@@ -44,6 +44,7 @@ public class AdminUserConfig implements CommandLineRunner {
                             .avatarUrl("")
                             .email("admin@email.com")
                             .notificationEmail("admin@email.com")
+                            .profileUrl("")
                             .createdAt(LocalDateTime.now())
                             .updatedAt(LocalDateTime.now())
                             .roles(Set.of(roleAdmin))

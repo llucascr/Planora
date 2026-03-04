@@ -30,12 +30,12 @@ public class OauthService {
             throw new DataNotFoundException("User with login " + login + " already exists");
         }
 
-        System.out.println(Role.Values.BASIC.getDescription());
         Role basicRole = roleRepository.findByName(Role.Values.BASIC.getDescription());
 
         User newUser = User.builder()
                 .login(user.getAttribute("login"))
                 .avatarUrl(user.getAttribute("avatar_url"))
+                .profileUrl(user.getAttribute("url"))
                 .email(user.getAttribute("email"))
                 .notificationEmail(user.getAttribute("notification_email"))
                 .createdAt(LocalDateTime.now())

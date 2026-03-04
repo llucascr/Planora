@@ -27,6 +27,9 @@ public class User {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
+    @Column(name = "profile_url")
+    private String profileUrl;
+
     private String email;
 
     @Column(name = "notification_email")
