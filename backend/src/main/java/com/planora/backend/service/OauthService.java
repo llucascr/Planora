@@ -7,6 +7,8 @@ import com.planora.backend.model.user.dto.UserResponse;
 import com.planora.backend.repository.RoleRepository;
 import com.planora.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import java.util.Set;
 @Service
 public class OauthService {
 
+    private static final Logger log = LoggerFactory.getLogger(OauthService.class);
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
@@ -24,10 +28,9 @@ public class OauthService {
 
         if (user == null) throw new DataNotFoundException("User not exists");
 
-        String login = user.getAttribute("login");
-
-        if (userRepository.findByLogin(login).isPresent()) {
-            throw new DataNotFoundException("User with login " + login + " already exists");
+        if (userRepository.findByLogin(user.getAttribute("login")).isPresent()) {
+            log.info("Login successful");
+            return;
         }
 
         Role basicRole = roleRepository.findByName(Role.Values.BASIC.getDescription());
