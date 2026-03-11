@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="74c1c74b-758c-454b-bde5-4a042c6e902c" name="Changes" comment="" />
+    <list default="true" id="74c1c74b-758c-454b-bde5-4a042c6e902c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/planora/backend/model/issue/Issue.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/planora/backend/model/issue/Label.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/planora/backend/model/issue/State.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,24 +14,24 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="3AP2F2nhnJZDoxnqOrC8eMwf495" />
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "lucas",
-    "last_opened_file_path": "/Users/lucasdecamposranzani"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;lucas&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/lucasdecamposranzani&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="74c1c74b-758c-454b-bde5-4a042c6e902c" name="Changes" comment="" />

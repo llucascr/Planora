@@ -1,10 +1,12 @@
 package com.planora.backend.model.user;
 
+import com.planora.backend.model.issue.Issue;
 import com.planora.backend.model.user.dto.UserResponse;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -40,6 +42,10 @@ public class User {
 
     @Column(name = "updated_at",  nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany
+    @JoinColumn(name = "issue_id")
+    private List<Issue> issues;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
