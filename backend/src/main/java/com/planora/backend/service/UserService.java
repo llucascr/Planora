@@ -13,13 +13,14 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserResponse getUserById(Long userId) {
-        return findById(userId).toResponse();
-    }
-
-    User findById(Long userId) {
+    public User findById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+    }
+
+    public User findByLogin(String login) {
+        return userRepository.findByLogin(login)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + login));
     }
 
 }
