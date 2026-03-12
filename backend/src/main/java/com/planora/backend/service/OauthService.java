@@ -4,7 +4,6 @@ import com.planora.backend.exception.DataNotFoundException;
 import com.planora.backend.model.user.Role;
 import com.planora.backend.model.user.User;
 import com.planora.backend.model.user.dto.LoginResponse;
-import com.planora.backend.model.user.dto.UserResponse;
 import com.planora.backend.repository.RoleRepository;
 import com.planora.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +61,7 @@ public class OauthService {
 
     private LoginResponse generatedLoginResponse(User user) {
         Instant now = Instant.now();
-        long expiresIn = 300L;
+        long expiresIn = 860000L;
 
         String scopes = user.getRoles()
                 .stream()
