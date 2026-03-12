@@ -6,14 +6,10 @@ import com.planora.backend.model.issue.Label;
 import com.planora.backend.model.issue.dto.IssueApiResponse;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
-import com.planora.backend.model.issue.dto.LabelResponse;
 import com.planora.backend.model.user.User;
-import com.planora.backend.model.user.dto.UserResponse;
 import com.planora.backend.repository.IssueRepository;
-import com.planora.backend.repository.LabelRepository;
-import com.planora.backend.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,9 +22,10 @@ public class GithubService {
     private static final String GITHUB_API_VERSION = "2022-11-28";
 
     private final IssueRepository issueRepository;
-    private final LabelRepository labelRepository;
-    private final UserRepository userRepository;
+
     private final UserService userService;
+    private final LabelService labelService;
+
     private final GithubClient githubClient;
 
     public IssueResponse createIssue(String token, IssueRequest issueRequest, Long userId, String repository) {
@@ -42,26 +39,19 @@ public class GithubService {
                 issueRequest
         );
 
-        List<Label> labels = apiResponse.labels().stream()
-                .map(this::resolveOrCreateLabel)
-                .toList();
+        List<Label> labels = getLabelsAddThemApiResponse(apiResponse);
+        List<User> assignees = getUsersAddThemApiResponse(apiResponse);
 
-        List<User> assignees = apiResponse.assignees().stream()
-                .map(ur -> resolveAssignee(ur.login()))
-                .toList();
-
-        LocalDateTime now = LocalDateTime.now();
-
-        Issue issue = apiResponse.toEntity();
-        issue.setUserId(user);
-        issue.setLabels(labels);
-        issue.setAssignees(assignees);
-        issue.setCreatedAt(now);
-        issue.setUpdatedAt(now);
-
+        Issue issue = setUpIssue(apiResponse, user, labels, assignees);
         issueRepository.save(issue);
 
-        IssueApiResponse resolvedApiResponse = new IssueApiResponse(
+        IssueApiResponse resolvedApiResponse = setUpIssueApiResponse(apiResponse, user, assignees);
+
+        return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), null);
+    }
+
+    private static @NonNull IssueApiResponse setUpIssueApiResponse(IssueApiResponse apiResponse, User user, List<User> assignees) {
+        return new IssueApiResponse(
                 apiResponse.url(),
                 apiResponse.number(),
                 apiResponse.title(),
@@ -71,25 +61,32 @@ public class GithubService {
                 apiResponse.labels(),
                 assignees.stream().map(User::toResponse).toList()
         );
-
-        return new IssueResponse(resolvedApiResponse, now, now, null);
     }
 
-    private Label resolveOrCreateLabel(LabelResponse labelResponse) {
-        return labelRepository.findByName(labelResponse.name())
-                .orElseGet(() -> {
-                    Label label = new Label();
-                    label.setUrl(labelResponse.url());
-                    label.setName(labelResponse.name());
-                    label.setColor(labelResponse.color());
-                    label.setDescription(labelResponse.description());
-                    return labelRepository.save(label);
-                });
+    private static @NonNull Issue setUpIssue(IssueApiResponse apiResponse, User user, List<Label> labels, List<User> assignees) {
+        LocalDateTime now = LocalDateTime.now();
+        Issue issue = apiResponse.toEntity();
+
+        issue.setUserId(user);
+        issue.setLabels(labels);
+        issue.setAssignees(assignees);
+        issue.setCreatedAt(now);
+        issue.setUpdatedAt(now);
+
+        return issue;
     }
 
-    private User resolveAssignee(String login) {
-        return userRepository.findByLogin(login)
-                .orElseThrow(() -> new EntityNotFoundException("User not found: " + login));
+    private @NonNull List<User> getUsersAddThemApiResponse(IssueApiResponse apiResponse) {
+        List<User> assignees = apiResponse.assignees().stream()
+                .map(ur -> userService.findByLogin(ur.login()))
+                .toList();
+        return assignees;
     }
 
+    private @NonNull List<Label> getLabelsAddThemApiResponse(IssueApiResponse apiResponse) {
+        return apiResponse.labels().stream()
+                .map(labelService::resolveOrCreateLabel)
+                .toList();
+    }
+    
 }
