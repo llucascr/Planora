@@ -29,6 +29,8 @@ public class Issue {
 
     private String title;
 
+    private String body;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private State state;
