@@ -1,6 +1,7 @@
 package com.planora.backend.model.user;
 
 import com.planora.backend.model.issue.Issue;
+import com.planora.backend.model.issue.dto.UserIssueResponse;
 import com.planora.backend.model.user.dto.UserResponse;
 import jakarta.persistence.*;
 import lombok.*;
@@ -63,6 +64,15 @@ public class User {
                 this.createdAt,
                 this.updatedAt,
                 this.roles
+        );
+    }
+
+    public UserIssueResponse toIssueResponse() {
+        return new UserIssueResponse(
+                this.login,
+                this.avatarUrl,
+                this.email,
+                this.notificationEmail
         );
     }
 

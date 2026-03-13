@@ -57,9 +57,9 @@ public class GithubService {
                 apiResponse.title(),
                 apiResponse.body(),
                 apiResponse.state(),
-                user.toResponse(),
+                user.toIssueResponse(),
                 apiResponse.labels(),
-                assignees.stream().map(User::toResponse).toList()
+                assignees.stream().map(User::toIssueResponse).toList()
         );
     }
 

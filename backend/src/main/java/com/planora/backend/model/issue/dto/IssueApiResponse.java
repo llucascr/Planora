@@ -8,7 +8,6 @@ import com.planora.backend.model.issue.State;
 import com.planora.backend.model.user.User;
 import com.planora.backend.model.user.dto.UserResponse;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -18,9 +17,9 @@ public record IssueApiResponse(
         String title,
         String body,
         String state,
-        @JsonProperty("user") UserResponse owner,
+        @JsonProperty("user") UserIssueResponse owner,
         List<LabelResponse> labels,
-        List<UserResponse> assignees
+        List<UserIssueResponse> assignees
 ) {
 
     public Issue toEntity() {
@@ -31,20 +30,7 @@ public record IssueApiResponse(
         issue.setBody(this.body);
         issue.setState(State.valueOf(this.state.toUpperCase()));
         issue.setLabels(this.labels.stream().map(IssueApiResponse::toLabelEntity).toList());
-        issue.setAssignees(this.assignees.stream().map(IssueApiResponse::toUserEntity).toList());
         return issue;
-    }
-
-    private static User toUserEntity(UserResponse userResponse) {
-        return User.builder()
-                .login(userResponse.login())
-                .avatarUrl(userResponse.avatarUrl())
-                .email(userResponse.email())
-                .notificationEmail(userResponse.notificationEmail())
-                .createdAt(userResponse.createdAt())
-                .updatedAt(userResponse.updatedAt())
-                .roles(userResponse.roles())
-                .build();
     }
 
     private static Label toLabelEntity(LabelResponse labelResponse) {
