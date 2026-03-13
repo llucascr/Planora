@@ -87,5 +87,5 @@ public class GithubService {
                 .map(labelService::resolveOrCreateLabel)
                 .toList();
     }
-    
+
 }
