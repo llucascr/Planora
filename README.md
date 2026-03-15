@@ -137,7 +137,7 @@ Seguimos o [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## 📄 Licença
 
-Distribuído sob a licença **GNU GENERAL PUBLIC**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Distribuído sob a licença **GNU GENERAL PUBLIC**. Veja o arquivo [LICENSE](https://github.com/llucascr/Planora/blob/lucas/LICENSE.md) para mais detalhes.
 
 ---
 
