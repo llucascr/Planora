@@ -12,6 +12,7 @@ public class Role {
     @Column(name = "role_id")
     private Long roleId;
 
+    @Getter
     private String name;
 
     public enum Values {
