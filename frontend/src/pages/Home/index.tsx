@@ -8,6 +8,8 @@ import {
   CheckCircle,
   Warning,
 } from "@phosphor-icons/react";
+import { Button } from "components";
+import { useUI } from "context";
 import {
   AreaChart,
   Area,
@@ -89,6 +91,8 @@ export const HomePage = () => {
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
+  const ui = useUI();
+
 
   return (
     <div className="space-y-6">
@@ -111,6 +115,24 @@ export const HomePage = () => {
           })}
         </div>
       </div>
+
+      <Button color="blue" title="Sidebar" onClick={() => ui.show({
+        content: <>
+          <Button color="blue" title="Sidebar" onClick={() => ui.show({
+            content: <></>,
+            id: "modal",
+            type: "modal",
+            options: {
+              titulo: "Modal"
+            }
+          })} /></>,
+        id: "sidebar",
+        type: "sidebar",
+        options: {
+          position: "right",
+          titulo: "Sidebar"
+        }
+      })} />
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
