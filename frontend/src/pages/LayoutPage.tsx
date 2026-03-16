@@ -30,10 +30,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { to: "/", label: "Dashboard", icon: House, exact: true },
-  { to: "/projects", label: "Projetos", icon: FolderOpen },
-  { to: "/tasks", label: "Tarefas", icon: CheckSquare },
-  { to: "/calendar", label: "Calendário", icon: CalendarBlank },
-  { to: "/reports", label: "Relatórios", icon: ChartBar },
+  { to: "/projetos", label: "Projetos", icon: FolderOpen },
 ];
 
 const bottomItems: NavItem[] = [
