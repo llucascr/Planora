@@ -24,6 +24,9 @@ public class KanbanBoard {
     private String name;
     private String description;
 
+    private String githubRepository;
+    private String githubOwnerName;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User owner;
