@@ -1,4 +1,9 @@
 package com.planora.backend.model.kanban.dto;
 
-public record KanbanBoardRequest() {
+public record KanbanBoardRequest(
+        String name,
+        String description,
+        String githubRepository,
+        String githubOwnerName
+) {
 }
