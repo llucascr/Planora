@@ -116,23 +116,6 @@ export const HomePage = () => {
         </div>
       </div>
 
-      <Button color="blue" title="Sidebar" onClick={() => ui.show({
-        content: <>
-          <Button color="blue" title="Sidebar" onClick={() => ui.show({
-            content: <></>,
-            id: "modal",
-            type: "modal",
-            options: {
-              titulo: "Modal"
-            }
-          })} /></>,
-        id: "sidebar",
-        type: "sidebar",
-        options: {
-          position: "right",
-          titulo: "Sidebar"
-        }
-      })} />
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -259,20 +242,6 @@ export const HomePage = () => {
               <p className="text-sm font-semibold text-gray-800 mb-3 leading-tight">
                 {project.name}
               </p>
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-xs text-gray-400">
-                  <span>Progresso</span>
-                  <span className="font-medium" style={{ color: project.color }}>
-                    {project.progress}%
-                  </span>
-                </div>
-                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{ width: `${project.progress}%`, backgroundColor: project.color }}
-                  />
-                </div>
-              </div>
             </div>
           ))}
         </div>
