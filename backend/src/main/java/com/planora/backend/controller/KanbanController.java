@@ -16,8 +16,11 @@ public class KanbanController {
     private final KanbanBoardService kanbanBoardService;
 
     @PostMapping("/board")
-    public ResponseEntity<?> createKanbanBoard(@RequestBody KanbanBoardRequest request, @RequestParam Long userId) {
-        kanbanBoardService.createKanbanBoard(request, userId);
+    public ResponseEntity<?> createKanbanBoard(
+            @RequestHeader("token") String token,
+            @RequestBody KanbanBoardRequest request,
+            @RequestParam Long userId) {
+        kanbanBoardService.createKanbanBoard(token, request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

@@ -18,12 +18,17 @@ public class KanbanBoardService {
 
     private final UserService userService;
 
-    public void createKanbanBoard(KanbanBoardRequest request, Long userId) {
+    private final GithubService githubService;
+
+    public void createKanbanBoard(String token, KanbanBoardRequest request, Long userId) {
+        if (!githubService.checkIfRepositoryAndOwnerNameAreValid(token, request.githubOwnerName(), request.githubRepository())) {
+            throw new DataNotFoundException("Repository " + request.githubRepository() + " not found for owner " + request.githubOwnerName());
+        }
+
         KanbanBoard kanbanBoard = KanbanBoard.builder()
                 .name(request.name())
                 .description(request.description())
                 .owner(userService.findById(userId))
-                // Verificar se esse repository existe nesse ownerName
                 .githubRepository(request.githubRepository())
                 .githubOwnerName(request.githubOwnerName())
                 .members(new ArrayList<>())
