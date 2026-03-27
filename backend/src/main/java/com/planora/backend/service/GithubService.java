@@ -50,6 +50,15 @@ public class GithubService {
         return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), null);
     }
 
+    public boolean checkIfRepositoryAndOwnerNameAreValid(String token, String ownerName, String repository) {
+        try {
+            githubClient.getRepository(ownerName, repository, "Bearer " + token, GITHUB_API_VERSION);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private static @NonNull IssueApiResponse setUpIssueApiResponse(IssueApiResponse apiResponse, User user, List<User> assignees) {
         return new IssueApiResponse(
                 apiResponse.url(),
