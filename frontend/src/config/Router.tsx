@@ -19,7 +19,7 @@ export const Router = createBrowserRouter([
       },
       {
         id: "tarefas",
-        path: "/tarefas",
+        path: "/projetos/:projectId/tarefas",
         Component: TarefasPage,
       },
       {
