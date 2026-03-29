@@ -10,6 +10,8 @@ import com.planora.backend.model.user.User;
 import com.planora.backend.repository.IssueRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +22,8 @@ import java.util.List;
 public class GithubService {
 
     private static final String GITHUB_API_VERSION = "2022-11-28";
+
+    private static final Logger log = LoggerFactory.getLogger(GithubService.class);
 
     private final IssueRepository issueRepository;
 
@@ -50,11 +54,25 @@ public class GithubService {
         return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), null);
     }
 
+//    public List<IssueResponse> getAllIssuesFromRepository(String token, Long userId, String repository) {
+//        User user = userService.findById(userId);
+//
+//        List<IssueApiResponse> listIssues = githubClient.getAllIssuesFromRepository(
+//                user.getLogin(),
+//                repository,
+//                "Bearer " + token,
+//                GITHUB_API_VERSION
+//        );
+//
+//        return
+//    }
+
     public boolean checkIfRepositoryAndOwnerNameAreValid(String token, String ownerName, String repository) {
         try {
             githubClient.getRepository(ownerName, repository, "Bearer " + token, GITHUB_API_VERSION);
             return true;
         } catch (Exception e) {
+            log.warn("Repository validation failed for owner='{}' repo='{}': {}", ownerName, repository, e.getMessage());
             return false;
         }
     }
