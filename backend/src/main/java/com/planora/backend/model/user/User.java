@@ -2,6 +2,7 @@ package com.planora.backend.model.user;
 
 import com.planora.backend.model.issue.Issue;
 import com.planora.backend.model.issue.dto.UserIssueResponse;
+import com.planora.backend.model.kanban.KanbanMember;
 import com.planora.backend.model.user.dto.UserResponse;
 import jakarta.persistence.*;
 import lombok.*;
@@ -54,6 +55,9 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    @OneToMany(mappedBy = "user")
+    private List<KanbanMember> kanbanMemberships;
 
     public UserResponse toResponse() {
         return new UserResponse(

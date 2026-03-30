@@ -6,10 +6,13 @@ import com.planora.backend.model.issue.Label;
 import com.planora.backend.model.issue.dto.IssueApiResponse;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
+import com.planora.backend.model.issue.dto.RepositoryResponse;
 import com.planora.backend.model.user.User;
 import com.planora.backend.repository.IssueRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,13 +22,11 @@ import java.util.List;
 @Service
 public class GithubService {
 
+    private static final Logger log = LoggerFactory.getLogger(GithubService.class);
     private static final String GITHUB_API_VERSION = "2022-11-28";
-
     private final IssueRepository issueRepository;
-
     private final UserService userService;
     private final LabelService labelService;
-
     private final GithubClient githubClient;
 
     public IssueResponse createIssue(String token, IssueRequest issueRequest, Long userId, String repository) {
@@ -48,6 +49,16 @@ public class GithubService {
         IssueApiResponse resolvedApiResponse = setUpIssueApiResponse(apiResponse, user, assignees);
 
         return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), null);
+    }
+
+    public boolean checkIfRepositoryAndOwnerNameAreValid(String token, String ownerName, String repository) {
+        try {
+            return githubClient
+                    .getRepository(ownerName, repository, "Bearer " + token, GITHUB_API_VERSION) != null;
+        } catch (Exception e) {
+            log.warn("Repository validation failed for owner='{}' repo='{}': {}", ownerName, repository, e.getMessage());
+            return false;
+        }
     }
 
     private static @NonNull IssueApiResponse setUpIssueApiResponse(IssueApiResponse apiResponse, User user, List<User> assignees) {

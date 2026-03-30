@@ -1,5 +1,6 @@
 package com.planora.backend.model.issue;
 
+import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.model.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -63,5 +64,9 @@ public class Issue {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> assignees;
+
+    @ManyToOne
+    @JoinColumn(name = "kanban_column_id")
+    private KanbanColumn column;
 
 }

@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="74c1c74b-758c-454b-bde5-4a042c6e902c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/planora/backend/model/issue/Issue.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/planora/backend/model/issue/Label.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/planora/backend/model/issue/State.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/planora/backend/service/GithubService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/planora/backend/service/GithubService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/planora/backend/service/KanbanBoardService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/planora/backend/service/KanbanBoardService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,6 +18,10 @@
   &quot;associatedIndex&quot;: 2
 }</component>
   <component name="ProjectId" id="3AP2F2nhnJZDoxnqOrC8eMwf495" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
