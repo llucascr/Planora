@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Outlet, NavLink, useLocation } from "react-router-dom";
+import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { NotificationProvider, UIProvider } from "context";
+import { useCookie } from "hooks";
+import { config } from "config";
 import logo from "../img/logo_horizontal_white.png";
 import logoSmall from "../img/logo_solo_white.png";
 import {
@@ -15,6 +17,8 @@ import {
   X,
   CaretRight,
   User,
+  SignOut,
+  SignIn,
   ChatCircleDots,
   PaperPlaneTilt,
   Robot,
@@ -62,6 +66,28 @@ export const LayoutPage = ({ children }: LayoutProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+  const { getCookie, deleteCookie } = useCookie();
+  const navigate = useNavigate();
+
+  const isLoggedIn = !!getCookie(config.tokenCookieNome);
+
+  const handleLogout = () => {
+    deleteCookie(config.tokenCookieNome);
+    setProfileMenuOpen(false);
+    navigate("/login");
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const [messages, setMessages] = useState<ChatMessage[]>([
     { from: "bot", text: "Olá! 👋 Sou o assistente da Planora. Como posso te ajudar com seus projetos?" },
   ]);
@@ -223,24 +249,59 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                 </NavLink>
               ))}
 
-              {/* User profile */}
-              <div
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg mt-2 bg-white/10 cursor-pointer hover:bg-white/20 transition-colors"
-                title={collapsed ? "Meu perfil" : undefined}
-              >
-                <div className="w-7 h-7 rounded-full bg-[#3d5aad] flex items-center justify-center shrink-0">
-                  <User size={16} weight="fill" className="text-white" />
+              {/* User profile / login */}
+              {isLoggedIn ? (
+                <div ref={profileMenuRef} className="relative mt-2">
+                  <div
+                    onClick={() => setProfileMenuOpen((o) => !o)}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 cursor-pointer hover:bg-white/20 transition-colors"
+                    title={collapsed ? "Meu perfil" : undefined}
+                  >
+                    <div className="w-7 h-7 rounded-full bg-[#3d5aad] flex items-center justify-center shrink-0">
+                      <User size={16} weight="fill" className="text-white" />
+                    </div>
+                    <div
+                      className={[
+                        "min-w-0 transition-all duration-300",
+                        collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto",
+                      ].join(" ")}
+                    >
+                      <p className="text-sm font-medium text-white truncate whitespace-nowrap">Meu Perfil</p>
+                      <p className="text-xs text-white/50 truncate whitespace-nowrap">Ver conta</p>
+                    </div>
+                  </div>
+
+                  {profileMenuOpen && (
+                    <div className="absolute bottom-full left-0 mb-1 w-full bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <SignOut size={16} weight="bold" />
+                        Sair da conta
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <div
-                  className={[
-                    "min-w-0 transition-all duration-300",
-                    collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto",
-                  ].join(" ")}
+              ) : (
+                <button
+                  onClick={() => navigate("/login")}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg mt-2 w-full bg-white/10 hover:bg-white/20 transition-colors"
+                  title={collapsed ? "Entrar" : undefined}
                 >
-                  <p className="text-sm font-medium text-white truncate whitespace-nowrap">Meu Perfil</p>
-                  <p className="text-xs text-white/50 truncate whitespace-nowrap">Ver conta</p>
-                </div>
-              </div>
+                  <div className="w-7 h-7 rounded-full bg-[#3d5aad] flex items-center justify-center shrink-0">
+                    <SignIn size={16} weight="fill" className="text-white" />
+                  </div>
+                  <span
+                    className={[
+                      "text-sm font-medium text-white transition-all duration-300 whitespace-nowrap",
+                      collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto",
+                    ].join(" ")}
+                  >
+                    Entrar
+                  </span>
+                </button>
+              )}
             </div>
           </aside>
 
