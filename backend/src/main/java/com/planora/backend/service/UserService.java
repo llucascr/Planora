@@ -7,6 +7,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -21,6 +23,10 @@ public class UserService {
     public User findByLogin(String login) {
         return userRepository.findByLogin(login)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + login));
+    }
+
+    public Optional<User> findOptionalByLogin(String login) {
+        return userRepository.findByLogin(login);
     }
 
 }

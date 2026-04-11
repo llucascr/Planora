@@ -1,5 +1,8 @@
 package com.planora.backend.controller;
 
+import com.planora.backend.model.issue.dto.IssueRequest;
+import com.planora.backend.model.issue.dto.IssueResponse;
+import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.model.kanban.dto.KanbanBoardRequest;
 import com.planora.backend.repository.KanbanBoardRepository;
 import com.planora.backend.service.KanbanBoardService;
@@ -22,6 +25,20 @@ public class KanbanController {
             @RequestParam Long userId) {
         kanbanBoardService.createKanbanBoard(token, request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/createIssue")
+    public ResponseEntity<IssueResponse> createIssueAndAddToColumn(
+            @RequestParam Long boardId,
+            @RequestParam Long columnId,
+            @RequestHeader("token") String token,
+            @RequestBody IssueRequest issueRequest,
+            @RequestParam Long userId,
+            @RequestParam String repository
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                kanbanBoardService.createIssueAndAddToColumn(boardId, columnId, token, issueRequest, userId, repository)
+        );
     }
 
 }
