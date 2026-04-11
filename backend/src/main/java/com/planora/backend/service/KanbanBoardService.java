@@ -1,15 +1,23 @@
 package com.planora.backend.service;
 
 import com.planora.backend.exception.DataNotFoundException;
+import com.planora.backend.exception.UnauthorizedException;
+import com.planora.backend.model.issue.Issue;
+import com.planora.backend.model.issue.dto.IssueRequest;
+import com.planora.backend.model.issue.dto.IssueResponse;
 import com.planora.backend.model.kanban.InvitedStatus;
 import com.planora.backend.model.kanban.KanbanBoard;
 import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.model.kanban.KanbanMember;
 import com.planora.backend.model.kanban.dto.KanbanBoardRequest;
 import com.planora.backend.model.user.User;
+import com.planora.backend.repository.IssueRepository;
 import com.planora.backend.repository.KanbanBoardRepository;
 import com.planora.backend.repository.KanbanColumnRepository;
+import com.planora.backend.repository.KanbanMemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,8 +28,11 @@ import java.util.List;
 @Service
 public class KanbanBoardService {
 
+    private static final Logger log = LoggerFactory.getLogger(KanbanBoardService.class);
+
     private final KanbanBoardRepository kanbanBoardRepository;
     private final KanbanColumnRepository kanbanColumnRepository;
+    private final KanbanMemberRepository kanbanMemberRepository;
     private final UserService userService;
     private final GithubService githubService;
 
@@ -43,12 +54,31 @@ public class KanbanBoardService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        addMemberInKanban(kanbanBoard, user);
+        addOwnerMemberInKanban(kanbanBoard, user);
         KanbanBoard savedBoard = kanbanBoardRepository.save(kanbanBoard);
         createDefaultColumns(savedBoard);
     }
 
-    private static void addMemberInKanban(KanbanBoard kanbanBoard, User user) {
+    public IssueResponse createIssueAndAddToColumn(Long boardId, Long columnId, String token, IssueRequest issueRequest,
+                                                   Long userId, String repository
+    ) {
+        KanbanBoard board = getKanbanBoard(boardId);
+
+        User user = userService.findById(userId);
+
+        if (kanbanMemberRepository.findByKanbanBoardAndUser(board, user).isEmpty()) {
+            throw new UnauthorizedException("Kanban member not found");
+        }
+
+        KanbanColumn column = board.getColumns().stream()
+                .filter(c -> c.getKanbanColumnId().equals(columnId))
+                .findFirst()
+                .orElseThrow(() -> new DataNotFoundException("Column with id " + columnId + " not found in board " + boardId));
+
+        return githubService.createIssue(token, issueRequest, userId, repository, column);
+    }
+
+    private static void addOwnerMemberInKanban(KanbanBoard kanbanBoard, User user) {
         KanbanMember ownerMember = KanbanMember.builder()
                 .kanbanBoard(kanbanBoard)
                 .user(user)

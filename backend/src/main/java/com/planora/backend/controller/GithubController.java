@@ -2,6 +2,7 @@ package com.planora.backend.controller;
 
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
+import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.service.GithubService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,10 @@ public class GithubController {
             @RequestHeader("token") String token,
             @RequestBody IssueRequest issueRequest,
             @RequestParam Long userId,
-            @RequestParam String repository) {
-        return ResponseEntity.ok(githubService.createIssue(token, issueRequest, userId, repository));
+            @RequestParam String repository,
+            @RequestParam KanbanColumn column
+    ) {
+        return ResponseEntity.ok(githubService.createIssue(token, issueRequest, userId, repository, column));
     }
 
 
