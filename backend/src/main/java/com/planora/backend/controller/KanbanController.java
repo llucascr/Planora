@@ -24,7 +24,7 @@ public class KanbanController {
     private final KanbanBoardService kanbanBoardService;
     private final TokenService tokenService;
 
-    @PostMapping("/board")
+    @PostMapping("/board/create")
     public ResponseEntity<KanbanBoardResponse> createKanbanBoard(
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody KanbanBoardRequest request) {
@@ -32,7 +32,7 @@ public class KanbanController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/board")
+    @GetMapping("/board/list")
     public ResponseEntity<List<KanbanBoardResponse>> getAllBoardsByUser(@AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(kanbanBoardService.getAllBoardsByUser(tokenService.getUserId(jwt)));
     }
@@ -42,20 +42,20 @@ public class KanbanController {
         return ResponseEntity.ok(kanbanBoardService.getBoardById(id));
     }
 
-    @PutMapping("/board/{id}")
+    @PutMapping("/board/update/{id}")
     public ResponseEntity<KanbanBoardResponse> updateBoard(
             @PathVariable Long id,
             @RequestBody KanbanBoardRequest request) {
         return ResponseEntity.ok(kanbanBoardService.updateBoard(id, request));
     }
 
-    @DeleteMapping("/board/{id}")
+    @DeleteMapping("/board/delete/{id}")
     public ResponseEntity<Map<String, String>> deleteBoard(@PathVariable Long id) {
         kanbanBoardService.deleteBoard(id);
         return ResponseEntity.ok(Map.of("message", "Board deleted successfully"));
     }
 
-    @PostMapping("/createIssue")
+    @PostMapping("/board/issue/create")
     public ResponseEntity<IssueResponse> createIssueAndAddToColumn(
             @RequestParam Long boardId,
             @RequestParam Long columnId,
