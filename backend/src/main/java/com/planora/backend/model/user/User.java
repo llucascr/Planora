@@ -39,6 +39,9 @@ public class User {
     @Column(name = "notification_email")
     private String notificationEmail;
 
+    @Column(name = "github_token")
+    private String githubToken;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

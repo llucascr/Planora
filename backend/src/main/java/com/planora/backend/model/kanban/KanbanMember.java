@@ -1,5 +1,6 @@
 package com.planora.backend.model.kanban;
 
+import com.planora.backend.model.kanban.dto.InvitedStatus;
 import com.planora.backend.model.user.User;
 import jakarta.persistence.*;
 import lombok.*;
