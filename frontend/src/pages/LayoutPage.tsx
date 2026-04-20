@@ -6,9 +6,6 @@ import logoSmall from "../img/logo_solo_white.png";
 import {
   House,
   FolderOpen,
-  CheckSquare,
-  CalendarBlank,
-  ChartBar,
   Gear,
   Bell,
   List,
@@ -43,11 +40,15 @@ const bottomItems: NavItem[] = [
 type ChatMessage = { from: "user" | "bot"; text: string };
 
 const BOT_REPLIES: Record<string, string> = {
-  default: "Entendido! Posso te ajudar com informações sobre seus projetos. Qual é a sua dúvida?",
+  default:
+    "Entendido! Posso te ajudar com informações sobre seus projetos. Qual é a sua dúvida?",
   oi: "Olá! 👋 Sou o assistente da Planora. Como posso te ajudar com seus projetos?",
-  ajuda: "Claro! Posso te ajudar a entender o andamento dos projetos, prazos e tarefas. O que você precisa saber?",
-  prazo: "Os projetos com prazo mais próximo são: **Portal do Cliente** (25/03) e **Redesign do App** (30/03).",
-  atrasado: "Atualmente o projeto **Módulo de Relatórios** está atrasado. O prazo era 10/03 e o progresso está em 20%.",
+  ajuda:
+    "Claro! Posso te ajudar a entender o andamento dos projetos, prazos e tarefas. O que você precisa saber?",
+  prazo:
+    "Os projetos com prazo mais próximo são: **Portal do Cliente** (25/03) e **Redesign do App** (30/03).",
+  atrasado:
+    "Atualmente o projeto **Módulo de Relatórios** está atrasado. O prazo era 10/03 e o progresso está em 20%.",
 };
 
 function getBotReply(msg: string): string {
@@ -63,7 +64,10 @@ export const LayoutPage = ({ children }: LayoutProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { from: "bot", text: "Olá! 👋 Sou o assistente da Planora. Como posso te ajudar com seus projetos?" },
+    {
+      from: "bot",
+      text: "Olá! 👋 Sou o assistente da Planora. Como posso te ajudar com seus projetos?",
+    },
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -84,7 +88,10 @@ export const LayoutPage = ({ children }: LayoutProps) => {
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
-      setMessages((prev) => [...prev, { from: "bot", text: getBotReply(text) }]);
+      setMessages((prev) => [
+        ...prev,
+        { from: "bot", text: getBotReply(text) },
+      ]);
     }, 900);
   }
 
@@ -102,17 +109,17 @@ export const LayoutPage = ({ children }: LayoutProps) => {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  const pageTitle = [...navItems, ...bottomItems].find((item) =>
-    item.exact
-      ? location.pathname === item.to
-      : location.pathname.startsWith(item.to) && item.to !== "/"
-  )?.label ?? "Dashboard";
+  const pageTitle =
+    [...navItems, ...bottomItems].find((item) =>
+      item.exact
+        ? location.pathname === item.to
+        : location.pathname.startsWith(item.to) && item.to !== "/",
+    )?.label ?? "Dashboard";
 
   return (
     <NotificationProvider>
       <UIProvider>
         <div className="flex h-screen bg-[#eef0f7] overflow-hidden">
-
           {/* Mobile overlay */}
           {mobileOpen && (
             <div
@@ -124,22 +131,29 @@ export const LayoutPage = ({ children }: LayoutProps) => {
           {/* Sidebar */}
           <aside
             className={[
-              "fixed lg:relative z-30 flex flex-col h-full bg-gradient-to-b from-[#0E1F63] to-[#091550] text-white shadow-2xl overflow-hidden",
+              "fixed lg:relative z-30 flex flex-col h-full bg-linear-to-b from-[#0E1F63] to-[#091550] text-white shadow-2xl overflow-hidden",
               "transition-[width] duration-300 ease-in-out",
               collapsed ? "w-20" : "w-60",
-              mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+              mobileOpen
+                ? "translate-x-0"
+                : "-translate-x-full lg:translate-x-0",
             ].join(" ")}
           >
             {/* Logo */}
             <div className="flex items-center border-b border-white/10 px-3 py-4 shrink-0">
-              <div className="relative flex-1 flex items-center justify-center overflow-hidden" style={{ height: 48 }}>
+              <div
+                className="relative flex-1 flex items-center justify-center overflow-hidden"
+                style={{ height: 48 }}
+              >
                 {/* Logo expandido */}
                 <img
                   src={logo}
                   alt="Planora"
                   className={[
                     "absolute h-12 object-contain transition-all duration-300",
-                    collapsed ? "opacity-0 scale-90 pointer-events-none" : "opacity-100 scale-100",
+                    collapsed
+                      ? "opacity-0 scale-90 pointer-events-none"
+                      : "opacity-100 scale-100",
                   ].join(" ")}
                 />
                 {/* Logo recolhido */}
@@ -148,7 +162,9 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                   alt="Planora"
                   className={[
                     "absolute h-10 object-contain transition-all duration-300",
-                    collapsed ? "opacity-100 scale-100" : "opacity-0 scale-90 pointer-events-none",
+                    collapsed
+                      ? "opacity-100 scale-100"
+                      : "opacity-0 scale-90 pointer-events-none",
                   ].join(" ")}
                 />
               </div>
@@ -160,7 +176,10 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                 <CaretRight
                   size={14}
                   weight="bold"
-                  className={["transition-transform duration-300", collapsed ? "" : "rotate-180"].join(" ")}
+                  className={[
+                    "transition-transform duration-300",
+                    collapsed ? "" : "rotate-180",
+                  ].join(" ")}
                 />
               </button>
             </div>
@@ -186,7 +205,9 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                   <span
                     className={[
                       "truncate transition-all duration-300 whitespace-nowrap",
-                      collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto",
+                      collapsed
+                        ? "opacity-0 w-0 overflow-hidden"
+                        : "opacity-100 w-auto",
                     ].join(" ")}
                   >
                     {label}
@@ -215,7 +236,9 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                   <span
                     className={[
                       "truncate transition-all duration-300 whitespace-nowrap",
-                      collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto",
+                      collapsed
+                        ? "opacity-0 w-0 overflow-hidden"
+                        : "opacity-100 w-auto",
                     ].join(" ")}
                   >
                     {label}
@@ -234,11 +257,17 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                 <div
                   className={[
                     "min-w-0 transition-all duration-300",
-                    collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto",
+                    collapsed
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto",
                   ].join(" ")}
                 >
-                  <p className="text-sm font-medium text-white truncate whitespace-nowrap">Meu Perfil</p>
-                  <p className="text-xs text-white/50 truncate whitespace-nowrap">Ver conta</p>
+                  <p className="text-sm font-medium text-white truncate whitespace-nowrap">
+                    Meu Perfil
+                  </p>
+                  <p className="text-xs text-white/50 truncate whitespace-nowrap">
+                    Ver conta
+                  </p>
                 </div>
               </div>
             </div>
@@ -246,7 +275,6 @@ export const LayoutPage = ({ children }: LayoutProps) => {
 
           {/* Main area */}
           <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-
             {/* Topbar */}
             <header className="flex items-center justify-between h-14 px-4 bg-white border-b border-gray-200 shadow-sm shrink-0">
               <div className="flex items-center gap-3">
@@ -262,7 +290,9 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <span className="hidden sm:inline">Planora</span>
                   <span className="hidden sm:inline text-gray-300">/</span>
-                  <span className="font-semibold text-gray-800">{pageTitle}</span>
+                  <span className="font-semibold text-gray-800">
+                    {pageTitle}
+                  </span>
                 </div>
               </div>
 
@@ -272,7 +302,6 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                   <Bell size={20} weight="duotone" />
                   <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#0E1F63] rounded-full ring-2 ring-white" />
                 </button>
-
               </div>
             </header>
 
@@ -286,18 +315,19 @@ export const LayoutPage = ({ children }: LayoutProps) => {
           {/* Chat FAB — só aparece em /projetos */}
           {isProjetosPage && (
             <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-
               {/* Chat panel */}
               {chatOpen && (
                 <div className="w-80 h-[420px] bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-[fadeSlideUp_0.2s_ease-out]">
                   {/* Header */}
-                  <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[#0E1F63] to-[#3d5aad]">
+                  <div className="flex items-center justify-between px-4 py-3 bg-linear-to-r from-[#0E1F63] to-[#3d5aad]">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                         <Robot size={16} weight="fill" className="text-white" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-white leading-tight">Assistente</p>
+                        <p className="text-sm font-semibold text-white leading-tight">
+                          Assistente
+                        </p>
                         <p className="text-[10px] text-white/60">Planora AI</p>
                       </div>
                     </div>
@@ -312,10 +342,17 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                   {/* Messages */}
                   <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 bg-[#f8f9fc]">
                     {messages.map((msg, i) => (
-                      <div key={i} className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}>
+                      <div
+                        key={i}
+                        className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
+                      >
                         {msg.from === "bot" && (
                           <div className="w-6 h-6 rounded-full bg-[#0E1F63] flex items-center justify-center mr-2 mt-0.5 shrink-0">
-                            <Robot size={12} weight="fill" className="text-white" />
+                            <Robot
+                              size={12}
+                              weight="fill"
+                              className="text-white"
+                            />
                           </div>
                         )}
                         <div
@@ -333,7 +370,11 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                     {isTyping && (
                       <div className="flex justify-start">
                         <div className="w-6 h-6 rounded-full bg-[#0E1F63] flex items-center justify-center mr-2 mt-0.5 shrink-0">
-                          <Robot size={12} weight="fill" className="text-white" />
+                          <Robot
+                            size={12}
+                            weight="fill"
+                            className="text-white"
+                          />
                         </div>
                         <div className="bg-white border border-gray-100 shadow-sm px-4 py-3 rounded-2xl rounded-bl-sm flex gap-1 items-center">
                           <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:0ms]" />
@@ -373,18 +414,22 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                   "w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200",
                   chatOpen
                     ? "bg-gray-700 hover:bg-gray-800 rotate-0"
-                    : "bg-gradient-to-br from-[#0E1F63] to-[#3d5aad] hover:scale-110",
+                    : "bg-linear-to-br from-[#0E1F63] to-[#3d5aad] hover:scale-110",
                 ].join(" ")}
                 title="Abrir assistente"
               >
-                {chatOpen
-                  ? <X size={22} weight="bold" className="text-white" />
-                  : <ChatCircleDots size={26} weight="fill" className="text-white" />
-                }
+                {chatOpen ? (
+                  <X size={22} weight="bold" className="text-white" />
+                ) : (
+                  <ChatCircleDots
+                    size={26}
+                    weight="fill"
+                    className="text-white"
+                  />
+                )}
               </button>
             </div>
           )}
-
         </div>
       </UIProvider>
     </NotificationProvider>

@@ -7,7 +7,6 @@ import {
   ArrowsDownUp,
   SortDescending,
   SortAscending,
-  Target,
   FileText,
 } from "@phosphor-icons/react";
 import { useBoardState, useBoardDispatch } from "../domain/boardStore";

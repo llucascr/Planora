@@ -8,8 +8,6 @@ import {
   CheckCircle,
   Warning,
 } from "@phosphor-icons/react";
-import { Button } from "components";
-import { useUI } from "context";
 import {
   AreaChart,
   Area,
@@ -30,17 +28,49 @@ const progressData = [
 ];
 
 const recentProjects = [
-  { name: "Redesign do App", progress: 72, status: "Em andamento", color: "#0E1F63" },
-  { name: "API de Pagamentos", progress: 45, status: "Em andamento", color: "#3d5aad" },
-  { name: "Dashboard Analytics", progress: 100, status: "Concluído", color: "#16a34a" },
-  { name: "Módulo de Relatórios", progress: 20, status: "Atrasado", color: "#dc2626" },
+  {
+    name: "Redesign do App",
+    progress: 72,
+    status: "Em andamento",
+    color: "#0E1F63",
+  },
+  {
+    name: "API de Pagamentos",
+    progress: 45,
+    status: "Em andamento",
+    color: "#3d5aad",
+  },
+  {
+    name: "Dashboard Analytics",
+    progress: 100,
+    status: "Concluído",
+    color: "#16a34a",
+  },
+  {
+    name: "Módulo de Relatórios",
+    progress: 20,
+    status: "Atrasado",
+    color: "#dc2626",
+  },
 ];
 
 const recentTasks = [
   { title: "Revisar protótipos de UI", project: "Redesign do App", done: true },
-  { title: "Configurar endpoints REST", project: "API de Pagamentos", done: false },
-  { title: "Escrever testes unitários", project: "API de Pagamentos", done: false },
-  { title: "Exportar relatório mensal", project: "Módulo de Relatórios", done: false },
+  {
+    title: "Configurar endpoints REST",
+    project: "API de Pagamentos",
+    done: false,
+  },
+  {
+    title: "Escrever testes unitários",
+    project: "API de Pagamentos",
+    done: false,
+  },
+  {
+    title: "Exportar relatório mensal",
+    project: "Módulo de Relatórios",
+    done: false,
+  },
   { title: "Deploy em produção", project: "Dashboard Analytics", done: true },
 ];
 
@@ -91,12 +121,9 @@ export const HomePage = () => {
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
-  const ui = useUI();
-
 
   return (
     <div className="space-y-6">
-
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -116,7 +143,6 @@ export const HomePage = () => {
         </div>
       </div>
 
-
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map(({ label, value, icon: Icon, change, positive, bg }) => (
@@ -126,13 +152,17 @@ export const HomePage = () => {
           >
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500">{label}</span>
-              <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center`}>
+              <div
+                className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center`}
+              >
                 <Icon size={18} weight="duotone" className="text-white" />
               </div>
             </div>
             <div>
               <p className="text-3xl font-bold text-gray-800">{value}</p>
-              <p className={`text-xs mt-1 ${positive ? "text-emerald-500" : "text-amber-500"}`}>
+              <p
+                className={`text-xs mt-1 ${positive ? "text-emerald-500" : "text-amber-500"}`}
+              >
                 {change}
               </p>
             </div>
@@ -142,17 +172,21 @@ export const HomePage = () => {
 
       {/* Chart + Recent Tasks */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
         {/* Chart */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-gray-800">Progresso Mensal</h2>
+            <h2 className="text-base font-semibold text-gray-800">
+              Progresso Mensal
+            </h2>
             <span className="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
               Últimos 6 meses
             </span>
           </div>
           <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={progressData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+            <AreaChart
+              data={progressData}
+              margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
+            >
               <defs>
                 <linearGradient id="gradTarefas" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#0E1F63" stopOpacity={0.15} />
@@ -164,10 +198,23 @@ export const HomePage = () => {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="mes" tick={{ fontSize: 12, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+              <XAxis
+                dataKey="mes"
+                tick={{ fontSize: 12, fill: "#9ca3af" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 12, fill: "#9ca3af" }}
+                axisLine={false}
+                tickLine={false}
+              />
               <Tooltip
-                contentStyle={{ borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: 12 }}
+                contentStyle={{
+                  borderRadius: "12px",
+                  border: "1px solid #e5e7eb",
+                  fontSize: 12,
+                }}
               />
               <Area
                 type="monotone"
@@ -192,7 +239,9 @@ export const HomePage = () => {
         {/* Recent Tasks */}
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-gray-800">Tarefas Recentes</h2>
+            <h2 className="text-base font-semibold text-gray-800">
+              Tarefas Recentes
+            </h2>
             <button className="text-gray-400 hover:text-gray-600 transition-colors">
               <DotsThree size={20} weight="bold" />
             </button>
@@ -201,16 +250,29 @@ export const HomePage = () => {
             {recentTasks.map((task) => (
               <li key={task.title} className="flex items-start gap-3">
                 <div className="mt-0.5 shrink-0">
-                  {task.done
-                    ? <CheckCircle size={18} weight="fill" className="text-emerald-500" />
-                    : <Circle size={18} weight="regular" className="text-gray-300" />
-                  }
+                  {task.done ? (
+                    <CheckCircle
+                      size={18}
+                      weight="fill"
+                      className="text-emerald-500"
+                    />
+                  ) : (
+                    <Circle
+                      size={18}
+                      weight="regular"
+                      className="text-gray-300"
+                    />
+                  )}
                 </div>
                 <div className="min-w-0">
-                  <p className={`text-sm font-medium truncate ${task.done ? "line-through text-gray-400" : "text-gray-700"}`}>
+                  <p
+                    className={`text-sm font-medium truncate ${task.done ? "line-through text-gray-400" : "text-gray-700"}`}
+                  >
                     {task.title}
                   </p>
-                  <p className="text-xs text-gray-400 truncate">{task.project}</p>
+                  <p className="text-xs text-gray-400 truncate">
+                    {task.project}
+                  </p>
                 </div>
               </li>
             ))}
@@ -221,8 +283,12 @@ export const HomePage = () => {
       {/* Recent Projects */}
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-gray-800">Projetos Recentes</h2>
-          <button className="text-xs text-[#0E1F63] font-medium hover:underline">Ver todos</button>
+          <h2 className="text-base font-semibold text-gray-800">
+            Projetos Recentes
+          </h2>
+          <button className="text-xs text-[#0E1F63] font-medium hover:underline">
+            Ver todos
+          </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {recentProjects.map((project) => (
@@ -246,7 +312,6 @@ export const HomePage = () => {
           ))}
         </div>
       </div>
-
     </div>
   );
 };

@@ -24,16 +24,17 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    "baseUrl": "./src", // Define a pasta base para os caminhos relativos
+    "baseUrl": "./src",
     "paths": {
-      "components/*": ["components/index"],
-      "config/*": ["config/index"],
-      "context/*": ["context/index"],
-      "hooks/*": ["hooks/index"],
-      "types/*": ["types/index"],
-      "utils/*": ["utils/index"],
-      "pages/*": ["pages/index"],
-      "/*": ["src/*"]
+      "components": ["components/index"],
+      "config": ["config/index"],
+      "context": ["context/index"],
+      "hooks": ["hooks/index"],
+      "types": ["types/index"],
+      "utils": ["utils/index"],
+      "pages": ["pages/index"],
+      "api": ["api/index"],
+      "@/*": ["./*"]
     }
   },
   "include": ["src"]
