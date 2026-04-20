@@ -53,7 +53,7 @@ public class KanbanBoardService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        addMemberInKanban(kanbanBoard, user);
+        addOwnerMemberInKanban(kanbanBoard, user);
         KanbanBoard savedBoard = kanbanBoardRepository.save(kanbanBoard);
         createDefaultColumns(savedBoard);
         return getBoardById(savedBoard.getKanbanBoardId());
@@ -110,7 +110,7 @@ public class KanbanBoardService {
                 () -> new DataNotFoundException("Kanban Board with id " + id + " not found"));
     }
 
-    private static void addMemberInKanban(KanbanBoard kanbanBoard, User user) {
+    private static void addOwnerMemberInKanban(KanbanBoard kanbanBoard, User user) {
         KanbanMember ownerMember = KanbanMember.builder()
                 .kanbanBoard(kanbanBoard)
                 .user(user)
@@ -166,4 +166,5 @@ public class KanbanBoardService {
                 members
         );
     }
+
 }
