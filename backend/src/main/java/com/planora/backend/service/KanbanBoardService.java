@@ -84,7 +84,7 @@ public class KanbanBoardService {
     }
 
     public List<KanbanBoardResponse> getAllBoardsByUser(Long userId) {
-        return kanbanBoardRepository.findByOwner_UserId(userId).stream()
+        return kanbanBoardRepository.findByMembers_User_UserIdAndMembers_InvitedStatus(userId, InvitedStatus.ACCEPTED).stream()
                 .map(this::toResponse)
                 .toList();
     }

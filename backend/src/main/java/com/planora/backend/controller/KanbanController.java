@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -49,9 +50,9 @@ public class KanbanController {
     }
 
     @DeleteMapping("/board/{id}")
-    public ResponseEntity<Void> deleteBoard(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteBoard(@PathVariable Long id) {
         kanbanBoardService.deleteBoard(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Board deleted successfully"));
     }
 
     @PostMapping("/createIssue")
