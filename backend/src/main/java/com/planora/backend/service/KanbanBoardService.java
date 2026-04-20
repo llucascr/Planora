@@ -64,9 +64,7 @@ public class KanbanBoardService {
     ) {
         KanbanBoard board = getKanbanBoard(boardId);
 
-        User user = userService.findById(userId);
-
-        if (kanbanMemberRepository.findByKanbanBoardAndUser(board, user).isEmpty()) {
+        if (kanbanMemberRepository.findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId).isEmpty()) {
             throw new UnauthorizedException("Kanban member not found");
         }
 
