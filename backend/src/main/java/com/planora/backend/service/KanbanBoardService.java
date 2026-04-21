@@ -15,6 +15,7 @@ import com.planora.backend.repository.KanbanMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -59,21 +60,36 @@ public class KanbanBoardService {
         return getBoardById(savedBoard.getKanbanBoardId());
     }
 
-    public IssueResponse createIssueAndAddToColumn(Long boardId, Long columnId, String token, IssueRequest issueRequest,
+    public IssueResponse createIssueAndAddToColumn(Long boardId, Long columnId, Jwt token, IssueRequest issueRequest,
                                                    Long userId, String repository
     ) {
-        KanbanBoard board = getKanbanBoard(boardId);
 
         if (kanbanMemberRepository.findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId).isEmpty()) {
             throw new UnauthorizedException("Kanban member not found");
         }
 
-        KanbanColumn column = board.getColumns().stream()
+        KanbanColumn column = getKanbanBoard(boardId).getColumns().stream()
                 .filter(c -> c.getKanbanColumnId().equals(columnId))
                 .findFirst()
                 .orElseThrow(() -> new DataNotFoundException("Column with id " + columnId + " not found in board " + boardId));
 
         return githubService.createIssue(token, issueRequest, userId, repository, column);
+    }
+
+    public List<IssueResponse> createBulkIssuesAndAddToColumn(Long boardId, Long columnId, Jwt token,
+                                                              List<IssueRequest> issueRequests, Long userId, String repository
+    ) {
+
+        if (kanbanMemberRepository.findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId).isEmpty()) {
+            throw new UnauthorizedException("Kanban member not found");
+        }
+
+        KanbanColumn column = getKanbanBoard(boardId).getColumns().stream()
+                .filter(c -> c.getKanbanColumnId().equals(columnId))
+                .findFirst()
+                .orElseThrow(() -> new DataNotFoundException("Column with id " + columnId + " not found in board " + boardId));
+
+        return githubService.createBulkIssues(token, issueRequests, userId, repository, column);
     }
 
     public KanbanBoard getKanbanBoard(Long id) {
