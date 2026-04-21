@@ -1,0 +1,241 @@
+{
+	"info": {
+		"_postman_id": "351b0c6c-09bb-4215-96ff-e30f569663ab",
+		"name": "Planora",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21226662",
+		"_collection_link": "https://hubsaas.postman.co/workspace/PUC~ba189806-a9e2-4bbb-992a-7bfb6e1dfdfa/collection/21226662-351b0c6c-09bb-4215-96ff-e30f569663ab?action=share&source=collection_link&creator=21226662"
+	},
+	"item": [
+		{
+			"name": "Kanban",
+			"item": [
+				{
+					"name": "Issue",
+					"item": [
+						{
+							"name": "Criar issue",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{develop}}/v1/kanban/board/issue/create",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"board",
+										"issue",
+										"create"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Buscar board",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{develop}}/v1/kanban/board/11",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"kanban",
+								"board",
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar board",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{develop}}/v1/kanban/board/list",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"kanban",
+								"board",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar board",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"teste 02\",\n    \"description\": \"teste\",\n    \"githubRepository\": \"teste\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{develop}}/v1/kanban/board/create",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"kanban",
+								"board",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar board",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"teste 02\",\n    \"description\": \"teste\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{develop}}/v1/kanban/board/update/14",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"kanban",
+								"board",
+								"update",
+								"14"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar bard",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{develop}}/v1/kanban/board/delete/10",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"kanban",
+								"board",
+								"delete",
+								"10"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "OAuth",
+			"item": [
+				{
+					"name": "Login",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"teste 01\",\n    \"description\": \"teste\",\n    \"githubRepository\": \"teste\"\n    }"
+						},
+						"url": {
+							"raw": "{{develop}}/login",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
