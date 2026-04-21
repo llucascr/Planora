@@ -1,39 +1,57 @@
-import { ErrorPage, HomePage, LayoutPage, LoginPage, ProjetosPage, TarefasPage, ChatbotPage } from "pages"; 
+import { ErrorPage, HomePage, LayoutPage, LoginPage, ProjetosPage, TarefasPage, ChatbotPage, Callback } from "pages";
 import { createBrowserRouter } from "react-router-dom";
+import { ProtectedRoute, PublicOnlyRoute } from "./ProtectedRoute";
 
 export const Router = createBrowserRouter([
   {
-    id: "root",
-    path: "/",
-    Component: LayoutPage, 
+    // Component: ProtectedRoute,
     children: [
       {
+        id: "root",
         path: "/",
-        Component: HomePage,
+        Component: LayoutPage,
         errorElement: <ErrorPage />,
+        children: [
+          {
+            path: "/",
+            Component: HomePage,
+          },
+          {
+            id: "projetos",
+            path: "/projetos",
+            Component: ProjetosPage,
+          },
+          {
+            id: "tarefas",
+            path: "/projetos/:projectId/tarefas",
+            Component: TarefasPage,
+          },
+          {
+            id: "chatbot",
+            path: "/chatbot",
+            Component: ChatbotPage,
+          },
+        ],
       },
-      {
-        id: "projetos",
-        path: "/projetos",
-        Component: ProjetosPage,
-      },
-      {
-        id: "tarefas",
-        path: "/projetos/:projectId/tarefas",
-        Component: TarefasPage,
-      },
-      {
-        id: "chatbot",
-        path: "/chatbot",
-        Component: ChatbotPage,
-      }
     ],
-    errorElement: <ErrorPage />,
   },
   {
-    id: "login",
-    path: "/login",
-    Component: LoginPage,
+    Component: PublicOnlyRoute,
+    children: [
+      {
+        id: "login",
+        path: "/login",
+        Component: LoginPage,
+      },
+    ],
   },
-  
+  {
+    id: "callback",
+    path: "/callback/:token",
+    Component: Callback,
+  },
+  {
+    path: "*",
+    element: <ErrorPage />,
+  },
 ]);

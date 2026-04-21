@@ -38,8 +38,8 @@ public class SecurityConfig {
                 .oauth2ResourceServer(
                         oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .oauth2Login(oauth2 -> oauth2
-                        .successHandler(successHandler)
-                )
+                        .loginPage("http://localhost:3000/login")
+                        .successHandler(successHandler))
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS

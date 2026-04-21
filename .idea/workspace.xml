@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="74c1c74b-758c-454b-bde5-4a042c6e902c" name="Changes" comment="" />
+    <list default="true" id="74c1c74b-758c-454b-bde5-4a042c6e902c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Login/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Login/index.tsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,6 +12,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Hugo-02"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/llucascr/Planora.git",
+    "accountId": "9d10f9ea-4bdb-4367-b88b-2965c5e80a4b"
+  }
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -23,8 +37,11 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "develop",
-    "last_opened_file_path": "/home/luis/Área de Trabalho/PUC/Planora/backend",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "hugo",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/hugop/OneDrive/Documentos/GitHub/Planora",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   },
