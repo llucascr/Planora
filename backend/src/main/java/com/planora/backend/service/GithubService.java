@@ -14,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,14 +32,26 @@ public class GithubService {
     private final UserService userService;
     private final LabelService labelService;
     private final GithubClient githubClient;
+    private final TokenService tokenService;
 
-    public IssueResponse createIssue(String token, IssueRequest issueRequest, Long userId, String repository, KanbanColumn column) {
+    public IssueResponse createIssue(Jwt token, IssueRequest issueRequest, Long userId, String repository, KanbanColumn column) {
         User user = userService.findById(userId);
+        return buildAndPersistIssue(user, repository, token, column, issueRequest);
+    }
 
+    @Transactional
+    public List<IssueResponse> createBulkIssues(Jwt token, List<IssueRequest> requests, Long userId, String repository, KanbanColumn column) {
+        User user = userService.findById(userId);
+        return requests.stream()
+                .map(request -> buildAndPersistIssue(user, repository, token, column, request))
+                .toList();
+    }
+
+    private IssueResponse buildAndPersistIssue(User user, String repository, Jwt token, KanbanColumn column, IssueRequest issueRequest) {
         IssueApiResponse apiResponse = githubClient.createIssue(
                 user.getLogin(),
                 repository,
-                "Bearer " + token,
+                "Bearer " + tokenService.getGithubToken(token),
                 GITHUB_API_VERSION,
                 issueRequest
         );

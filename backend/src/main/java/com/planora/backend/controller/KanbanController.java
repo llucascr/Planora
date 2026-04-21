@@ -1,7 +1,9 @@
 package com.planora.backend.controller;
 
+import com.planora.backend.model.issue.dto.BulkIssueRequest;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
+import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.model.kanban.dto.KanbanBoardRequest;
 import com.planora.backend.model.kanban.dto.KanbanBoardResponse;
 import com.planora.backend.model.kanban.dto.KanbanMemberResponse;
@@ -9,6 +11,7 @@ import com.planora.backend.model.kanban.dto.MemberInviteRequest;
 import com.planora.backend.service.KanbanBoardService;
 import com.planora.backend.service.KanbanMemberService;
 import com.planora.backend.service.TokenService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,13 +67,27 @@ public class KanbanController {
     public ResponseEntity<IssueResponse> createIssueAndAddToColumn(
             @RequestParam Long boardId,
             @RequestParam Long columnId,
-            @RequestHeader("token") String token,
+            @AuthenticationPrincipal Jwt jwt,
             @RequestBody IssueRequest issueRequest,
             @RequestParam Long userId,
             @RequestParam String repository
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                kanbanBoardService.createIssueAndAddToColumn(boardId, columnId, token, issueRequest, userId, repository)
+                kanbanBoardService.createIssueAndAddToColumn(boardId, columnId, jwt, issueRequest, userId, repository)
+        );
+    }
+
+    @PostMapping("/board/issue/bulk")
+    public ResponseEntity<List<IssueResponse>> createBulkIssuesAndAddToColumn(
+            @RequestParam Long boardId,
+            @RequestParam Long columnId,
+            @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody BulkIssueRequest bulkRequest,
+            @RequestParam Long userId,
+            @RequestParam String repository
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                kanbanBoardService.createBulkIssuesAndAddToColumn(boardId, columnId, jwt, bulkRequest.issues(), userId, repository)
         );
     }
 
