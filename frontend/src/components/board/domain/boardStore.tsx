@@ -24,7 +24,6 @@ export function normalizeBoard(columns: BoardColumn[]): NormalizedState {
       id: col.id,
       nome: col.nome,
       ordem: col.ordem,
-      idOrganizacao: col.idOrganizacao,
       idBoard: col.idBoard,
     };
     normalized.columnCards[colId] = [];

@@ -32,14 +32,17 @@ public class OauthService {
 
     private final JwtEncoder jwtEncoder;
 
-    public LoginResponse save(OAuth2User oAuth2User) {
+    public LoginResponse save(OAuth2User oAuth2User, String githubToken) {
 
         if (oAuth2User == null) throw new DataNotFoundException("User not exists");
 
         Optional<User> userOp = userRepository.findByLogin(oAuth2User.getAttribute("login"));
 
         if (userOp.isPresent()) {
-            return generatedLoginResponse(userOp.get());
+            User existing = userOp.get();
+            existing.setGithubToken(githubToken);
+            userRepository.save(existing);
+            return generatedLoginResponse(existing);
         }
 
         Role basicRole = roleRepository.findByName(Role.Values.BASIC.getDescription());
@@ -50,6 +53,7 @@ public class OauthService {
                 .profileUrl(oAuth2User.getAttribute("url"))
                 .email(oAuth2User.getAttribute("email"))
                 .notificationEmail(oAuth2User.getAttribute("notification_email"))
+                .githubToken(githubToken)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .roles(Set.of(basicRole))
@@ -74,6 +78,7 @@ public class OauthService {
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiresIn))
                 .claim("scope", scopes)
+                .claim("githubToken", user.getGithubToken())
                 .build();
 
         String jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

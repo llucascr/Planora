@@ -7,6 +7,7 @@ import com.planora.backend.model.issue.dto.IssueApiResponse;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
 import com.planora.backend.model.issue.dto.RepositoryResponse;
+import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.model.user.User;
 import com.planora.backend.repository.IssueRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -29,7 +31,7 @@ public class GithubService {
     private final LabelService labelService;
     private final GithubClient githubClient;
 
-    public IssueResponse createIssue(String token, IssueRequest issueRequest, Long userId, String repository) {
+    public IssueResponse createIssue(String token, IssueRequest issueRequest, Long userId, String repository, KanbanColumn column) {
         User user = userService.findById(userId);
 
         IssueApiResponse apiResponse = githubClient.createIssue(
@@ -44,9 +46,10 @@ public class GithubService {
         List<User> assignees = getUsersAddThemApiResponse(apiResponse);
 
         Issue issue = setUpIssue(apiResponse, user, labels, assignees);
+        issue.setColumn(column);
         issueRepository.save(issue);
 
-        IssueApiResponse resolvedApiResponse = setUpIssueApiResponse(apiResponse, user, assignees);
+        IssueApiResponse resolvedApiResponse = setUpIssueApiResponse(apiResponse, user);
 
         return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), null);
     }
@@ -61,7 +64,7 @@ public class GithubService {
         }
     }
 
-    private static @NonNull IssueApiResponse setUpIssueApiResponse(IssueApiResponse apiResponse, User user, List<User> assignees) {
+    private static @NonNull IssueApiResponse setUpIssueApiResponse(IssueApiResponse apiResponse, User user) {
         return new IssueApiResponse(
                 apiResponse.url(),
                 apiResponse.number(),
@@ -70,7 +73,7 @@ public class GithubService {
                 apiResponse.state(),
                 user.toIssueResponse(),
                 apiResponse.labels(),
-                assignees.stream().map(User::toIssueResponse).toList()
+                apiResponse.assignees()
         );
     }
 
@@ -89,7 +92,9 @@ public class GithubService {
 
     private @NonNull List<User> getUsersAddThemApiResponse(IssueApiResponse apiResponse) {
         return apiResponse.assignees().stream()
-                .map(ur -> userService.findByLogin(ur.login()))
+                .map(ur -> userService.findOptionalByLogin(ur.login()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .toList();
     }
 

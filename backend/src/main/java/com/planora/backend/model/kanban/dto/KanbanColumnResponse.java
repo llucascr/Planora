@@ -1,6 +1,7 @@
 package com.planora.backend.model.kanban.dto;
 
-public record KanbanColumnRequest(
+public record KanbanColumnResponse(
+        Long kanbanColumnId,
         String name,
         Integer position
 ) {

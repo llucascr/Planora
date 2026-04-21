@@ -25,7 +25,6 @@
 - [Sobre o Projeto](#-sobre-o-projeto)
 - [Funcionalidades](#-funcionalidades)
 - [Stack Tecnológica](#-stack-tecnológica)
-- [Arquitetura](#-arquitetura)
 - [Licença](#-licença)
 
 ---
@@ -97,6 +96,30 @@ Extrai e documenta automaticamente:
 | **Autenticação** | GitHub OAuth · Personal Access Token |
 | **Processamento** | Parsing de `.txt` · NLP Pipeline |
 | **Infraestrutura** |  |
+
+---
+
+## Rondando o projeto
+
+### Criando chave pública e privada
+
+```
+# 1. Generate PKCS#8 private key 
+openssl genpkey -algorithm RSA -out app.key -pkeyopt rsa_keygen_bits:2048 
+
+# 2. Extract the public key 
+openssl rsa -pubout -in app.key -out app.pub
+```
+
+### Variáveis de ambiente
+
+```
+DB_PASSWORD=MinhaSenh@Segura123
+DB_URL=jdbc:postgresql://localhost:5432/meu_banco
+DB_USERNAME=postgres
+GITHUB_CLIENT_ID=Ov23liABCDEF1234567
+GITHUB_CLIENT_SECRET=a1b2c3d4e5f6789012345678901234567890abcd
+```
 
 ---
 

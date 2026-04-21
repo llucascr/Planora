@@ -34,6 +34,7 @@ export default({mode} : {
                 hooks: path.resolve(__dirname, "./src/hooks/index"),
                 types: path.resolve(__dirname, "src/types/index"),
                 utils: path.resolve(__dirname, "src/utils/index"),
+                api: path.resolve(__dirname, "src/api/index"),
                 pages: path.resolve(__dirname, "src/pages/index"),
                 "@": path.resolve(__dirname, "src/")
             }
