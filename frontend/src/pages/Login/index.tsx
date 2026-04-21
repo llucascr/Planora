@@ -31,8 +31,8 @@ const GitHubMark = () => (
 );
 
 export const LoginPage = () => {
-  const handleGithubLogin = () => {
-    window.location.href = `${config.apiUrl}oauth2/authorization/github`;
+  const handleGithubLogin = async () => {
+    window.location.href = `${config.apiUrl}/oauth2/authorization/github`;
   };
 
   return (

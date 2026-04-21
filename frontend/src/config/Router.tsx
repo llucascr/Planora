@@ -1,10 +1,10 @@
-import { ErrorPage, HomePage, LayoutPage, LoginPage, ProjetosPage, TarefasPage, ChatbotPage } from "pages";
+import { ErrorPage, HomePage, LayoutPage, LoginPage, ProjetosPage, TarefasPage, ChatbotPage, Callback } from "pages";
 import { createBrowserRouter } from "react-router-dom";
 import { ProtectedRoute, PublicOnlyRoute } from "./ProtectedRoute";
 
 export const Router = createBrowserRouter([
   {
-    Component: ProtectedRoute,
+    // Component: ProtectedRoute,
     children: [
       {
         id: "root",
@@ -44,6 +44,11 @@ export const Router = createBrowserRouter([
         Component: LoginPage,
       },
     ],
+  },
+  {
+    id: "callback",
+    path: "/callback/:token",
+    Component: Callback,
   },
   {
     path: "*",

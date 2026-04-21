@@ -43,9 +43,13 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         String githubToken = authorizedClient.getAccessToken().getTokenValue();
         LoginResponse loginResponse = oauthService.save(user, githubToken);
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().print(objectMapper.writeValueAsString(loginResponse));
-        response.getWriter().flush();
+        String token = loginResponse.accessToken();
+        String redirectUrl = "http://localhost:3000/callback/" + token;
+        response.sendRedirect(redirectUrl);
+
+//        response.setContentType("application/json");
+//        response.setCharacterEncoding("UTF-8");
+//        response.getWriter().print(objectMapper.writeValueAsString(loginResponse));
+//        response.getWriter().flush();
     }
 }
