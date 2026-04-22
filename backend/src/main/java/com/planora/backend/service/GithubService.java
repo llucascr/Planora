@@ -6,7 +6,7 @@ import com.planora.backend.model.issue.Label;
 import com.planora.backend.model.issue.dto.IssueApiResponse;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
-import com.planora.backend.model.issue.dto.RepositoryResponse;
+import com.planora.backend.model.issue.dto.UserRepositoryResponse;
 import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.model.user.User;
 import com.planora.backend.repository.IssueRepository;
@@ -66,6 +66,10 @@ public class GithubService {
         IssueApiResponse resolvedApiResponse = setUpIssueApiResponse(apiResponse, user);
 
         return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), null);
+    }
+
+    public List<UserRepositoryResponse> listUserRepositories(String githubToken) {
+        return githubClient.getUserRepositories("Bearer " + githubToken, GITHUB_API_VERSION);
     }
 
     public boolean checkIfRepositoryAndOwnerNameAreValid(String token, String ownerName, String repository) {
