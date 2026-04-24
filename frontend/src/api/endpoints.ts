@@ -13,6 +13,9 @@ export const ENDPOINTS = {
         update: (id: number) => `/v1/kanban/board/update/${id}`,
         delete: (id: number) => `/v1/kanban/board/delete/${id}`,
       }
+    },
+    github: {
+      repositories: '/v1/github/repositories',
     }
   },
   login: '/login'

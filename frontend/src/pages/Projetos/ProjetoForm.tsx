@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNotification, useUI } from "context";
 import { httpClient, ENDPOINTS } from "api";
 import type { ProjetoBoard } from "types";
 import { v4 } from "uuid";
+import type { Repositorio } from "@/types/repositorios";
+import { Dropdown } from "@processhub-lib/react";
+import { CaretDown, GithubLogo, MagicWandIcon } from "@phosphor-icons/react";
 
 type CreatePayload = {
   name: string;
@@ -27,8 +30,11 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
 
   const [name, setName] = useState(board?.name ?? "");
   const [description, setDescription] = useState(board?.description ?? "");
-  const [githubRepository, setGithubRepository] = useState("");
+  const [githubRepository, setGithubRepository] = useState<
+    Repositorio | undefined
+  >(undefined);
   const [loading, setLoading] = useState(false);
+  const [repositories, setRepositories] = useState<Repositorio[]>([]);
 
   const isCreate = action === "create";
 
@@ -37,8 +43,12 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
     setLoading(true);
 
     try {
-      if (isCreate) {
-        const payload: CreatePayload = { name, description, githubRepository };
+      if (isCreate && githubRepository) {
+        const payload: CreatePayload = {
+          name,
+          description,
+          githubRepository: githubRepository.full_name,
+        };
         const res = await httpClient.post<ProjetoBoard, CreatePayload>(
           ENDPOINTS.v1.kanban.board.create,
           payload,
@@ -66,6 +76,33 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
     }
   };
 
+  function listaRepositorios() {
+    httpClient
+      .get<Repositorio[]>(ENDPOINTS.v1.github.repositories)
+      .then((res) => {
+        setRepositories(res);
+      });
+  }
+
+  useEffect(() => {
+    listaRepositorios();
+  }, []);
+
+  const repoOptions = useMemo(() => {
+    return [
+      {
+        value: "",
+        label: "Selecione um repositório",
+        icon: <GithubLogo size={16} />,
+      },
+      ...repositories.map((repo) => ({
+        value: String(repo.id),
+        label: repo.full_name,
+        icon: <GithubLogo size={16} />,
+      })),
+    ];
+  }, [repositories]);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
@@ -82,10 +119,56 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
         />
       </div>
 
+      {repositories && (
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium text-gray-700">
+            Repositório GitHub
+          </label>
+          <Dropdown
+            options={repoOptions}
+            value={String(githubRepository?.id || "")}
+            onChange={(val) => {
+              const repo = repositories.find((r) => String(r.id) === val);
+              setGithubRepository(repo);
+            }}
+            searchable={false}
+            className="w-full"
+            renderTrigger={(selectedOption, isOpen) => (
+              <div className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-xl py-2.5 px-4 text-sm text-gray-700 focus:border-[#3d5aad] focus:ring-2 focus:ring-[#3d5aad]/10 transition-all font-normal cursor-pointer shadow-sm hover:border-gray-300">
+                <div className="flex items-center gap-2 truncate">
+                  {selectedOption?.icon || <GithubLogo size={16} />}
+                  <span className="truncate">
+                    {selectedOption?.label || "Selecione um repositório"}
+                  </span>
+                </div>
+                <CaretDown
+                  size={12}
+                  className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                />
+              </div>
+            )}
+            menuClassName="!w-full h-64 overflow-y-auto !rounded-xl !border-gray-100 !shadow-2xl !bg-white"
+          />
+        </div>
+      )}
+
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">
-          Descrição
-        </label>
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="block text-sm font-medium text-gray-700">
+            Descrição
+          </label>
+          {isCreate && githubRepository?.description && !description && (
+            <button
+              type="button"
+              onClick={() => setDescription(githubRepository.description || "")}
+              className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+              title="Usar descrição do GitHub"
+            >
+              <MagicWandIcon size={14} />
+              <span>Sincronizar com GitHub</span>
+            </button>
+          )}
+        </div>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -94,24 +177,6 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
           className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#3d5aad] focus:ring-2 focus:ring-[#3d5aad]/10 transition resize-none"
         />
       </div>
-
-      {isCreate && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            Repositório GitHub
-          </label>
-          <input
-            type="text"
-            value={githubRepository}
-            onChange={(e) => setGithubRepository(e.target.value)}
-            placeholder="Ex: planora"
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#3d5aad] focus:ring-2 focus:ring-[#3d5aad]/10 transition"
-          />
-          <p className="text-xs text-gray-400 mt-1">
-            Digite o nome do repositório
-          </p>
-        </div>
-      )}
 
       <div className="flex justify-end gap-3 pt-2">
         <button
@@ -124,7 +189,7 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2.5 text-sm font-medium text-white bg-[#0E1F63] rounded-xl hover:bg-[#1a2f7a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          className="px-4 py-2.5 text-sm font-medium text-white bg-primary rounded-xl hover:bg-[#1a2f7a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
           {loading
             ? isCreate
