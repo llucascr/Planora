@@ -27,6 +27,7 @@ export default({mode} : {
             tailwindcss(), react()
         ],
         resolve: {
+            dedupe: ["react", "react-dom"],
             alias: {
                 components: path.resolve(__dirname, "src/components/index"),
                 config: path.resolve(__dirname, "src/config/index"),

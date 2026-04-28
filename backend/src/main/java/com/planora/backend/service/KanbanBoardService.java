@@ -37,18 +37,29 @@ public class KanbanBoardService {
     public KanbanBoardResponse createKanbanBoard(KanbanBoardRequest request, Long userId, String githubToken) {
         User user = userService.findById(userId);
 
-        String githubOwnerName = user.getLogin();
+        String[] repoParts = request.githubRepository().split("/");
 
-        if (!githubService.checkIfRepositoryAndOwnerNameAreValid(githubToken, githubOwnerName, request.githubRepository())) {
-            throw new DataNotFoundException("Repository " + request.githubRepository() + " not found for owner " + githubOwnerName);
+        if (repoParts.length != 2) {
+            throw new IllegalArgumentException("Formato inválido. Use owner/repository");
+        }
+
+        String owner = repoParts[0];
+        String repo = repoParts[1];
+
+        if (!githubService.checkIfRepositoryAndOwnerNameAreValid(
+                githubToken,
+                owner,
+                repo
+        )) {
+            throw new DataNotFoundException("Repository " + request.githubRepository());
         }
 
         KanbanBoard kanbanBoard = KanbanBoard.builder()
                 .name(request.name())
                 .description(request.description())
                 .owner(user)
-                .githubRepository(request.githubRepository())
-                .githubOwnerName(githubOwnerName)
+                .githubRepository(repo)
+                .githubOwnerName(owner)
                 .members(new ArrayList<>())
                 .columns(new ArrayList<>())
                 .createdAt(LocalDateTime.now())
