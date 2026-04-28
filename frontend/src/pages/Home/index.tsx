@@ -128,7 +128,7 @@ export const HomePage = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#0E1F63]">
-            {greeting}, Fillipe 👋
+            {greeting}, Usuário 👋
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
             Veja o resumo dos seus projetos e tarefas de hoje.

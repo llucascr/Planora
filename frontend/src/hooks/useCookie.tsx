@@ -64,7 +64,7 @@ export const useCookie = (): PromiseUseCookie => {
    * deleteCookie("token");
    */
   function deleteCookie(cname: string): void {
-    document.cookie = cname + "=";
+    document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   }
 
   /**
