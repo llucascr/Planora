@@ -4,7 +4,7 @@ import { ProtectedRoute, PublicOnlyRoute } from "./ProtectedRoute";
 
 export const Router = createBrowserRouter([
   {
-    // Component: ProtectedRoute,
+    Component: ProtectedRoute,
     children: [
       {
         id: "root",

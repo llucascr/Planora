@@ -72,10 +72,11 @@ export const LayoutPage = ({ children }: LayoutProps) => {
   const { getCookie, deleteCookie } = useCookie();
   const navigate = useNavigate();
 
-  const isLoggedIn = !!getCookie(config.tokenCookieNome);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => !!getCookie(config.tokenCookieNome));
 
   const handleLogout = () => {
     deleteCookie(config.tokenCookieNome);
+    setIsLoggedIn(false);
     setProfileMenuOpen(false);
     navigate("/login");
   };
@@ -99,6 +100,10 @@ export const LayoutPage = ({ children }: LayoutProps) => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+
+  useEffect(() => {
+    setIsLoggedIn(!!getCookie(config.tokenCookieNome));
+  }, [location.pathname]);
 
   const isProjetosPage = location.pathname.startsWith("/projetos");
 
