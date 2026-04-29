@@ -68,6 +68,7 @@ public class KanbanBoardService {
         addOwnerMemberInKanban(kanbanBoard, user);
         KanbanBoard savedBoard = kanbanBoardRepository.save(kanbanBoard);
         createDefaultColumns(savedBoard);
+        registerWebhookIfNeeded(savedBoard, githubToken, owner, repo);
         return getBoardById(savedBoard.getKanbanBoardId());
     }
 
@@ -127,12 +128,45 @@ public class KanbanBoardService {
 
     public void deleteBoard(Long id) {
         KanbanBoard board = findById(id);
+        removeWebhookIfLastBoard(board);
         kanbanBoardRepository.delete(board);
     }
 
     public KanbanBoard findById(Long id) {
         return kanbanBoardRepository.findById(id).orElseThrow(
                 () -> new DataNotFoundException("Kanban Board with id " + id + " not found"));
+    }
+
+    private void registerWebhookIfNeeded(KanbanBoard board, String githubToken, String owner, String repo) {
+        Long webhookId = kanbanBoardRepository
+                .findFirstByGithubOwnerNameAndGithubRepositoryAndGithubWebhookIdIsNotNull(owner, repo)
+                .map(KanbanBoard::getGithubWebhookId)
+                .orElseGet(() -> {
+                    try {
+                        return githubService.createRepositoryWebhook(githubToken, owner, repo);
+                    } catch (Exception e) {
+                        log.warn("Could not create GitHub webhook for {}/{}: {}", owner, repo, e.getMessage());
+                        return null;
+                    }
+                });
+        board.setGithubWebhookId(webhookId);
+        kanbanBoardRepository.save(board);
+    }
+
+    private void removeWebhookIfLastBoard(KanbanBoard board) {
+        if (board.getGithubWebhookId() == null) return;
+        boolean hasOtherBoards = !kanbanBoardRepository
+                .findByGithubOwnerNameAndGithubRepositoryAndKanbanBoardIdNot(
+                        board.getGithubOwnerName(), board.getGithubRepository(), board.getKanbanBoardId()
+                ).isEmpty();
+        if (!hasOtherBoards) {
+            githubService.deleteRepositoryWebhook(
+                    board.getOwner().getGithubToken(),
+                    board.getGithubOwnerName(),
+                    board.getGithubRepository(),
+                    board.getGithubWebhookId()
+            );
+        }
     }
 
     private static void addOwnerMemberInKanban(KanbanBoard kanbanBoard, User user) {

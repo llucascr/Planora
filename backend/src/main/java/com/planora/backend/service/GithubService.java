@@ -3,6 +3,8 @@ package com.planora.backend.service;
 import com.planora.backend.client.GithubClient;
 import com.planora.backend.model.issue.Issue;
 import com.planora.backend.model.issue.Label;
+import com.planora.backend.model.issue.dto.GithubWebhookCreateRequest;
+import com.planora.backend.model.issue.dto.GithubWebhookResponse;
 import com.planora.backend.model.issue.dto.IssueApiResponse;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
@@ -14,10 +16,12 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,11 +32,18 @@ public class GithubService {
 
     private static final Logger log = LoggerFactory.getLogger(GithubService.class);
     private static final String GITHUB_API_VERSION = "2022-11-28";
+
     private final IssueRepository issueRepository;
     private final UserService userService;
     private final LabelService labelService;
     private final GithubClient githubClient;
     private final TokenService tokenService;
+
+    @Value("${app.base-url:http://localhost:8080}")
+    private String appBaseUrl;
+
+    @Value("${github.webhook.secret:}")
+    private String webhookSecret;
 
     public IssueResponse createIssue(Jwt token, IssueRequest issueRequest, Long userId, String repository, KanbanColumn column) {
         User user = userService.findById(userId);
@@ -79,6 +90,57 @@ public class GithubService {
         } catch (Exception e) {
             log.warn("Repository validation failed for owner='{}' repo='{}': {}", ownerName, repository, e.getMessage());
             return false;
+        }
+    }
+
+    public Long createRepositoryWebhook(String githubToken, String owner, String repo) {
+        if (isLocalUrl(appBaseUrl)) {
+            log.warn("Skipping webhook creation for {}/{}: APP_BASE_URL='{}' is not publicly reachable. " +
+                     "Set APP_BASE_URL to a public URL (e.g. via ngrok) to enable webhook integration.",
+                     owner, repo, appBaseUrl);
+            return null;
+        }
+        GithubWebhookCreateRequest request = new GithubWebhookCreateRequest(
+                "web",
+                new GithubWebhookCreateRequest.GithubWebhookConfig(
+                        buildWebhookUrl(),
+                        "json",
+                        webhookSecret.isBlank() ? null : webhookSecret,
+                        "0"
+                ),
+                List.of("issues"),
+                true
+        );
+        GithubWebhookResponse response = githubClient.createWebhook(
+                owner, repo, "Bearer " + githubToken, GITHUB_API_VERSION, request
+        );
+        log.info("GitHub webhook created (id={}) for {}/{}", response.id(), owner, repo);
+        return response.id();
+    }
+
+    private String buildWebhookUrl() {
+        try {
+            URI uri = URI.create(appBaseUrl);
+            String origin = uri.getScheme() + "://" + uri.getHost()
+                    + (uri.getPort() != -1 ? ":" + uri.getPort() : "");
+            return origin + "/v1/webhook/github/issues";
+        } catch (Exception e) {
+            return appBaseUrl.replaceAll("/+$", "") + "/v1/webhook/github/issues";
+        }
+    }
+
+    private boolean isLocalUrl(String url) {
+        if (url == null) return true;
+        String lower = url.toLowerCase();
+        return lower.contains("localhost") || lower.contains("127.0.0.1") || lower.contains("0.0.0.0");
+    }
+
+    public void deleteRepositoryWebhook(String githubToken, String owner, String repo, Long webhookId) {
+        try {
+            githubClient.deleteWebhook(owner, repo, webhookId, "Bearer " + githubToken, GITHUB_API_VERSION);
+            log.info("GitHub webhook deleted (id={}) for {}/{}", webhookId, owner, repo);
+        } catch (Exception e) {
+            log.warn("Failed to delete webhook {} for {}/{}: {}", webhookId, owner, repo, e.getMessage());
         }
     }
 
