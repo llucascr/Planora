@@ -10,7 +10,9 @@ export function Callback() {
     useEffect(() => {
         if (token) {
             setCookie(config.tokenCookieNome, token, 860000);
-            window.location.replace("/");
+            setTimeout(() => {
+                window.location.replace("/");
+            }, 300);
         }
     }, [token]);
 
