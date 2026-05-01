@@ -17,3 +17,6 @@ REPETITION_PENALTY: float = 1.2
 # compute, so each request will take proportionally longer as this value grows.
 MAX_CONCURRENT: int = 2
 REQUEST_TIMEOUT_SECONDS: float = 1800.0
+
+# Callback URL for sending results back to the client
+CALLBACK_URL:str = "http://localhost:9000/callback"

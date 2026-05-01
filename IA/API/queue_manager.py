@@ -2,6 +2,7 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from typing import Tuple
 
+import httpx
 from model_service import ModelService
 import config
 
@@ -19,7 +20,7 @@ class InferenceQueueManager:
 
     def __init__(self, model_service: ModelService) -> None:
         self._model_service = model_service
-        self._queue: asyncio.Queue[Tuple[str, asyncio.Future]] = asyncio.Queue()
+        self._queue: asyncio.Queue[Tuple[str, asyncio.Future[list[dict]]]] = asyncio.Queue()
         self._executor = ThreadPoolExecutor(max_workers=config.MAX_CONCURRENT)
         self._worker_tasks: list[asyncio.Task] = []
 
@@ -54,7 +55,7 @@ class InferenceQueueManager:
     # Public interface
     # ------------------------------------------------------------------
 
-    async def submit(self, description: str) -> str:
+    async def submit(self, description: str) -> list[dict]:
         """
         Enqueue an inference request and await its result.
 
@@ -62,11 +63,31 @@ class InferenceQueueManager:
             asyncio.TimeoutError: when the request exceeds REQUEST_TIMEOUT_SECONDS.
         """
         loop = asyncio.get_running_loop()
-        future: asyncio.Future[str] = loop.create_future()
+        future: asyncio.Future[list[dict]] = loop.create_future()
 
         await self._queue.put((description, future))
 
         return await asyncio.wait_for(future, timeout=config.REQUEST_TIMEOUT_SECONDS)
+    
+    # New logic with callback support
+    async def submit_with_callback(self, description: str, job_id: int) -> None:
+        loop = asyncio.get_running_loop()
+        future: asyncio.Future[list[dict]] = loop.create_future()
+        await self._queue.put((description, future))
+        # cria uma task que aguarda o resultado e dispara o callback
+        asyncio.create_task(self._await_and_callback(future, job_id))
+
+    async def _await_and_callback(self, future: asyncio.Future, job_id: int) -> None:
+        try:
+            result = await future
+            payload = {"backlog": result, "jobId": job_id}
+        except Exception as exc:
+            payload = {"error": str(exc), "jobId": job_id}
+        await self._post_callback(payload)
+
+    async def _post_callback(self, payload: dict) -> None:
+        async with httpx.AsyncClient() as client:
+            await client.post(config.CALLBACK_URL, json=payload, timeout=30.0)
 
     @property
     def queue_size(self) -> int:

@@ -3,24 +3,25 @@ import asyncio
 from fastapi import APIRouter, HTTPException, Request, status
 
 from queue_manager import InferenceQueueManager
-from schemas import BacklogRequest, BacklogResponse, HealthResponse, QueueStatusResponse
+from schemas import AcceptedResponse, BacklogRequest, BacklogResponse, HealthResponse, QueueStatusResponse
 
 router = APIRouter(prefix="/api/v1", tags=["backlog"])
 
 
 @router.post(
     "/generate-backlog",
-    response_model=BacklogResponse,
+    response_model=AcceptedResponse,
     summary="Generate a structured GitHub issues backlog from a project description.",
+    status_code=status.HTTP_202_ACCEPTED
 )
-async def generate_backlog(request: Request, body: BacklogRequest) -> BacklogResponse:
+async def generate_backlog(request: Request, body: BacklogRequest) -> AcceptedResponse:
     queue_manager: InferenceQueueManager = request.app.state.queue_manager
 
     try:
-        result = await queue_manager.submit(body.description)
-        return BacklogResponse(
-            backlog=result,
-            jobId=body.jobId
+        await queue_manager.submit_with_callback(body.description, body.jobId)
+        return AcceptedResponse(
+            jobId=body.jobId,
+            message="Backlog generation submitted successfully."
         )
 
     except asyncio.TimeoutError:

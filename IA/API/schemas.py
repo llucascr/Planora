@@ -14,9 +14,12 @@ class BacklogRequest(BaseModel):
 
 
 class BacklogResponse(BaseModel):
-    backlog: str
+    backlog: list[dict]
     jobId: int
 
+class AcceptedResponse(BaseModel):
+    jobId: int
+    message: str
 
 class QueueStatusResponse(BaseModel):
     pending_requests: int
