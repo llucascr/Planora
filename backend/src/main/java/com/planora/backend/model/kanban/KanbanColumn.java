@@ -22,6 +22,7 @@ public class KanbanColumn {
 
     private String name;
     private Integer position;
+    private Boolean isColumnDone;
 
     @ManyToOne
     @JoinColumn(name = "kanban_board_id")

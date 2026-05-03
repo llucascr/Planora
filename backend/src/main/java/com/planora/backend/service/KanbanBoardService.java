@@ -2,6 +2,7 @@ package com.planora.backend.service;
 
 import com.planora.backend.exception.DataNotFoundException;
 import com.planora.backend.exception.UnauthorizedException;
+import com.planora.backend.model.issue.Issue;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
 import com.planora.backend.model.issue.dto.IssueSummaryResponse;
@@ -102,6 +103,14 @@ public class KanbanBoardService {
                 .orElseThrow(() -> new DataNotFoundException("Column with id " + columnId + " not found in board " + boardId));
 
         return githubService.createBulkIssues(token, issueRequests, userId, repository, column);
+    }
+
+    public IssueResponse openIssue(Jwt token, Long issueId) {
+        return githubService.openIssue(token, issueId);
+    }
+
+    public IssueResponse closeIssue(Jwt token, Long issueId) {
+        return githubService.closeIssue(token, issueId);
     }
 
     public KanbanBoard getKanbanBoard(Long id) {

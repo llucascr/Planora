@@ -87,6 +87,22 @@ public class KanbanController {
         );
     }
 
+    @PatchMapping("/board/issue/{issueId}/open")
+    public ResponseEntity<IssueResponse> openIssue(
+            @PathVariable Long issueId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        return ResponseEntity.ok(kanbanBoardService.openIssue(jwt, issueId));
+    }
+
+    @PatchMapping("/board/issue/{issueId}/close")
+    public ResponseEntity<IssueResponse> closeIssue(
+            @PathVariable Long issueId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        return ResponseEntity.ok(kanbanBoardService.closeIssue(jwt, issueId));
+    }
+
     @PostMapping("/board/{boardId}/member/invite")
     public ResponseEntity<KanbanMemberResponse> inviteMember(
             @PathVariable Long boardId,
