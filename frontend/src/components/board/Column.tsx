@@ -1,10 +1,11 @@
 import React, { useState, useRef } from "react";
-import { DotsSixVertical, Plus } from "@phosphor-icons/react";
+import { DotsSixVertical, Plus, DotsThreeVertical } from "@phosphor-icons/react";
 import { Card } from "./cards/Card";
 import { useBoardState, useBoardDispatch } from "./domain/boardStore";
 import type { DragInfo } from "./domain/types";
 import { COLUMN_COLORS } from "./Board";
 import { classnames } from "./utils/classnames";
+import { httpClient } from "api";
 
 interface ColumnProps {
   columnId: string;
@@ -40,6 +41,9 @@ export function Column({
   const [isDragOver, setIsDragOver] = useState(false);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
   const columnRef = useRef<HTMLDivElement>(null);
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(column.name);
+  const [openMenu, setOpenMenu] = useState(false);
 
   const accentColor = COLUMN_COLORS[columnIndex % COLUMN_COLORS.length];
 
@@ -98,6 +102,55 @@ export function Column({
     dragRef.current = null;
   }
 
+  async function handleSave() {
+    setEditing(false);
+
+    if (name === column.name) return;
+
+    dispatch({
+      type: "UPDATE_COLUMN",
+      payload: {
+        columnId,
+        name,
+      },
+    });
+
+    try {
+      await httpClient.put(
+        `/v1/kanban/board/${column.idBoard}/column/${column.id}`,
+        {
+          name,
+          position: column.order,
+        }
+      );
+    } catch (err) {
+      dispatch({
+        type: "UPDATE_COLUMN",
+        payload: {
+          columnId,
+          name: column.name,
+        },
+      });
+    }
+  }
+
+  async function handleDelete() {
+  try {
+    await httpClient.delete(
+      `/v1/kanban/board/${column.idBoard}/column/${column.id}`
+    );
+
+    dispatch({
+      type: "DELETE_COLUMN",
+      payload: String(columnId),
+    });
+
+    setOpenMenu(false);
+  } catch (err) {
+    console.error("erro:", err);
+  }
+}
+
   return (
     <div
       className={classnames(
@@ -127,16 +180,54 @@ export function Column({
           style={{ backgroundColor: accentColor }}
         />
 
-        <button
-          className="flex-1 text-left text-[13px] font-semibold text-foreground opacity-90 hover:opacity-100 truncate"
-          onClick={handleToggle}
-        >
-          {column.nome}
-        </button>
+        {editing ? (
+          <input
+            autoFocus
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={handleSave}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSave();
+              if (e.key === "Escape") {
+                setName(column.name);
+                setEditing(false);
+              }
+            }}
+            className="flex-1 bg-transparent text-[13px] font-semibold outline-none"
+          />
+        ) : (
+          <button
+            className="flex-1 text-left text-[13px] font-semibold text-foreground opacity-90 hover:opacity-100 truncate"
+            onDoubleClick={() => setEditing(true)}
+            onClick={handleToggle}
+          >
+            {column.name}
+          </button>
+        )}
 
         <span className="text-[13px] font-bold text-foreground tabular-nums shrink-0">
           {totalCount}
         </span>
+
+        <div className="relative">
+          <button
+            onClick={() => setOpenMenu((v) => !v)}
+            className="p-1 rounded hover:bg-accent-hover"
+          >
+            <DotsThreeVertical size={16} />
+          </button>
+
+          {openMenu && (
+            <div className="absolute right-0 mt-2 w-36 bg-background border border-border rounded-md shadow-lg z-50">
+              <button
+                className="w-full text-left px-3 py-2 text-sm hover:bg-accent-hover text-red-500"
+                onMouseDown={handleDelete}
+              >
+                Excluir coluna
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div

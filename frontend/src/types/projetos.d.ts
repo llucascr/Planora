@@ -8,7 +8,7 @@ export enum InvitedStatus {
 
 export type ColumnBoard = {
     kanbanColumnId: number,
-    nome: string
+    name: string
     position: number
 }
 
