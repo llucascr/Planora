@@ -169,4 +169,16 @@ public class KanbanController {
                 kanbanBoardService.getColumns(boardId, userId)
         );
     }
+
+    @GetMapping("/board/{boardId}/columns/issues")
+    public ResponseEntity<List<KanbanColumnWithIssuesResponse>> getColumnsWithIssues(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        Long userId = tokenService.getUserId(jwt);
+
+        return ResponseEntity.ok(
+                kanbanBoardService.getColumnsWithIssues(boardId, userId)
+        );
+    }
 }

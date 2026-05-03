@@ -4,6 +4,7 @@ import com.planora.backend.exception.DataNotFoundException;
 import com.planora.backend.exception.UnauthorizedException;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
+import com.planora.backend.model.issue.dto.IssueSummaryResponse;
 import com.planora.backend.model.kanban.KanbanBoard;
 import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.model.kanban.KanbanMember;
@@ -302,6 +303,29 @@ public class KanbanBoardService {
                         col.getKanbanColumnId(),
                         col.getName(),
                         col.getPosition()
+                ))
+                .toList();
+    }
+
+    public List<KanbanColumnWithIssuesResponse> getColumnsWithIssues(Long boardId, Long userId) {
+
+        if (kanbanMemberRepository
+                .findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId)
+                .isEmpty()) {
+            throw new UnauthorizedException("Kanban member not found");
+        }
+
+        List<KanbanColumn> columns =
+                kanbanColumnRepository.findByKanbanBoard_KanbanBoardIdOrderByPositionAsc(boardId);
+
+        return columns.stream()
+                .map(col -> new KanbanColumnWithIssuesResponse(
+                        col.getKanbanColumnId(),
+                        col.getName(),
+                        col.getPosition(),
+                        col.getIssues().stream()
+                                .map(IssueSummaryResponse::fromEntity)
+                                .toList()
                 ))
                 .toList();
     }
