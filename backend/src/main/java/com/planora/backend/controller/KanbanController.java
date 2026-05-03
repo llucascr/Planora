@@ -103,6 +103,15 @@ public class KanbanController {
         return ResponseEntity.ok(kanbanBoardService.closeIssue(jwt, issueId));
     }
 
+    @DeleteMapping("/board/issue/{issueId}")
+    public ResponseEntity<Map<String, String>> deleteIssue(
+            @PathVariable Long issueId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        kanbanBoardService.deleteIssue(jwt, issueId);
+        return ResponseEntity.ok(Map.of("message", "Issue deleted successfully"));
+    }
+
     @PostMapping("/board/{boardId}/member/invite")
     public ResponseEntity<KanbanMemberResponse> inviteMember(
             @PathVariable Long boardId,

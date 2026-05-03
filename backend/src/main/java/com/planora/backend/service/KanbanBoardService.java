@@ -113,6 +113,10 @@ public class KanbanBoardService {
         return githubService.closeIssue(token, issueId);
     }
 
+    public void deleteIssue(Jwt token, Long issueId) {
+        githubService.deleteIssue(token, issueId);
+    }
+
     public KanbanBoard getKanbanBoard(Long id) {
         return kanbanBoardRepository.findById(id).orElseThrow(
                 () -> new DataNotFoundException("Kanban Board with id " + id + " not found"));

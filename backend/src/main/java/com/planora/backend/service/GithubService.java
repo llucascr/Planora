@@ -104,6 +104,26 @@ public class GithubService {
         return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), issue.getClosedAt());
     }
 
+    @Transactional
+    public void deleteIssue(Jwt token, Long issueId) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new DataNotFoundException("Issue not found"));
+
+        if (issue.getState() != State.CLOSED) {
+            KanbanBoard board = issue.getColumn().getKanbanBoard();
+            githubClient.updateIssue(
+                    board.getGithubOwnerName(),
+                    board.getGithubRepository(),
+                    issue.getNumber(),
+                    "Bearer " + tokenService.getGithubToken(token),
+                    GITHUB_API_VERSION,
+                    new IssueUpdateRequest("closed")
+            );
+        }
+
+        issueRepository.delete(issue);
+    }
+
     private IssueResponse buildAndPersistIssue(User user, String repository, Jwt token, KanbanColumn column, IssueRequest issueRequest) {
         IssueApiResponse apiResponse = githubClient.createIssue(
                 user.getLogin(),
