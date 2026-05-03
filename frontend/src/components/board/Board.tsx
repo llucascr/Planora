@@ -49,10 +49,12 @@ function BoardInner({
   onCardMove,
   onColumnMove,
   refetch,
+  onCreateColumn,
 }: {
   onCardMove?: (from: string, to: string, cardId: string) => void;
   onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
   refetch?: () => void;
+  onCreateColumn?: (name: string) => Promise<void>;
 }) {
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -76,8 +78,8 @@ function BoardInner({
   const selectedCard = selectedCardId ? normalized.cards[selectedCardId] : null;
   const selectedColumnId = selectedCardId
     ? Object.entries(normalized.columnCards).find(([, ids]) =>
-        ids.includes(selectedCardId),
-      )?.[0]
+      ids.includes(selectedCardId),
+    )?.[0]
     : null;
   const selectedColumn = selectedColumnId
     ? normalized.columns[selectedColumnId]
@@ -92,6 +94,7 @@ function BoardInner({
             onCardClick={handleCardClick}
             onCardMove={onCardMove}
             onColumnMove={onColumnMove}
+            onCreateColumn={onCreateColumn}
           />
         );
       case "list":
@@ -116,7 +119,7 @@ function BoardInner({
   }
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden">
+    <div className="flex h-full w-full flex-col overflow-x-auto">
       <div className="relative p-2 z-20 flex items-center gap-3 border-b border-border backdrop-blur shrink-0 px-4">
         <div className="flex-1 min-w-0">
           <FilterBar />
@@ -160,7 +163,7 @@ function BoardInner({
         className={classnames(
           "flex-1 min-h-0",
           viewMode === "kanban"
-            ? "overflow-hidden"
+            ? "overflow-x-auto overflow-y-hidden"
             : "overflow-y-auto px-4 py-4",
         )}
       >
@@ -170,7 +173,7 @@ function BoardInner({
       {selectedCard && (
         <CardModal
           card={selectedCard}
-          columnName={selectedColumn?.nome}
+          columnName={selectedColumn?.name}
           onClose={handleCloseModal}
         />
       )}
@@ -188,6 +191,7 @@ interface BoardProps {
   onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
   className?: string;
   refetch?: () => void;
+  onCreateColumn?: (name: string) => Promise<void>;
 }
 
 export function Board({
@@ -196,6 +200,7 @@ export function Board({
   onColumnMove,
   className,
   refetch,
+  onCreateColumn,
 }: BoardProps) {
   return (
     <BoardProvider initialColumns={columns}>
@@ -204,6 +209,7 @@ export function Board({
           onCardMove={onCardMove}
           onColumnMove={onColumnMove}
           refetch={refetch}
+          onCreateColumn={onCreateColumn}
         />
       </div>
     </BoardProvider>
