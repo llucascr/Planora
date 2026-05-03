@@ -54,20 +54,6 @@ class InferenceQueueManager:
     # ------------------------------------------------------------------
     # Public interface
     # ------------------------------------------------------------------
-
-    async def submit(self, description: str) -> list[dict]:
-        """
-        Enqueue an inference request and await its result.
-
-        Raises:
-            asyncio.TimeoutError: when the request exceeds REQUEST_TIMEOUT_SECONDS.
-        """
-        loop = asyncio.get_running_loop()
-        future: asyncio.Future[list[dict]] = loop.create_future()
-
-        await self._queue.put((description, future))
-
-        return await asyncio.wait_for(future, timeout=config.REQUEST_TIMEOUT_SECONDS)
     
     # New logic with callback support
     async def submit_with_callback(self, description: str, job_id: int) -> None:
