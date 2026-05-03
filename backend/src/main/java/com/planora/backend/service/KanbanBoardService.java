@@ -6,6 +6,7 @@ import com.planora.backend.model.issue.Issue;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
 import com.planora.backend.model.issue.dto.IssueSummaryResponse;
+import com.planora.backend.model.issue.dto.IssueUpdateRequest;
 import com.planora.backend.model.kanban.KanbanBoard;
 import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.model.kanban.KanbanMember;
@@ -111,6 +112,10 @@ public class KanbanBoardService {
 
     public IssueResponse closeIssue(Jwt token, Long issueId) {
         return githubService.closeIssue(token, issueId);
+    }
+
+    public IssueResponse updateIssue(Jwt token, Long issueId, IssueUpdateRequest request) {
+        return githubService.updateIssue(token, issueId, request);
     }
 
     public void deleteIssue(Jwt token, Long issueId) {

@@ -64,7 +64,7 @@ public class GithubService {
                 issue.getNumber(),
                 "Bearer " + tokenService.getGithubToken(token),
                 GITHUB_API_VERSION,
-                new IssueUpdateRequest("open")
+                new IssueUpdateRequest(null, null, "open", null, null)
         );
 
         issue.setState(State.OPEN);
@@ -90,7 +90,7 @@ public class GithubService {
                 issue.getNumber(),
                 "Bearer " + tokenService.getGithubToken(token),
                 GITHUB_API_VERSION,
-                new IssueUpdateRequest("closed")
+                new IssueUpdateRequest(null, null, "closed", null, null)
         );
 
         LocalDateTime now = LocalDateTime.now();
@@ -101,6 +101,29 @@ public class GithubService {
 
         IssueApiResponse resolvedApiResponse = setUpIssueApiResponse(apiResponse, issue.getUser());
 
+        return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), issue.getClosedAt());
+    }
+
+    @Transactional
+    public IssueResponse updateIssue(Jwt token, Long issueId, IssueUpdateRequest request) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new DataNotFoundException("Issue not found"));
+
+        KanbanBoard board = issue.getColumn().getKanbanBoard();
+
+        IssueApiResponse apiResponse = githubClient.updateIssue(
+                board.getGithubOwnerName(),
+                board.getGithubRepository(),
+                issue.getNumber(),
+                "Bearer " + tokenService.getGithubToken(token),
+                GITHUB_API_VERSION,
+                request
+        );
+
+        syncIssueFromApiResponse(issue, apiResponse);
+        issueRepository.save(issue);
+
+        IssueApiResponse resolvedApiResponse = setUpIssueApiResponse(apiResponse, issue.getUser());
         return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), issue.getClosedAt());
     }
 
@@ -117,7 +140,7 @@ public class GithubService {
                     issue.getNumber(),
                     "Bearer " + tokenService.getGithubToken(token),
                     GITHUB_API_VERSION,
-                    new IssueUpdateRequest("closed")
+                    new IssueUpdateRequest(null, null, "closed", null, null) // TODO: Melhorar essa logica de deleção
             );
         }
 
@@ -183,6 +206,23 @@ public class GithubService {
         issue.setUpdatedAt(now);
 
         return issue;
+    }
+
+    private void syncIssueFromApiResponse(Issue issue, IssueApiResponse apiResponse) {
+        LocalDateTime now = LocalDateTime.now();
+        issue.setTitle(apiResponse.title());
+        issue.setBody(apiResponse.body());
+
+        issue.getLabels().clear();
+        issue.getLabels().addAll(getLabelsAddThemApiResponse(apiResponse));
+
+        issue.getAssignees().clear();
+        issue.getAssignees().addAll(getUsersAddThemApiResponse(apiResponse));
+
+        State newState = State.valueOf(apiResponse.state().toUpperCase());
+        issue.setState(newState);
+        issue.setClosedAt(newState == State.CLOSED ? now : null);
+        issue.setUpdatedAt(now);
     }
 
     private @NonNull List<User> getUsersAddThemApiResponse(IssueApiResponse apiResponse) {
