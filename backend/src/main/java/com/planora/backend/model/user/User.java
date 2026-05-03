@@ -48,7 +48,7 @@ public class User {
     @Column(name = "updated_at",  nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "userId")
+    @OneToMany(mappedBy = "user")
     private List<Issue> issues;
 
     @ManyToMany(fetch = FetchType.EAGER)

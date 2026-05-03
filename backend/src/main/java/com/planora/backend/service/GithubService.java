@@ -1,12 +1,16 @@
 package com.planora.backend.service;
 
 import com.planora.backend.client.GithubClient;
+import com.planora.backend.exception.DataNotFoundException;
 import com.planora.backend.model.issue.Issue;
 import com.planora.backend.model.issue.Label;
+import com.planora.backend.model.issue.State;
 import com.planora.backend.model.issue.dto.IssueApiResponse;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
+import com.planora.backend.model.issue.dto.IssueUpdateRequest;
 import com.planora.backend.model.issue.dto.UserRepositoryResponse;
+import com.planora.backend.model.kanban.KanbanBoard;
 import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.model.user.User;
 import com.planora.backend.repository.IssueRepository;
@@ -45,6 +49,102 @@ public class GithubService {
         return requests.stream()
                 .map(request -> buildAndPersistIssue(user, repository, token, column, request))
                 .toList();
+    }
+
+    @Transactional
+    public IssueResponse openIssue(Jwt token, Long issueId) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new DataNotFoundException("Issue not found"));
+
+        KanbanBoard board = issue.getColumn().getKanbanBoard();
+
+        IssueApiResponse apiResponse = githubClient.updateIssue(
+                board.getGithubOwnerName(),
+                board.getGithubRepository(),
+                issue.getNumber(),
+                "Bearer " + tokenService.getGithubToken(token),
+                GITHUB_API_VERSION,
+                new IssueUpdateRequest(null, null, "open", null, null)
+        );
+
+        issue.setState(State.OPEN);
+        issue.setClosedAt(null);
+        issue.setUpdatedAt(LocalDateTime.now());
+        issueRepository.save(issue);
+
+        IssueApiResponse resolvedApiResponse = setUpIssueApiResponse(apiResponse, issue.getUser());
+
+        return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), null);
+    }
+
+    @Transactional
+    public IssueResponse closeIssue(Jwt token, Long issueId) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new DataNotFoundException("Issue not found"));
+
+        KanbanBoard board = issue.getColumn().getKanbanBoard();
+
+        IssueApiResponse apiResponse = githubClient.updateIssue(
+                board.getGithubOwnerName(),
+                board.getGithubRepository(),
+                issue.getNumber(),
+                "Bearer " + tokenService.getGithubToken(token),
+                GITHUB_API_VERSION,
+                new IssueUpdateRequest(null, null, "closed", null, null)
+        );
+
+        LocalDateTime now = LocalDateTime.now();
+        issue.setState(State.CLOSED);
+        issue.setClosedAt(now);
+        issue.setUpdatedAt(now);
+        issueRepository.save(issue);
+
+        IssueApiResponse resolvedApiResponse = setUpIssueApiResponse(apiResponse, issue.getUser());
+
+        return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), issue.getClosedAt());
+    }
+
+    @Transactional
+    public IssueResponse updateIssue(Jwt token, Long issueId, IssueUpdateRequest request) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new DataNotFoundException("Issue not found"));
+
+        KanbanBoard board = issue.getColumn().getKanbanBoard();
+
+        IssueApiResponse apiResponse = githubClient.updateIssue(
+                board.getGithubOwnerName(),
+                board.getGithubRepository(),
+                issue.getNumber(),
+                "Bearer " + tokenService.getGithubToken(token),
+                GITHUB_API_VERSION,
+                request
+        );
+
+        syncIssueFromApiResponse(issue, apiResponse);
+        issueRepository.save(issue);
+
+        IssueApiResponse resolvedApiResponse = setUpIssueApiResponse(apiResponse, issue.getUser());
+        return new IssueResponse(resolvedApiResponse, issue.getCreatedAt(), issue.getUpdatedAt(), issue.getClosedAt());
+    }
+
+    @Transactional
+    public void deleteIssue(Jwt token, Long issueId) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new DataNotFoundException("Issue not found"));
+
+        if (issue.getState() != State.CLOSED) {
+            KanbanBoard board = issue.getColumn().getKanbanBoard();
+            githubClient.updateIssue(
+                    board.getGithubOwnerName(),
+                    board.getGithubRepository(),
+                    issue.getNumber(),
+                    "Bearer " + tokenService.getGithubToken(token),
+                    GITHUB_API_VERSION,
+                    new IssueUpdateRequest(null, null, "closed", null, null) // TODO: Melhorar essa logica de deleção
+            );
+        }
+
+        issueRepository.delete(issue);
     }
 
     private IssueResponse buildAndPersistIssue(User user, String repository, Jwt token, KanbanColumn column, IssueRequest issueRequest) {
@@ -99,13 +199,30 @@ public class GithubService {
         LocalDateTime now = LocalDateTime.now();
         Issue issue = apiResponse.toEntity();
 
-        issue.setUserId(user);
+        issue.setUser(user);
         issue.setLabels(labels);
         issue.setAssignees(assignees);
         issue.setCreatedAt(now);
         issue.setUpdatedAt(now);
 
         return issue;
+    }
+
+    private void syncIssueFromApiResponse(Issue issue, IssueApiResponse apiResponse) {
+        LocalDateTime now = LocalDateTime.now();
+        issue.setTitle(apiResponse.title());
+        issue.setBody(apiResponse.body());
+
+        issue.getLabels().clear();
+        issue.getLabels().addAll(getLabelsAddThemApiResponse(apiResponse));
+
+        issue.getAssignees().clear();
+        issue.getAssignees().addAll(getUsersAddThemApiResponse(apiResponse));
+
+        State newState = State.valueOf(apiResponse.state().toUpperCase());
+        issue.setState(newState);
+        issue.setClosedAt(newState == State.CLOSED ? now : null);
+        issue.setUpdatedAt(now);
     }
 
     private @NonNull List<User> getUsersAddThemApiResponse(IssueApiResponse apiResponse) {

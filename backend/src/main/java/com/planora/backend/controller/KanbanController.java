@@ -3,6 +3,7 @@ package com.planora.backend.controller;
 import com.planora.backend.model.issue.dto.BulkIssueRequest;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
+import com.planora.backend.model.issue.dto.IssueUpdateRequest;
 import com.planora.backend.model.kanban.dto.*;
 import com.planora.backend.service.KanbanBoardService;
 import com.planora.backend.service.KanbanMemberService;
@@ -87,6 +88,40 @@ public class KanbanController {
         );
     }
 
+    @PatchMapping("/board/issue/{issueId}/open")
+    public ResponseEntity<IssueResponse> openIssue(
+            @PathVariable Long issueId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        return ResponseEntity.ok(kanbanBoardService.openIssue(jwt, issueId));
+    }
+
+    @PatchMapping("/board/issue/{issueId}/close")
+    public ResponseEntity<IssueResponse> closeIssue(
+            @PathVariable Long issueId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        return ResponseEntity.ok(kanbanBoardService.closeIssue(jwt, issueId));
+    }
+
+    @DeleteMapping("/board/issue/{issueId}")
+    public ResponseEntity<Map<String, String>> deleteIssue(
+            @PathVariable Long issueId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        kanbanBoardService.deleteIssue(jwt, issueId);
+        return ResponseEntity.ok(Map.of("message", "Issue deleted successfully"));
+    }
+
+    @PatchMapping("/board/issue/{issueId}")
+    public ResponseEntity<IssueResponse> updateIssue(
+            @PathVariable Long issueId,
+            @RequestBody IssueUpdateRequest request,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        return ResponseEntity.ok(kanbanBoardService.updateIssue(jwt, issueId, request));
+    }
+
     @PostMapping("/board/{boardId}/member/invite")
     public ResponseEntity<KanbanMemberResponse> inviteMember(
             @PathVariable Long boardId,
@@ -167,6 +202,18 @@ public class KanbanController {
 
         return ResponseEntity.ok(
                 kanbanBoardService.getColumns(boardId, userId)
+        );
+    }
+
+    @GetMapping("/board/{boardId}/columns/issues")
+    public ResponseEntity<List<KanbanColumnWithIssuesResponse>> getColumnsWithIssues(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        Long userId = tokenService.getUserId(jwt);
+
+        return ResponseEntity.ok(
+                kanbanBoardService.getColumnsWithIssues(boardId, userId)
         );
     }
 }
