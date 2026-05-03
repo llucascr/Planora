@@ -3,6 +3,8 @@ import { Board, type BoardColumn } from "components";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { ProjetoBoard } from "types";
+import { useUI } from "context";
+import { ColumnForm } from "./ColumnForm";
 
 // const projectsData: Record<string, { name: string; color: string }> = {
 //   "1": { name: "Redesign do App", color: "#0E1F63" },
@@ -56,6 +58,7 @@ export const TarefasPage = () => {
   const boardId = Number(projectId);
 
   const [columns, setColumns] = useState<BoardColumn[]>([]);
+  const ui = useUI();
 
   function refetch() {
     httpClient
@@ -76,26 +79,32 @@ export const TarefasPage = () => {
       });
   }
 
+  function openCreateColumnModal() {
+    ui.show({
+      id: "column-form-create",
+      type: "modal",
+      options: { titulo: "Nova Coluna" },
+      content: (
+        <ColumnForm
+          boardId={boardId}
+          refetch={refetch}
+          onClose={() => ui.hide("modal", "column-form-create")}
+        />
+      ),
+    });
+  }
+
   useEffect(() => {
     if (!boardId || isNaN(boardId)) return;
     refetch();
   }, [boardId]);
-
-  async function handleCreateColumn(name: string) {
-    await httpClient.post(
-      `/v1/kanban/board/${boardId}/column`,
-      { name }
-    );
-
-    refetch();
-  }
 
   async function handleColumnMove(
     fromIndex: number,
     toIndex: number,
     columnId: string
   ) {
-    const reordered = columns.map(c => ({ ...c }));
+    const reordered = [...columns];
 
     const [moved] = reordered.splice(fromIndex, 1);
     reordered.splice(toIndex, 0, moved);
@@ -116,8 +125,8 @@ export const TarefasPage = () => {
         key={columns.length}
         columns={columns}
         refetch={refetch}
-        onCreateColumn={handleCreateColumn}
         onColumnMove={handleColumnMove}
+        onCreateColumn={openCreateColumnModal}
       />
     </div>
   );

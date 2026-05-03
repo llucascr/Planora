@@ -11,7 +11,8 @@ interface KanbanViewProps {
   onCardClick?: (cardId: string) => void;
   onCardMove?: (from: string, to: string, cardId: string) => void;
   onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
-  onCreateColumn?: (name: string) => Promise<void>;
+
+  onCreateColumn?: () => void;
 }
 
 function KanbanColumn({
@@ -168,12 +169,10 @@ export function KanbanView({
 
       {/* Add column placeholder */}
       <div className="shrink-0 w-[272px] flex items-start pt-0">
-        <button className="flex w-full items-center gap-2 rounded-xl border border-dashed border-border px-4 py-3 text-xs text-muted-foreground hover:border-border hover:text-foreground hover:bg-accent/50 transition-all self-start" onClick={async () => {
-          const name = prompt("Nome da coluna");
-          if (!name) return;
-
-          await onCreateColumn?.(name);
-        }}>
+        <button
+          className="flex w-full items-center gap-2 rounded-xl border border-dashed border-border px-4 py-3 text-xs text-muted-foreground hover:border-border hover:text-foreground hover:bg-accent/50 transition-all self-start"
+          onClick={onCreateColumn}
+        >
           <span className="text-lg font-light leading-none">+</span>
           Nova coluna
         </button>

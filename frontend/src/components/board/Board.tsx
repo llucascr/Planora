@@ -54,7 +54,7 @@ function BoardInner({
   onCardMove?: (from: string, to: string, cardId: string) => void;
   onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
   refetch?: () => void;
-  onCreateColumn?: (name: string) => Promise<void>;
+  onCreateColumn?: () => void;
 }) {
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -191,7 +191,7 @@ interface BoardProps {
   onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
   className?: string;
   refetch?: () => void;
-  onCreateColumn?: (name: string) => Promise<void>;
+  onCreateColumn?: () => void;
 }
 
 export function Board({
