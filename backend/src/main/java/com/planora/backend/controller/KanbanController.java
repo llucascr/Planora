@@ -3,11 +3,7 @@ package com.planora.backend.controller;
 import com.planora.backend.model.issue.dto.BulkIssueRequest;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
-import com.planora.backend.model.kanban.KanbanColumn;
-import com.planora.backend.model.kanban.dto.KanbanBoardRequest;
-import com.planora.backend.model.kanban.dto.KanbanBoardResponse;
-import com.planora.backend.model.kanban.dto.KanbanMemberResponse;
-import com.planora.backend.model.kanban.dto.MemberInviteRequest;
+import com.planora.backend.model.kanban.dto.*;
 import com.planora.backend.service.KanbanBoardService;
 import com.planora.backend.service.KanbanMemberService;
 import com.planora.backend.service.TokenService;
@@ -116,5 +112,61 @@ public class KanbanController {
             @PathVariable Long memberId) {
         kanbanMemberService.removeMember(boardId, memberId);
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Member deleted successfully"));
+    }
+
+    @PostMapping("/board/{boardId}/column")
+    public ResponseEntity<KanbanColumnResponse> createColumn(
+            @PathVariable Long boardId,
+            @RequestBody KanbanColumnRequest request
+    ) {
+        KanbanColumnResponse response =
+                kanbanBoardService.createColumn(boardId, request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    @PutMapping("/board/{boardId}/column/{columnId}")
+    public ResponseEntity<KanbanColumnResponse> updateColumn(
+            @PathVariable Long boardId,
+            @PathVariable Long columnId,
+            @RequestBody UpdateColumnRequest request,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        Long userId = tokenService.getUserId(jwt);
+
+        return ResponseEntity.ok(
+                kanbanBoardService.updateColumn(
+                        boardId,
+                        columnId,
+                        request.name(),
+                        request.position(),
+                        userId
+                )
+        );
+    }
+
+    @DeleteMapping("/board/{boardId}/column/{columnId}")
+    public ResponseEntity<Map<String, String>> deleteColumn(
+            @PathVariable Long boardId,
+            @PathVariable Long columnId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        Long userId = tokenService.getUserId(jwt);
+
+        kanbanBoardService.deleteColumn(boardId, columnId, userId);
+
+        return ResponseEntity.ok(Map.of("message", "Column deleted successfully"));
+    }
+
+    @GetMapping("/board/{boardId}/columns")
+    public ResponseEntity<List<KanbanColumnResponse>> getColumns(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        Long userId = tokenService.getUserId(jwt);
+
+        return ResponseEntity.ok(
+                kanbanBoardService.getColumns(boardId, userId)
+        );
     }
 }

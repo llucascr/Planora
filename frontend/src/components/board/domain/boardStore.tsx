@@ -15,15 +15,15 @@ export function normalizeBoard(columns: BoardColumn[]): NormalizedState {
     columnCards: {},
   };
 
-  const sorted = [...columns].sort((a, b) => a.ordem - b.ordem);
+  const sorted = [...columns].sort((a, b) => a.order - b.order);
 
   for (const col of sorted) {
     const colId = String(col.id);
     normalized.columnOrder.push(colId);
     normalized.columns[colId] = {
       id: col.id,
-      nome: col.nome,
-      ordem: col.ordem,
+      name: col.name,
+      order: col.order,
       idBoard: col.idBoard,
     };
     normalized.columnCards[colId] = [];
@@ -155,6 +155,47 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
       return { ...state, selectedCardId: action.payload };
     }
 
+    case "UPDATE_COLUMN": {
+      const { columnId, name } = action.payload;
+
+      return {
+        ...state,
+        normalized: {
+          ...state.normalized,
+          columns: {
+            ...state.normalized.columns,
+            [columnId]: {
+              ...state.normalized.columns[columnId],
+              name,
+            },
+          },
+        },
+      };
+    }
+
+    case "DELETE_COLUMN": {
+      const columnId = String(action.payload);
+
+      const newColumns = { ...state.normalized.columns };
+      const newColumnOrder = state.normalized.columnOrder.filter(
+        (id) => id !== columnId
+      );
+      const newColumnCards = { ...state.normalized.columnCards };
+
+      delete newColumns[columnId];
+      delete newColumnCards[columnId];
+
+      return {
+        ...state,
+        normalized: {
+          ...state.normalized,
+          columns: newColumns,
+          columnOrder: newColumnOrder,
+          columnCards: newColumnCards,
+        },
+      };
+    }
+
     default:
       return state;
   }
@@ -163,7 +204,7 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
 type Dispatch = React.Dispatch<BoardAction>;
 
 export const BoardStateContext = createContext<BoardState>(initialState);
-export const BoardDispatchContext = createContext<Dispatch>(() => {});
+export const BoardDispatchContext = createContext<Dispatch>(() => { });
 
 interface BoardProviderProps {
   children: React.ReactNode;

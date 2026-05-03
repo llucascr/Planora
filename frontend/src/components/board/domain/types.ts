@@ -52,8 +52,8 @@ export type CardType = 'lead' | 'planoAcao' | 'generic';
 
 export interface BoardColumn {
     id: number;
-    nome: string;
-    ordem: number;
+    name: string;
+    order: number;
     idBoard: number;
     cards: Card[];
 }
@@ -86,7 +86,9 @@ export type BoardAction =
     | { type: 'SET_VIEW'; payload: ViewMode }
     | { type: 'SET_FILTERS'; payload: Partial<FilterState> }
     | { type: 'TOGGLE_COLUMN'; payload: string }
-    | { type: 'SET_SELECTED_CARD'; payload: string | null };
+    | { type: 'SET_SELECTED_CARD'; payload: string | null }
+    | { type: "UPDATE_COLUMN"; payload: { columnId: string; name: string } }
+    | { type: "DELETE_COLUMN"; payload: string };
 
 export interface ColumnDragInfo {
     columnId: string;

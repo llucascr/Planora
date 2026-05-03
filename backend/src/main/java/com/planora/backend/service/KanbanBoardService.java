@@ -149,9 +149,9 @@ public class KanbanBoardService {
 
     private void createDefaultColumns(KanbanBoard board) {
         kanbanColumnRepository.saveAll(List.of(
-                buildColumn("Todo",        0, board),
+                buildColumn("Todo", 0, board),
                 buildColumn("In Progress", 1, board),
-                buildColumn("Done",        2, board)
+                buildColumn("Done", 2, board)
         ));
     }
 
@@ -192,4 +192,117 @@ public class KanbanBoardService {
         );
     }
 
+    public KanbanColumnResponse createColumn(Long boardId, KanbanColumnRequest request) {
+
+        KanbanBoard board = kanbanBoardRepository.findById(boardId)
+                .orElseThrow(() -> new RuntimeException("Board not found"));
+
+        KanbanColumn column = KanbanColumn.builder()
+                .name(request.name())
+                .position(board.getColumns().size())
+                .kanbanBoard(board)
+                .build();
+
+        kanbanColumnRepository.save(column);
+
+        return new KanbanColumnResponse(
+                column.getKanbanColumnId(),
+                column.getName(),
+                column.getPosition()
+        );
+    }
+
+    public KanbanColumnResponse updateColumn(
+            Long boardId,
+            Long columnId,
+            String name,
+            Integer position,
+            Long userId
+    ) {
+        if (kanbanMemberRepository
+                .findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId)
+                .isEmpty()) {
+            throw new UnauthorizedException("Kanban member not found");
+        }
+
+        KanbanColumn column = kanbanColumnRepository.findById(columnId)
+                .orElseThrow(() -> new DataNotFoundException("Column not found"));
+
+        if (!column.getKanbanBoard().getKanbanBoardId().equals(boardId)) {
+            throw new DataNotFoundException("Column does not belong to this board");
+        }
+
+        if (name != null && !name.isBlank()) {
+            column.setName(name);
+        }
+
+        if (position != null) {
+            List<KanbanColumn> columns =
+                    kanbanColumnRepository.findByKanbanBoard_KanbanBoardIdOrderByPosition(boardId);
+
+            columns.removeIf(c -> c.getKanbanColumnId().equals(columnId));
+            columns.add(position, column);
+
+            for (int i = 0; i < columns.size(); i++) {
+                columns.get(i).setPosition(i);
+            }
+
+            kanbanColumnRepository.saveAll(columns);
+        } else {
+            kanbanColumnRepository.save(column);
+        }
+
+        return new KanbanColumnResponse(
+                column.getKanbanColumnId(),
+                column.getName(),
+                column.getPosition()
+        );
+    }
+
+    public void deleteColumn(Long boardId, Long columnId, Long userId) {
+
+        if (kanbanMemberRepository
+                .findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId)
+                .isEmpty()) {
+            throw new UnauthorizedException("Kanban member not found");
+        }
+
+        KanbanColumn column = kanbanColumnRepository.findById(columnId)
+                .orElseThrow(() -> new DataNotFoundException("Column not found"));
+
+        if (!column.getKanbanBoard().getKanbanBoardId().equals(boardId)) {
+            throw new DataNotFoundException("Column does not belong to this board");
+        }
+
+        kanbanColumnRepository.delete(column);
+
+        List<KanbanColumn> columns =
+                kanbanColumnRepository.findByKanbanBoard_KanbanBoardIdOrderByPosition(boardId);
+
+        for (int i = 0; i < columns.size(); i++) {
+            columns.get(i).setPosition(i);
+        }
+
+        kanbanColumnRepository.saveAll(columns);
+    }
+
+    public List<KanbanColumnResponse> getColumns(Long boardId, Long userId) {
+
+        if (kanbanMemberRepository
+                .findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId)
+                .isEmpty()) {
+            throw new UnauthorizedException("Kanban member not found");
+        }
+
+        List<KanbanColumn> columns =
+                kanbanColumnRepository.findByKanbanBoard_KanbanBoardIdOrderByPositionAsc(boardId);
+
+        return columns.stream()
+                .map(col -> new KanbanColumnResponse(
+                        col.getKanbanColumnId(),
+                        col.getName(),
+                        col.getPosition()
+                ))
+                .toList();
+    }
 }

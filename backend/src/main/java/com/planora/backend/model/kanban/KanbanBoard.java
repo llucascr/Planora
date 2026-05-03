@@ -35,6 +35,7 @@ public class KanbanBoard {
     private List<KanbanMember> members;
 
     @OneToMany(mappedBy = "kanbanBoard", cascade = CascadeType.ALL)
+    @OrderBy("position ASC")
     private List<KanbanColumn> columns;
 
     @Column(name = "created_at")
