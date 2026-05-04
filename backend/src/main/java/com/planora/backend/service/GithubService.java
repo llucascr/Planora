@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -180,7 +181,15 @@ public class GithubService {
     }
 
     public List<UserRepositoryResponse> listUserRepositories(String githubToken) {
-        return githubClient.getUserRepositories("Bearer " + githubToken, GITHUB_API_VERSION);
+        List<UserRepositoryResponse> all = new ArrayList<>();
+        int page = 1;
+        final int perPage = 100;
+        List<UserRepositoryResponse> pageResult;
+        do {
+            pageResult = githubClient.getUserRepositories("Bearer " + githubToken, GITHUB_API_VERSION, perPage, page++);
+            all.addAll(pageResult);
+        } while (pageResult.size() == perPage);
+        return all;
     }
 
     public boolean checkIfRepositoryAndOwnerNameAreValid(String token, String ownerName, String repository) {

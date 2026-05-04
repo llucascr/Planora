@@ -73,7 +73,7 @@ public class WebhookService {
 
         log.info("Webhook '{}' received for {}/{} issue #{}", payload.action(), owner, repo, payload.issue().number());
 
-        List<KanbanBoard> boards = kanbanBoardRepository.findByGithubOwnerNameIgnoreCaseAndGithubRepositoryIgnoreCase(owner, repo);
+        List<KanbanBoard> boards = kanbanBoardRepository.findByGithubOwnerAndRepositoryIgnoreCase(owner, repo);
         if (boards.isEmpty()) {
             log.warn("No boards found for repository {}/{} — skipping", owner, repo);
             return;
@@ -84,7 +84,7 @@ public class WebhookService {
     }
 
     private void syncIssueToBoard(IssueWebhookPayload.WebhookIssueData issueData, KanbanBoard board) {
-        Optional<Issue> existing = issueRepository.findByNumberAndColumn_KanbanBoard_KanbanBoardId(
+        Optional<Issue> existing = issueRepository.findByNumberAndBoardId(
                 issueData.number(), board.getKanbanBoardId()
         );
 
