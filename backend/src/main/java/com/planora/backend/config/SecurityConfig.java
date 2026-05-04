@@ -33,6 +33,7 @@ public class SecurityConfig {
                     return config;
                 }))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/v1/webhook/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(

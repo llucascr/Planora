@@ -60,6 +60,13 @@ public class KanbanController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Board deleted successfully"));
     }
 
+    @PostMapping("/board/{boardId}/webhook")
+    public ResponseEntity<KanbanBoardResponse> registerWebhook(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(kanbanBoardService.registerWebhook(boardId, tokenService.getGithubToken(jwt)));
+    }
+
     @PostMapping("/board/issue/create")
     public ResponseEntity<IssueResponse> createIssueAndAddToColumn(
             @RequestParam Long boardId,

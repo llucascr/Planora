@@ -11,6 +11,7 @@ public record KanbanBoardResponse(
         String githubOwnerName,
         String ownerLogin,
         LocalDateTime createdAt,
+        boolean webhookActive,
         List<KanbanColumnResponse> columns,
         List<KanbanMemberResponse> members
 ) {
