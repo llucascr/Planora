@@ -31,4 +31,5 @@ export interface ProjetoBoard extends Response {
     createdAt: string,
     members: MemberBoard[],
     columns: ColumnBoard[]
+    webhookActive: boolean
 }
