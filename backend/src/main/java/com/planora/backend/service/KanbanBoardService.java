@@ -381,6 +381,44 @@ public class KanbanBoardService {
                 .toList();
     }
 
+    public void moveIssue(
+            Long boardId,
+            Long issueId,
+            Long targetColumnId,
+            Long userId
+    ) {
+
+        if (kanbanMemberRepository
+                .findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId)
+                .isEmpty()) {
+            throw new UnauthorizedException("Kanban member not found");
+        }
+
+        KanbanBoard board = findById(boardId);
+
+        Issue issue = board.getColumns().stream()
+                .flatMap(c -> c.getIssues().stream())
+                .filter(i -> i.getIssueId().equals(issueId))
+                .findFirst()
+                .orElseThrow(() -> new DataNotFoundException("Issue not found"));
+
+        KanbanColumn currentColumn = issue.getColumn();
+
+        KanbanColumn targetColumn = board.getColumns().stream()
+                .filter(c -> c.getKanbanColumnId().equals(targetColumnId))
+                .findFirst()
+                .orElseThrow(() -> new DataNotFoundException("Target column not found"));
+
+        currentColumn.getIssues().remove(issue);
+
+        List<Issue> targetIssues = targetColumn.getIssues();
+
+        issue.setColumn(targetColumn);
+
+        kanbanColumnRepository.save(currentColumn);
+        kanbanColumnRepository.save(targetColumn);
+    }
+
     public List<KanbanColumnWithIssuesResponse> getColumnsWithIssues(Long boardId, Long userId) {
 
         if (kanbanMemberRepository

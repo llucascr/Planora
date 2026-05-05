@@ -3,6 +3,7 @@ package com.planora.backend.controller;
 import com.planora.backend.model.issue.dto.BulkIssueRequest;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
+import com.planora.backend.model.issue.dto.MoveIssueRequest;
 import com.planora.backend.model.issue.dto.IssueUpdateRequest;
 import com.planora.backend.model.kanban.dto.*;
 import com.planora.backend.service.KanbanBoardService;
@@ -210,6 +211,24 @@ public class KanbanController {
         return ResponseEntity.ok(
                 kanbanBoardService.getColumns(boardId, userId)
         );
+    }
+
+    @PatchMapping("/board/{boardId}/issue/move")
+    public ResponseEntity<Map<String, String>> moveIssue(
+            @PathVariable Long boardId,
+            @RequestBody MoveIssueRequest request,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        Long userId = tokenService.getUserId(jwt);
+
+        kanbanBoardService.moveIssue(
+                boardId,
+                request.issueId(),
+                request.targetColumnId(),
+                userId
+        );
+
+        return ResponseEntity.ok(Map.of("message", "Issue moved successfully"));
     }
 
     @GetMapping("/board/{boardId}/columns/issues")
