@@ -47,9 +47,9 @@ public class Issue {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "tb_issue_label",
             joinColumns = @JoinColumn(name = "issue_id"),
@@ -57,7 +57,7 @@ public class Issue {
     )
     private List<Label> labels;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "tb_issue_user",
             joinColumns = @JoinColumn(name = "issue_id"),

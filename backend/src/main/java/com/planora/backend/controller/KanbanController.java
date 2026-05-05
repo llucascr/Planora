@@ -4,6 +4,7 @@ import com.planora.backend.model.issue.dto.BulkIssueRequest;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
 import com.planora.backend.model.issue.dto.MoveIssueRequest;
+import com.planora.backend.model.issue.dto.IssueUpdateRequest;
 import com.planora.backend.model.kanban.dto.*;
 import com.planora.backend.service.KanbanBoardService;
 import com.planora.backend.service.KanbanMemberService;
@@ -60,6 +61,13 @@ public class KanbanController {
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Board deleted successfully"));
     }
 
+    @PostMapping("/board/{boardId}/webhook")
+    public ResponseEntity<KanbanBoardResponse> registerWebhook(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(kanbanBoardService.registerWebhook(boardId, tokenService.getGithubToken(jwt)));
+    }
+
     @PostMapping("/board/issue/create")
     public ResponseEntity<IssueResponse> createIssueAndAddToColumn(
             @RequestParam Long boardId,
@@ -86,6 +94,40 @@ public class KanbanController {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 kanbanBoardService.createBulkIssuesAndAddToColumn(boardId, columnId, jwt, bulkRequest.issues(), userId, repository)
         );
+    }
+
+    @PatchMapping("/board/issue/{issueId}/open")
+    public ResponseEntity<IssueResponse> openIssue(
+            @PathVariable Long issueId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        return ResponseEntity.ok(kanbanBoardService.openIssue(jwt, issueId));
+    }
+
+    @PatchMapping("/board/issue/{issueId}/close")
+    public ResponseEntity<IssueResponse> closeIssue(
+            @PathVariable Long issueId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        return ResponseEntity.ok(kanbanBoardService.closeIssue(jwt, issueId));
+    }
+
+    @DeleteMapping("/board/issue/{issueId}")
+    public ResponseEntity<Map<String, String>> deleteIssue(
+            @PathVariable Long issueId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        kanbanBoardService.deleteIssue(jwt, issueId);
+        return ResponseEntity.ok(Map.of("message", "Issue deleted successfully"));
+    }
+
+    @PatchMapping("/board/issue/{issueId}")
+    public ResponseEntity<IssueResponse> updateIssue(
+            @PathVariable Long issueId,
+            @RequestBody IssueUpdateRequest request,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        return ResponseEntity.ok(kanbanBoardService.updateIssue(jwt, issueId, request));
     }
 
     @PostMapping("/board/{boardId}/member/invite")
@@ -187,5 +229,17 @@ public class KanbanController {
         );
 
         return ResponseEntity.ok(Map.of("message", "Issue moved successfully"));
+    }
+
+    @GetMapping("/board/{boardId}/columns/issues")
+    public ResponseEntity<List<KanbanColumnWithIssuesResponse>> getColumnsWithIssues(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        Long userId = tokenService.getUserId(jwt);
+
+        return ResponseEntity.ok(
+                kanbanBoardService.getColumnsWithIssues(boardId, userId)
+        );
     }
 }

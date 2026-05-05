@@ -5,6 +5,8 @@ import com.planora.backend.exception.UnauthorizedException;
 import com.planora.backend.model.issue.Issue;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
+import com.planora.backend.model.issue.dto.IssueSummaryResponse;
+import com.planora.backend.model.issue.dto.IssueUpdateRequest;
 import com.planora.backend.model.kanban.KanbanBoard;
 import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.model.kanban.KanbanMember;
@@ -69,6 +71,7 @@ public class KanbanBoardService {
         addOwnerMemberInKanban(kanbanBoard, user);
         KanbanBoard savedBoard = kanbanBoardRepository.save(kanbanBoard);
         createDefaultColumns(savedBoard);
+        registerWebhookIfNeeded(savedBoard, githubToken, owner, repo);
         return getBoardById(savedBoard.getKanbanBoardId());
     }
 
@@ -104,13 +107,29 @@ public class KanbanBoardService {
         return githubService.createBulkIssues(token, issueRequests, userId, repository, column);
     }
 
+    public IssueResponse openIssue(Jwt token, Long issueId) {
+        return githubService.openIssue(token, issueId);
+    }
+
+    public IssueResponse closeIssue(Jwt token, Long issueId) {
+        return githubService.closeIssue(token, issueId);
+    }
+
+    public IssueResponse updateIssue(Jwt token, Long issueId, IssueUpdateRequest request) {
+        return githubService.updateIssue(token, issueId, request);
+    }
+
+    public void deleteIssue(Jwt token, Long issueId) {
+        githubService.deleteIssue(token, issueId);
+    }
+
     public KanbanBoard getKanbanBoard(Long id) {
         return kanbanBoardRepository.findById(id).orElseThrow(
                 () -> new DataNotFoundException("Kanban Board with id " + id + " not found"));
     }
 
     public List<KanbanBoardResponse> getAllBoardsByUser(Long userId) {
-        return kanbanBoardRepository.findByMembers_User_UserIdAndMembers_InvitedStatus(userId, InvitedStatus.ACCEPTED).stream()
+        return kanbanBoardRepository.findBoardsByMemberUserIdAndStatus(userId, InvitedStatus.ACCEPTED).stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -128,12 +147,66 @@ public class KanbanBoardService {
 
     public void deleteBoard(Long id) {
         KanbanBoard board = findById(id);
+        removeWebhookIfLastBoard(board);
         kanbanBoardRepository.delete(board);
+    }
+
+    public KanbanBoardResponse registerWebhook(Long boardId, String githubToken) {
+        KanbanBoard board = findById(boardId);
+        if (board.getGithubWebhookId() != null) {
+            return toResponse(board);
+        }
+
+        String owner = board.getGithubOwnerName();
+        String repo = board.getGithubRepository();
+
+        Long webhookId = kanbanBoardRepository
+                .findBoardsByOwnerAndRepositoryWithWebhook(owner, repo)
+                .stream().findFirst()
+                .map(KanbanBoard::getGithubWebhookId)
+                .orElseGet(() -> githubService.createRepositoryWebhook(githubToken, owner, repo));
+
+        board.setGithubWebhookId(webhookId);
+        kanbanBoardRepository.save(board);
+        return toResponse(board);
     }
 
     public KanbanBoard findById(Long id) {
         return kanbanBoardRepository.findById(id).orElseThrow(
                 () -> new DataNotFoundException("Kanban Board with id " + id + " not found"));
+    }
+
+    private void registerWebhookIfNeeded(KanbanBoard board, String githubToken, String owner, String repo) {
+        Long webhookId = kanbanBoardRepository
+                .findBoardsByOwnerAndRepositoryWithWebhook(owner, repo)
+                .stream().findFirst()
+                .map(KanbanBoard::getGithubWebhookId)
+                .orElseGet(() -> {
+                    try {
+                        return githubService.createRepositoryWebhook(githubToken, owner, repo);
+                    } catch (Exception e) {
+                        log.warn("Could not create GitHub webhook for {}/{}: {}", owner, repo, e.getMessage());
+                        return null;
+                    }
+                });
+        board.setGithubWebhookId(webhookId);
+        kanbanBoardRepository.save(board);
+    }
+
+    private void removeWebhookIfLastBoard(KanbanBoard board) {
+        if (board.getGithubWebhookId() == null) return;
+        boolean hasOtherBoards = !kanbanBoardRepository
+                .findByOwnerAndRepositoryExcluding(
+                        board.getGithubOwnerName(), board.getGithubRepository(), board.getKanbanBoardId()
+                ).isEmpty();
+        if (!hasOtherBoards) {
+            githubService.deleteRepositoryWebhook(
+                    board.getOwner().getGithubToken(),
+                    board.getGithubOwnerName(),
+                    board.getGithubRepository(),
+                    board.getGithubWebhookId()
+            );
+        }
     }
 
     private static void addOwnerMemberInKanban(KanbanBoard kanbanBoard, User user) {
@@ -188,6 +261,7 @@ public class KanbanBoardService {
                 board.getGithubOwnerName(),
                 board.getOwner().getLogin(),
                 board.getCreatedAt(),
+                board.getGithubWebhookId() != null,
                 columns,
                 members
         );
@@ -343,5 +417,28 @@ public class KanbanBoardService {
 
         kanbanColumnRepository.save(currentColumn);
         kanbanColumnRepository.save(targetColumn);
+    }
+
+    public List<KanbanColumnWithIssuesResponse> getColumnsWithIssues(Long boardId, Long userId) {
+
+        if (kanbanMemberRepository
+                .findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId)
+                .isEmpty()) {
+            throw new UnauthorizedException("Kanban member not found");
+        }
+
+        List<KanbanColumn> columns =
+                kanbanColumnRepository.findByKanbanBoard_KanbanBoardIdOrderByPositionAsc(boardId);
+
+        return columns.stream()
+                .map(col -> new KanbanColumnWithIssuesResponse(
+                        col.getKanbanColumnId(),
+                        col.getName(),
+                        col.getPosition(),
+                        col.getIssues().stream()
+                                .map(IssueSummaryResponse::fromEntity)
+                                .toList()
+                ))
+                .toList();
     }
 }
