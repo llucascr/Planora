@@ -1,0 +1,710 @@
+{
+	"info": {
+		"_postman_id": "ae9cb0e7-54bf-4c00-bfdd-a0806066283e",
+		"name": "Planora",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21226662",
+		"_collection_link": "https://hubsaas.postman.co/workspace/PUC~ba189806-a9e2-4bbb-992a-7bfb6e1dfdfa/collection/21226662-ae9cb0e7-54bf-4c00-bfdd-a0806066283e?action=share&source=collection_link&creator=21226662"
+	},
+	"item": [
+		{
+			"name": "Kanban",
+			"item": [
+				{
+					"name": "Issue",
+					"item": [
+						{
+							"name": "Criar issue na coluna",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Login page not loading\",\n  \"body\": \"The login page returns a 500 error when submitting credentials.\",\n  \"assignees\": [\"llucascr\", \"LuisSilvah\"],\n  \"labels\": [\"bug\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{develop}}/v1/kanban/board/issue/create?boardId=21&columnId=61&userId=4&repository=repo-teste",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"board",
+										"issue",
+										"create"
+									],
+									"query": [
+										{
+											"key": "boardId",
+											"value": "21"
+										},
+										{
+											"key": "columnId",
+											"value": "61"
+										},
+										{
+											"key": "userId",
+											"value": "4"
+										},
+										{
+											"key": "repository",
+											"value": "repo-teste"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Criar Varias Issues",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"issues\": [\n    {\n        \"title\": \"Login page not loading\",\n        \"body\": \"The login page returns a 500 error when submitting credentials.\",\n        \"assignees\": [\"llucascr\", \"LuisSilvah\"],\n        \"labels\": [\"bug\"]\n    },\n    {\n        \"title\": \"Add dark mode support\",\n        \"body\": \"Users have requested a dark mode option in the settings panel. Should persist across sessions.\",\n        \"assignees\": [\"llucascr\"],\n        \"labels\": [\"enhancement\"]\n    },\n    {\n        \"title\": \"API response time exceeds 3s on /products endpoint\",\n        \"body\": \"The /products endpoint is taking over 3 seconds to respond under normal load. Needs query optimization.\",\n        \"assignees\": [\"LuisSilvah\"],\n        \"labels\": [\"bug\", \"performance\"]\n    },\n    {\n        \"title\": \"Update README with setup instructions\",\n        \"body\": \"The README is missing environment setup steps and how to run tests locally.\",\n        \"assignees\": [],\n        \"labels\": [\"documentation\"]\n    }\n]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{develop}}/v1/kanban/board/issue/bulk?userId=4&repository=repo-teste&columnId=61&boardId=21",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"board",
+										"issue",
+										"bulk"
+									],
+									"query": [
+										{
+											"key": "userId",
+											"value": "4"
+										},
+										{
+											"key": "repository",
+											"value": "repo-teste"
+										},
+										{
+											"key": "columnId",
+											"value": "61"
+										},
+										{
+											"key": "boardId",
+											"value": "21"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Listas todas as issues de um board com suas colunas",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{develop}}/v1/kanban/board/30/columns/issues",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"board",
+										"30",
+										"columns",
+										"issues"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Atualizar issue para Open",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{develop}}/v1/kanban/board/issue/40/open",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"board",
+										"issue",
+										"40",
+										"open"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Atualizar issue para Closed",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{develop}}/v1/kanban/board/issue/40/close",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"board",
+										"issue",
+										"40",
+										"close"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Deleta uma Issue",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{develop}}/v1/kanban/board/issue/40",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"board",
+										"issue",
+										"40"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Atualizar Issue",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "token",
+										"value": "{{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"Bug: Login page not TESTE\",\n  \"body\": \"The login page throws a 500 error when accessing via mobile browser.\",\n  \"state\": \"OPEN\",\n  \"assignees\": [\"llucascr\", \"LuisSilvah\"],\n  \"labels\": [\"bug\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{develop}}/v1/kanban/board/issue/47",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"board",
+										"issue",
+										"47"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Membros",
+					"item": [
+						{
+							"name": "Listar membros",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{develop}}/v1/kanban/board/:boardId/member/list",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"board",
+										":boardId",
+										"member",
+										"list"
+									],
+									"variable": [
+										{
+											"key": "boardId",
+											"value": "16"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Convidar membro",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"login\": \"Luis-Silvah\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{develop}}/v1/kanban/board/:boardId/member/invite",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"board",
+										":boardId",
+										"member",
+										"invite"
+									],
+									"variable": [
+										{
+											"key": "boardId",
+											"value": "16"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Atualizar status membro",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{develop}}/v1/kanban/member/15/status/update?status=accepted",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"member",
+										"15",
+										"status",
+										"update"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "accepted"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Deletar membro",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{develop}}/v1/kanban/board/16/member/delete/15",
+									"host": [
+										"{{develop}}"
+									],
+									"path": [
+										"v1",
+										"kanban",
+										"board",
+										"16",
+										"member",
+										"delete",
+										"15"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Buscar board",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{develop}}/v1/kanban/board/4",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"kanban",
+								"board",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar board",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{develop}}/v1/kanban/board/list",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"kanban",
+								"board",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar board",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Board do Lucas\",\n    \"description\": \"teste\",\n    \"githubRepository\": \"repo-teste\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{develop}}/v1/kanban/board/create",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"kanban",
+								"board",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar board",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"teste 02\",\n    \"description\": \"teste\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{develop}}/v1/kanban/board/update/14",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"kanban",
+								"board",
+								"update",
+								"14"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar bard",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{develop}}/v1/kanban/board/delete/10",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"kanban",
+								"board",
+								"delete",
+								"10"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "OAuth",
+			"item": [
+				{
+					"name": "Login",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"teste 01\",\n    \"description\": \"teste\",\n    \"githubRepository\": \"teste\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{develop}}/login",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Repositorios",
+			"item": [
+				{
+					"name": "Listar Repositorios",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{develop}}/v1/github/repositories",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"github",
+								"repositories"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "WebHook",
+			"item": [
+				{
+					"name": "Github WebHook",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Hub-Signature-256",
+								"value": "sha256=c34b602dd4633d23eccfd03e69500f3366c08e2ef3cee927ec011cb91d1042",
+								"type": "text"
+							},
+							{
+								"key": "X-GitHub-Event",
+								"value": "issues",
+								"type": "text"
+							},
+							{
+								"key": "X-GitHub-Hook-ID",
+								"value": "607649683",
+								"type": "text"
+							},
+							{
+								"key": "X-Hub-Signature",
+								"value": "sha1=6e89daa1a7d90fbb9c737f27de40553a48088042",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"action\" : \" aberto \" ,\n   \"issue\" : {\n     \"url\" : \" https://api.github.com/repos/LuisSilvah/teste/issues/7 \" ,\n     \"repository_url\" : \" https://api.github.com/repos/LuisSilvah/teste \" ,\n     \"labels_url\" : \" https://api.github.com/repos/LuisSilvah/teste/issues/7/labels{/name} \" ,\n     \"comments_url\" : \" https://api.github.com/repos/LuisSilvah/teste/issues/7/comments \" ,\n     \"events_url\" : \" https://api.github.com/repos/LuisSilvah/teste/issues/7/events \" ,\n     \"html_url\" : \" https://github.com/LuisSilvah/teste/issues/7 \" ,\n     \"id\" : 4298370189 ,\n     \"node_id\" : \" I_kwDOSHLmZM8AAAABADPsjQ \" ,\n     \"number\" : 7 ,\n     \"title\" : \" teste 07 \" ,\n     \"user\" : {\n       \"login\" : \" LuisSilvah \" ,\n       \"id\" : 79490427 ,\n       \"node_id\" : \" MDQ6VXNlcjc5NDkwNDI3 \" ,\n       \"avatar_url\" : \" https://avatars.githubusercontent.com/u/79490427?v=4 \" ,\n       \"gravatar_id\" : \" \" ,\n       \"url\" : \" https://api.github.com/users/LuisSilvah \" ,\n       \"html_url\" : \" https://github.com/LuisSilvah \" ,\n       \"followers_url\" : \" https://api.github.com/users/LuisSilvah/followers \" ,\n       \"following_url\" : \" https://api.github.com/users/LuisSilvah/following{/other_user} \" ,\n       \"gists_url\" : \" https://api.github.com/users/LuisSilvah/gists{/gist_id} \" ,\n       \"starred_url\" : \" https://api.github.com/users/LuisSilvah/starred{/owner}{/repo} \" ,\n       \"subscriptions_url\" :\" https://api.github.com/users/LuisSilvah/subscriptions \" ,\n       \"organizations_url\" : \" https://api.github.com/users/LuisSilvah/orgs \" ,\n       \"repos_url\" : \" https://api.github.com/users/LuisSilvah/repos \" ,\n       \"events_url\" : \" https://api.github.com/users/LuisSilvah/events{/privacy} \" ,\n       \"received_events_url\" : \" https://api.github.com/users/LuisSilvah/received_events \" ,\n       \"type\" : \" User \" ,\n       \"user_view_type\" : \" public \" ,\n       \"site_admin\" : false\n    },\n    \"rótulos\" : [\n\n    ],\n    \"estado\" : \" aberto \" ,\n     \"bloqueado\" : falso ,\n     \"responsáveis\" : [\n\n    ],\n    \"milestone\" : null ,\n     \"comments\" : 0 ,\n     \"created_at\" : \" 2026-04-20T20:08:13Z \" ,\n     \"updated_at\" : \" 2026-04-20T20:08:13Z \" ,\n     \"closed_at\" : null ,\n     \"assignee\" : null ,\n     \"author_association\" : \" OWNER \" ,\n     \"active_lock_reason\" : null ,\n     \"sub_issues_summary\" : {\n       \"total\" : 0 ,\n       \"completed\" : 0 ,\n       \"percent_completed\" : 0\n    },\n    \"issue_dependencies_summary\" : {\n       \"blocked_by\" : 0 ,\n       \"total_blocked_by\" : 0 ,\n       \"blocking\" : 0 ,\n       \"total_blocking\" : 0\n    },\n    \"corpo\" : null ,\n     \"reações\" : {\n       \"url\" : \" https://api.github.com/repos/LuisSilvah/teste/issues/7/reactions \" ,\n       \"contagem_total\" : 0 ,\n       \"+1\" : 0 ,\n       \"-1\" : 0 ,\n       \"risada\" : 0 ,\n       \"viva\" : 0 ,\n       \"confuso\" : 0 ,\n       \"coração\" : 0 ,\n       \"foguete\" : 0 ,\n       \"olhos\" : 0\n    },\n    \"timeline_url\" : \" https://api.github.com/repos/LuisSilvah/teste/issues/7/timeline \" ,\n     \"performed_via_github_app\" : null ,\n     \"state_reason\" : null ,\n     \"pinned_comment\" : null\n  },\n  \"repository\" : {\n     \"id\" : 1215489636 ,\n     \"node_id\" : \" R_kgDOSHLmZA \" ,\n     \"name\" : \" teste \" ,\n     \"full_name\" : \" LuisSilvah/teste \" ,\n     \"private\" : false ,\n     \"owner\" : {\n       \"login\" : \" LuisSilvah \" ,\n       \"id\" : 79490427 ,\n       \"node_id\" : \" MDQ6VXNlcjc5NDkwNDI3 \" ,\n       \"avatar_url\" : \" https://avatars.githubusercontent.com/u/79490427?v=4 \" ,\n       \"gravatar_id\" : \" \" ,\n       \"url\" : \" https://api.github.com/users/LuisSilvah \" ,\n       \"html_url\" : \" https://github.com/LuisSilvah \" ,\n       \"followers_url\" : \" https://api.github.com/users/LuisSilvah/followers \" ,\n       \"following_url\" : \" https://api.github.com/users/LuisSilvah/following{/other_user} \" ,\n       \"gists_url\" : \" https://api.github.com/users/LuisSilvah/gists{/gist_id} \" ,\n       \"starred_url\" : \" https://api.github.com/users/LuisSilvah/starred{/owner}{/repo} \" ,\n       \"subscriptions_url\" : \" https://api.github.com/users/LuisSilvah/subscriptions \" ,\n       \"organizations_url\" : \" https://api.github.com/users/LuisSilvah/orgs \" ,\n       \"repos_url\" : \" https://api.github.com/users/LuisSilvah/repos \" ,\n       \"events_url\" : \" https://api.github.com/users/LuisSilvah/events{/privacy} \" ,\n       \"received_events_url\" :\" https://api.github.com/users/LuisSilvah/received_events \" ,\n       \"type\" : \" User \" ,\n       \"user_view_type\" : \" public \",\n       \"site_admin\" : false\n    },\n    \"html_url\" : \" https://github.com/LuisSilvah/teste \" ,\n     \"description\" : null ,\n     \"fork\" : false ,\n     \"url\" : \" https://api.github.com/repos/LuisSilvah/teste \" ,\n     \"forks_url\" : \" https://api.github.com/repos/LuisSilvah/teste/forks \" ,\n     \"keys_url\" : \" https://api.github.com/repos/LuisSilvah/teste/keys{/key_id} \" ,\n     \"collaborators_url\" : \" https://api.github.com/repos/LuisSilvah/teste/collaborators{/collaborator} \" ,\n     \"teams_url\" : \" https://api.github.com/repos/LuisSilvah/teste/teams \" ,\n     \"hooks_url\" : \" https://api.github.com/repos/LuisSilvah/teste/hooks \" ,\n     \"issue_events_url\" : \" https://api.github.com/repos/LuisSilvah/teste/issues/events{/number} \" ,\n     \"events_url\" : \" https://api.github.com/repos/LuisSilvah/teste/events \" ,\n     \"assignees_url\" : \" https://api.github.com/repos/LuisSilvah/teste/assignees{/user} \" ,\n     \"branches_url\" : \" https://api.github.com/repos/LuisSilvah/teste/branches{/branch} \" ,\n     \"tags_url\" : \" https://api.github.com/repos/LuisSilvah/teste/tags \" ,\n     \"blobs_url\" : \" https://api.github.com/repos/LuisSilvah/teste/git/blobs{/sha} \" ,\n     \"git_tags_url\" : \" https://api.github.com/repos/LuisSilvah/teste/git/tags{/sha} \" ,\n     \"git_refs_url\" : \" https://api.github.com/repos/LuisSilvah/teste/git/refs{/sha} \" ,\n     \"trees_url\" : \" https://api.github.com/repos/LuisSilvah/teste/git/trees{/sha} \" ,\n     \"statuses_url\" : \" https://api.github.com/repos/LuisSilvah/teste/statuses/{sha} \" ,\n     \"languages_url\" : \" https://api.github.com/repos/LuisSilvah/teste/languages ​​\" ,\n    \"stargazers_url\" : \" https://api.github.com/repos/LuisSilvah/teste/stargazers \" ,\n     \"contributors_url\" : \" https://api.github.com/repos/LuisSilvah/teste/contributors \" ,\n     \"subscribers_url\" : \" https://api.github.com/repos/LuisSilvah/teste/subscribers \" ,\n     \"subscription_url\" : \" https://api.github.com/repos/LuisSilvah/teste/subscription \" ,\n     \"commits_url\" : \" https://api.github.com/repos/LuisSilvah/teste/commits{/sha} \" ,\n     \"git_commits_url\" : \" https://api.github.com/repos/LuisSilvah/teste/git/commits{/sha} \" ,\n     \"comments_url\" : \" https://api.github.com/repos/LuisSilvah/teste/comments{/number} \" ,\n     \"issue_comment_url\" : \" https://api.github.com/repos/LuisSilvah/teste/issues/comments{/number} \" ,\n     \"contents_url\" : \" https://api.github.com/repos/LuisSilvah/teste/contents/{+path} \" ,\n     \"compare_url\" : \" https://api.github.com/repos/LuisSilvah/teste/compare/{base}...{head} \" ,\n     \"merges_url\" : \" https://api.github.com/repos/LuisSilvah/teste/merges \" ,\n     \"archive_url\" : \" https://api.github.com/repos/LuisSilvah/teste/{archive_format}{/ref} \" ,\n     \"downloads_url\" : \" https://api.github.com/repos/LuisSilvah/teste/downloads \" ,\n     \"issues_url\" : \" https://api.github.com/repos/LuisSilvah/teste/issues{/number} \" ,\n     \"pulls_url\" : \" https://api.github.com/repos/LuisSilvah/teste/pulls{/number} \" ,\n     \"milestones_url\" : \" https://api.github.com/repos/LuisSilvah/teste/milestones{/number} \" ,\n     \"notifications_url\" : \" https://api.github.com/repos/LuisSilvah/teste/notifications{?since,all,participando} \" ,\n     \"labels_url\" : \" https://api.github.com/repos/LuisSilvah/teste/labels{/name} \" ,\n     \"releases_url\": \" https://api.github.com/repos/LuisSilvah/teste/releases{/id} \" ,\n     \"deployments_url\" : \" https://api.github.com/repos/LuisSilvah/teste/deployments \" ,\n     \"created_at\" : \" 2026-04-20T01:02:37Z \" ,\n     \"updated_at\" : \" 2026-04-20T01:02:37Z \" ,\n     \"pushed_at\" : \" 2026-04-20T01:02:37Z \" ,\n     \"git_url\" : \" git://github.com/LuisSilvah/teste.git \" ,\n     \"ssh_url\" : \" git@github.com:LuisSilvah/teste.git \" ,\n     \"clone_url\" : \" https://github.com/LuisSilvah/teste.git \" ,\n     \"svn_url\" : \" https://github.com/LuisSilvah/teste \" ,\n     \"homepage\" : null ,\n     \"size\" : 0 ,\n     \"stargazers_count\" : 0 ,\n     \"watchers_count\" : 0 ,\n     \"language\" : null ,\n     \"has_issues\" : true ,\n     \"has_projects\" : true ,\n     \"has_downloads\" : true ,\n     \"has_wiki\" : true ,\n     \"has_pages\" : false ,\n     \"has_discussions\" : false ,\n     \"forks_count\" : 0 ,\n     \"mirror_url\" : null ,\n     \"archived\" : false ,\n     \"disabled\" : false ,\n     \"open_issues_count\" : 7 ,\n     \"licença\" : nulo ,\n     \"permitir_forking\" : verdadeiro ,\n     \"é_template\" : falso ,\n     \"assinatura_web_commit_requirida\" : falso ,\n    \"has_pull_requests\" : true ,\n     \"pull_request_creation_policy\" : \" all \" ,\n     \"topics\" : [\n\n    ],\n    \"visibilidade\" : \" pública \" ,\n     \"forks\" : 0 ,\n     \"open_issues\" : 7 ,\n     \"watchers\" : 0 ,\n     \"default_branch\" : \" main \"\n  },\n  \"remetente\" : {\n     \"login\" : \" LuisSilvah \" ,\n     \"id\" : 79490427 ,\n     \"node_id\" : \" MDQ6VXNlcjc5NDkwNDI3 \" ,\n     \"avatar_url\" : \" https://avatars.githubusercontent.com/u/79490427?v=4 \" ,\n     \"gravatar_id\" : \" \" ,\n     \"url\" : \" https://api.github.com/users/LuisSilvah \" ,\n     \"html_url\" : \" https://github.com/LuisSilvah \" ,\n     \"followers_url\" : \" https://api.github.com/users/LuisSilvah/followers \" ,\n     \"following_url\" : \" https://api.github.com/users/LuisSilvah/following{/other_user} \" ,\n     \"gists_url\" : \" https://api.github.com/users/LuisSilvah/gists{/gist_id} \" ,\n     \"starred_url\" : \" https://api.github.com/users/LuisSilvah/starred{/owner}{/repo} \" ,\n     \"subscriptions_url\" : \" https://api.github.com/users/LuisSilvah/subscriptions \" ,\n     \"organizations_url\" : \" https://api.github.com/users/LuisSilvah/orgs \" ,\n     \"repos_url\" : \" https://api.github.com/users/LuisSilvah/repos \" ,\n     \"events_url\" : \" https://api.github.com/users/LuisSilvah/events{/privacy} \" ,\n     \"received_events_url\" : \" https://api.github.com/users/LuisSilvah/received_events \" ,\n     \"type\" : \" User \" ,\n     \"user_view_type\" : \" public \" ,\n     \"site_admin\" : false\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{develop}}/v1/webhook/github",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"webhook",
+								"github"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Registrar Webhook",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{develop}}/v1/kanban/board/36/webhook",
+							"host": [
+								"{{develop}}"
+							],
+							"path": [
+								"v1",
+								"kanban",
+								"board",
+								"36",
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -64,14 +64,14 @@ export const ProjetosPage = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#0E1F63]">Projetos</h1>
+          <h1 className="text-2xl font-bold text-primary">Projetos</h1>
           <p className="text-sm text-gray-500 mt-0.5">
             Gerencie e acompanhe todos os seus boards Kanban.
           </p>
         </div>
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-2 bg-[#0E1F63] text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-[#1a2f7a] transition-colors shadow-sm"
+          className="flex items-center gap-2 bg-primary text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-[#1a2f7a] transition-colors shadow-sm"
         >
           <Plus size={16} weight="bold" />
           Novo Projeto

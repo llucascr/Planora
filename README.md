@@ -178,3 +178,7 @@ Dúvidas, sugestões ou problemas? Abra uma [issue](https://github.com/seu-usuar
 <a href="#-issueforge-ai">Voltar ao topo ↑</a>
 
 </div>
+
+```bash
+npx cloudflared tunnel --url http://127.0.0.1:8080
+```
