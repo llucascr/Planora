@@ -3,4 +3,5 @@ IA/Treinamento/llama-backlog/
 IA/Treinamento/llama-backlog-lora/
 /IA/API/.vscode
 /IA/API/__pycache__
+/IA/API/.env
 .claude
