@@ -14,7 +14,7 @@ public class GithubClientConfig {
     private static final int BUFFER_SIZE_10_MB = 10 * 1024 * 1024;
 
     @Bean
-    public HttpServiceProxyFactory httpServiceProxyFactory() {
+    public HttpServiceProxyFactory githubHttpServiceProxyFactory() {
         ExchangeStrategies strategies = ExchangeStrategies.builder()
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(BUFFER_SIZE_10_MB))
                 .build();
@@ -28,8 +28,8 @@ public class GithubClientConfig {
     }
 
     @Bean
-    public GithubClient githubClient(HttpServiceProxyFactory factory) {
-        return factory.createClient(GithubClient.class);
+    public GithubClient githubClient(HttpServiceProxyFactory githubHttpServiceProxyFactory) {
+        return githubHttpServiceProxyFactory.createClient(GithubClient.class);
     }
 
 }
