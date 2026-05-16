@@ -74,9 +74,10 @@ public class KanbanController {
             @RequestParam Long columnId,
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody IssueRequest issueRequest,
-            @RequestParam Long userId,
             @RequestParam String repository
     ) {
+        Long userId = tokenService.getUserId(jwt);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 kanbanBoardService.createIssueAndAddToColumn(boardId, columnId, jwt, issueRequest, userId, repository)
         );

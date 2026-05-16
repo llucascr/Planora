@@ -11,8 +11,8 @@ interface KanbanViewProps {
   onCardClick?: (cardId: string) => void;
   onCardMove?: (from: string, to: string, cardId: string) => void;
   onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
-
   onCreateColumn?: () => void;
+  refetch: () => void;
 }
 
 function KanbanColumn({
@@ -29,6 +29,7 @@ function KanbanColumn({
   onColumnDrop,
   onColumnDragEnd,
   onCardMove,
+  refetch,
 }: {
   columnId: string;
   columnIndex: number;
@@ -42,6 +43,7 @@ function KanbanColumn({
   onColumnDrop: (e: React.DragEvent, toIdx: number) => void;
   onColumnDragEnd: () => void;
   onCardMove?: (from: string, to: string, cardId: string) => void;
+  refetch: () => void;
 }) {
   const filteredCardIds = useFilteredColumnCards(columnId);
   const isDragging = draggingColIdx === columnIndex;
@@ -81,6 +83,7 @@ function KanbanColumn({
         }
         onColumnHeaderDragEnd={onColumnDragEnd}
         isColumnDragging={isDragging}
+        refetch={refetch}
       />
     </div>
   );
@@ -92,6 +95,7 @@ export function KanbanView({
   onCardMove,
   onColumnMove,
   onCreateColumn,
+  refetch,
 }: KanbanViewProps) {
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -164,6 +168,7 @@ export function KanbanView({
           onColumnDrop={handleColumnDrop}
           onColumnDragEnd={handleColumnDragEnd}
           onCardMove={onCardMove}
+          refetch={refetch}
         />
       ))}
 

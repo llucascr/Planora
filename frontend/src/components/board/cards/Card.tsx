@@ -4,6 +4,8 @@ import { detectCardType, getCardTypeLabel } from "../domain/cardDetector";
 import { CardGeneric } from "./CardGeneric";
 import { useBoardDispatch } from "../domain/boardStore";
 import { classnames } from "../utils/classnames";
+import { useUI } from "context";
+import { IssueForm } from "@/pages/Tarefas/IssueForm";
 
 interface CardProps {
   card: CardData;
@@ -13,6 +15,9 @@ interface CardProps {
   dragRef: React.MutableRefObject<DragInfo | null>;
   onCardClick?: (cardId: string) => void;
   onCardMove?: (from: string, to: string, cardId: string) => void;
+  refetch?: () => void;
+  boardId?: number;
+  repository?: string;
 }
 
 function getCardCode(card: CardData): string | null {
@@ -39,6 +44,9 @@ export function Card({
   columnId,
   compact = false,
   dragRef,
+  refetch,
+  boardId,
+  repository,
   onCardClick,
 }: CardProps) {
   const dispatch = useBoardDispatch();
@@ -47,6 +55,7 @@ export function Card({
   const isDragging = useRef(false);
   const code = getCardCode(card);
   const label = typeLabel[cardType];
+  const ui = useUI();
 
   function handleDragStart(e: React.DragEvent) {
     isDragging.current = true;
@@ -73,7 +82,42 @@ export function Card({
     const props = { card, compact, onClick: undefined };
     switch (cardType) {
       default:
-        return <CardGeneric {...props} />;
+        return (
+          <CardGeneric
+            {...props}
+            onDelete={(cardId) => {
+              dispatch({
+                type: "DELETE_CARD",
+                payload: {
+                  cardId,
+                  columnId,
+                },
+              });
+            }}
+            onEdit={(card) => {
+              ui.show({
+                id: "issue-form-update",
+                type: "modal",
+                options: {
+                  titulo: "Editar Issue",
+                },
+                content: (
+                  <IssueForm
+                    action="update"
+                    issue={card}
+                    boardId={boardId!}
+                    columnId={Number(columnId)}
+                    repository={repository!}
+                    refetch={refetch!}
+                    onClose={() =>
+                      ui.hide("modal", "issue-form-update")
+                    }
+                  />
+                ),
+              });
+            }}
+          />
+        );
     }
   }
 

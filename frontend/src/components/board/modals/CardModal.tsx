@@ -100,7 +100,7 @@ export function CardModal({ card, columnName, onClose }: CardModalProps) {
               className="shrink-0 flex h-8 w-8 items-center justify-center rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-colors text-white"
               aria-label="Fechar"
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4 text-black" />
             </button>
           </div>
 

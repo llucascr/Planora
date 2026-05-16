@@ -127,6 +127,7 @@ export const TarefasPage = () => {
         refetch={refetch}
         onColumnMove={handleColumnMove}
         onCreateColumn={openCreateColumnModal}
+        boardId={boardId}
       />
     </div>
   );

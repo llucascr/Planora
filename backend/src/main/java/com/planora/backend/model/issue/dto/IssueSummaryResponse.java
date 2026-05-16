@@ -8,6 +8,7 @@ public record IssueSummaryResponse(
         Integer number,
         String title,
         State state,
+        String body,
         String url
 ) {
 
@@ -17,6 +18,7 @@ public record IssueSummaryResponse(
                 issue.getNumber(),
                 issue.getTitle(),
                 issue.getState(),
+                issue.getBody(),
                 issue.getUrl()
         );
     }

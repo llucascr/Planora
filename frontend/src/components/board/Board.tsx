@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from "react";
+import React, { useRef, useCallback, useState, useEffect } from "react";
 import {
   BoardProvider,
   useBoardState,
@@ -19,6 +19,7 @@ import {
   ArrowsCounterClockwise,
 } from "@phosphor-icons/react";
 import { classnames } from "./utils/classnames";
+import { httpClient } from "api";
 
 export const COLUMN_COLORS = [
   "#60a5fa", // blue
@@ -46,14 +47,14 @@ const VIEWS: { mode: ViewMode; icon: React.ReactNode; label: string }[] = [
 ];
 
 function BoardInner({
+  boardId,
   onCardMove,
   onColumnMove,
-  refetch,
   onCreateColumn,
 }: {
+  boardId: number;
   onCardMove?: (from: string, to: string, cardId: string) => void;
   onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
-  refetch?: () => void;
   onCreateColumn?: () => void;
 }) {
   const state = useBoardState();
@@ -85,6 +86,49 @@ function BoardInner({
     ? normalized.columns[selectedColumnId]
     : null;
 
+  async function handleRefetch() {
+    try {
+      const response: any = await httpClient.get(
+        `/v1/kanban/board/${boardId}/columns/issues`
+      );
+
+      const rawColumns = response;
+
+      const adapted = rawColumns.map((col: any) => ({
+        id: col.kanbanColumnId,
+        name: col.name,
+        order: col.position,
+        idBoard: boardId,
+        cards: (col.issues ?? []).map((issue: any) => 
+          {
+            console.log(issue);
+
+            return {
+              id: issue.issueId,
+              nome: issue.title,
+              descricao: issue.body,
+              status: issue.state,
+              number: issue.number,
+            };
+          }),
+      }));
+
+      console.log(adapted)
+
+      dispatch({
+        type: "LOAD_BOARD",
+        payload: adapted,
+      });
+
+    } catch (err) {
+      console.error("Erro ao buscar board:", err);
+    }
+  }
+
+  useEffect(() => {
+    handleRefetch();
+  }, []);
+
   function renderView() {
     switch (viewMode) {
       case "kanban":
@@ -95,6 +139,7 @@ function BoardInner({
             onCardMove={onCardMove}
             onColumnMove={onColumnMove}
             onCreateColumn={onCreateColumn}
+            refetch={handleRefetch}
           />
         );
       case "list":
@@ -132,7 +177,7 @@ function BoardInner({
               "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all group",
               "bg-secondary border border-border text-foreground hover:bg-accent-hover active:scale-95 shadow-sm",
             )}
-            onClick={refetch}
+            onClick={handleRefetch}
           >
             <ArrowsCounterClockwise className="h-3.5 w-3.5 transition-transform group-hover:rotate-180 duration-500" />
             <span className="hidden lg:inline">Atualizar</span>
@@ -182,6 +227,7 @@ function BoardInner({
 }
 
 interface BoardProps {
+  boardId: number;
   columns: BoardColumn[];
   onCardMove?: (
     fromColumnId: string,
@@ -195,20 +241,20 @@ interface BoardProps {
 }
 
 export function Board({
+  boardId,
   columns,
   onCardMove,
   onColumnMove,
   className,
-  refetch,
   onCreateColumn,
 }: BoardProps) {
   return (
     <BoardProvider initialColumns={columns}>
       <div className={classnames("h-full flex flex-col", className)}>
         <BoardInner
+          boardId={boardId}
           onCardMove={onCardMove}
           onColumnMove={onColumnMove}
-          refetch={refetch}
           onCreateColumn={onCreateColumn}
         />
       </div>
