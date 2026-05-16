@@ -334,19 +334,19 @@ public class KanbanBoardService {
         );
     }
 
-    public void deleteColumn(Long boardId, Long columnId, Long userId) {
-
-        if (kanbanMemberRepository
-                .findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId)
-                .isEmpty()) {
-            throw new UnauthorizedException("Kanban member not found");
-        }
+    public void deleteColumn(Jwt token, Long boardId, Long columnId, Long userId) {
 
         KanbanColumn column = kanbanColumnRepository.findById(columnId)
                 .orElseThrow(() -> new DataNotFoundException("Column not found"));
 
         if (!column.getKanbanBoard().getKanbanBoardId().equals(boardId)) {
             throw new DataNotFoundException("Column does not belong to this board");
+        }
+
+        List<Issue> issues = new ArrayList<>(column.getIssues());
+
+        for (Issue issue : issues) {
+            githubService.deleteIssue(token, issue.getIssueId());
         }
 
         kanbanColumnRepository.delete(column);

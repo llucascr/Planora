@@ -196,7 +196,7 @@ public class KanbanController {
     ) {
         Long userId = tokenService.getUserId(jwt);
 
-        kanbanBoardService.deleteColumn(boardId, columnId, userId);
+        kanbanBoardService.deleteColumn(jwt, boardId, columnId, userId);
 
         return ResponseEntity.ok(Map.of("message", "Column deleted successfully"));
     }
