@@ -14,19 +14,16 @@ import org.springframework.stereotype.Service;
 public class ApiPythonService {
 
     private final ApiPythonRepository apiPythonRepository;
-    private  ApiPythonClient apiPythonClient;
+    private final ApiPythonClient apiPythonClient;
 
     public AcceptedResponse generateBacklog(String description) {
         BacklogRequest backlogRequest = saveJobAndgetBacklogRequest(description);
 
-        if (apiPythonRepository.findById(backlogRequest.jobId()).isPresent()) {
+        /*if (apiPythonRepository.findById(backlogRequest.jobId()).isPresent()) {
             throw new DataAlreadyExistException("The Job is already being processed or has already been processed.");
-        }
+        }*/
 
-        return new AcceptedResponse(
-                backlogRequest.jobId(),
-                backlogRequest.description()
-        );
+        return apiPythonClient.generateBacklog(backlogRequest);
     }
 
     private BacklogRequest saveJobAndgetBacklogRequest(String description) {
