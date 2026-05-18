@@ -19,4 +19,4 @@ MAX_CONCURRENT: int = 2
 REQUEST_TIMEOUT_SECONDS: float = 1800.0
 
 # Callback URL for sending results back to the client
-CALLBACK_URL:str = "http://localhost:9000/callback"
+CALLBACK_URL:str = "http://localhost:8080/callback"
