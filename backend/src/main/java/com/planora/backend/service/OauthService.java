@@ -87,4 +87,24 @@ public class OauthService {
         return new LoginResponse(jwtValue, expiresIn);
     }
 
+    public String generateNonExpiringToken(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
+
+        String scopes = user.getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(Collectors.joining(" "));
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("Planora")
+                .subject(user.getUserId().toString())
+                .issuedAt(Instant.now())
+                .claim("scope", scopes)
+                .claim("githubToken", user.getGithubToken())
+                .build();
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
 }
