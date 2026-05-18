@@ -18,4 +18,13 @@ public class Job {
 
     private String description;
 
+    private Long boardId;
+    private Long columnId;
+
+    @Column(columnDefinition = "TEXT")
+    private String jwtToken;
+
+    private Long userId;
+    private String repository;
+
 }
