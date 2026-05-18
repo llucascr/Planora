@@ -2,6 +2,9 @@ package com.planora.backend.model.issue.dto;
 
 import com.planora.backend.model.issue.Issue;
 import com.planora.backend.model.issue.State;
+import com.planora.backend.model.user.User;
+
+import java.util.List;
 
 public record IssueSummaryResponse(
         Long issueId,
@@ -9,7 +12,8 @@ public record IssueSummaryResponse(
         String title,
         State state,
         String body,
-        String url
+        String url,
+        List<IssueAssigneeResponse> assignees
 ) {
 
     public static IssueSummaryResponse fromEntity(Issue issue) {
@@ -19,7 +23,14 @@ public record IssueSummaryResponse(
                 issue.getTitle(),
                 issue.getState(),
                 issue.getBody(),
-                issue.getUrl()
+                issue.getUrl(),
+                issue.getAssignees()
+                        .stream()
+                        .map(user -> new IssueAssigneeResponse(
+                                user.getLogin(),
+                                user.getAvatarUrl()
+                        ))
+                        .toList()
         );
     }
 

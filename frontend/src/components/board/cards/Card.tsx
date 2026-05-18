@@ -6,6 +6,7 @@ import { useBoardDispatch } from "../domain/boardStore";
 import { classnames } from "../utils/classnames";
 import { useUI } from "context";
 import { IssueForm } from "@/pages/Tarefas/IssueForm";
+import type { MemberBoard } from "types";
 
 interface CardProps {
   card: CardData;
@@ -18,6 +19,7 @@ interface CardProps {
   refetch?: () => void;
   boardId?: number;
   repository?: string;
+  members?: MemberBoard[];
 }
 
 function getCardCode(card: CardData): string | null {
@@ -46,6 +48,7 @@ export function Card({
   dragRef,
   refetch,
   boardId,
+  members = [],
   repository,
   onCardClick,
 }: CardProps) {
@@ -109,6 +112,7 @@ export function Card({
                     columnId={Number(columnId)}
                     repository={repository!}
                     refetch={refetch!}
+                    members={members}
                     onClose={() =>
                       ui.hide("modal", "issue-form-update")
                     }

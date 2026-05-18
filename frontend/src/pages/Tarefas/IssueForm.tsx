@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { httpClient } from "api";
 import { useUI } from "context";
+import { CaretDown, Check } from "@phosphor-icons/react";
+import type { MemberBoard } from "types";
 
 interface IssueFormProps {
   action?: "create" | "update";
@@ -10,6 +12,8 @@ interface IssueFormProps {
   columnId: number;
   repository: string;
 
+  members: MemberBoard[];
+
   refetch: () => void;
   onClose?: () => void;
 }
@@ -17,11 +21,10 @@ interface IssueFormProps {
 export function IssueForm({
   action = "create",
   issue,
-
   boardId,
   columnId,
   repository,
-
+  members,
   refetch,
   onClose,
 }: IssueFormProps) {
@@ -31,8 +34,19 @@ export function IssueForm({
   const [description, setDescription] = useState(
     issue?.descricao || ""
   );
-
+  const [assignees, setAssignees] = useState<string[]>(
+    issue?.assignees?.map((a: any) => a.login) || []
+  );
+  const [openMembers, setOpenMembers] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  function toggleAssignee(login: string) {
+    setAssignees((prev) =>
+      prev.includes(login)
+        ? prev.filter((a) => a !== login)
+        : [...prev, login]
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -46,7 +60,7 @@ export function IssueForm({
           {
             title,
             body: description,
-            assignees: [],
+            assignees,
             labels: [],
           }
         );
@@ -56,6 +70,8 @@ export function IssueForm({
           {
             title,
             body: description,
+            assignees,
+            labels: [],
           }
         );
       }
@@ -110,6 +126,67 @@ export function IssueForm({
           rows={5}
           className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none resize-none focus:border-[#3d5aad] focus:ring-2 focus:ring-[#3d5aad]/10 transition"
         />
+      </div>
+
+      <div className="relative">
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          Responsáveis
+        </label>
+
+        <button
+          type="button"
+          onClick={() => setOpenMembers((prev) => !prev)}
+          className="w-full flex items-center justify-between px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-left hover:border-gray-300 transition"
+        >
+          <span className="text-sm text-gray-700 truncate">
+            {assignees.length === 0
+              ? "Selecionar responsáveis"
+              : assignees.join(", ")}
+          </span>
+
+          <CaretDown
+            size={16}
+            className={`transition-transform ${openMembers ? "rotate-180" : ""
+              }`}
+          />
+        </button>
+
+        {openMembers && (
+          <div className="absolute z-20 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+            <div className="max-h-52 overflow-y-auto">
+              {members.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-gray-400">
+                  Nenhum membro encontrado
+                </p>
+              ) : (
+                members.map((member) => {
+                  const selected = assignees.includes(member.login);
+
+                  return (
+                    <button
+                      key={member.login}
+                      type="button"
+                      onClick={() => toggleAssignee(member.login)}
+                      className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition text-left"
+                    >
+                      <span className="text-sm text-gray-700">
+                        {member.login}
+                      </span>
+
+                      {selected && (
+                        <Check
+                          size={16}
+                          weight="bold"
+                          className="text-primary"
+                        />
+                      )}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex justify-end gap-3 pt-2">

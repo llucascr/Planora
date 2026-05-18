@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState, useEffect } from "react";
+import React, { useRef, useCallback, useEffect } from "react";
 import {
   BoardProvider,
   useBoardState,
@@ -20,6 +20,7 @@ import {
 } from "@phosphor-icons/react";
 import { classnames } from "./utils/classnames";
 import { httpClient } from "api";
+import type { MemberBoard } from "types";
 
 export const COLUMN_COLORS = [
   "#60a5fa", // blue
@@ -51,17 +52,20 @@ function BoardInner({
   onCardMove,
   onColumnMove,
   onCreateColumn,
+  members = [],
+  repository,
 }: {
   boardId: number;
   onCardMove?: (from: string, to: string, cardId: string) => void;
   onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
   onCreateColumn?: () => void;
+  members?: MemberBoard[];
+  repository?: string;
 }) {
   const state = useBoardState();
   const dispatch = useBoardDispatch();
   const dragRef = useRef<DragInfo | null>(null);
   const { viewMode, selectedCardId, normalized } = state;
-
   const setView = useCallback(
     (m: ViewMode) => dispatch({ type: "SET_VIEW", payload: m }),
     [dispatch],
@@ -99,18 +103,17 @@ function BoardInner({
         name: col.name,
         order: col.position,
         idBoard: boardId,
-        cards: (col.issues ?? []).map((issue: any) => 
-          {
-            console.log(issue);
+        cards: (col.issues ?? []).map((issue: any) => {
 
-            return {
-              id: issue.issueId,
-              nome: issue.title,
-              descricao: issue.body,
-              status: issue.state,
-              number: issue.number,
-            };
-          }),
+          return {
+            id: issue.issueId,
+            nome: issue.title,
+            descricao: issue.body,
+            status: issue.state,
+            number: issue.number,
+            assignees: issue.assignees
+          };
+        }),
       }));
 
       console.log(adapted)
@@ -139,6 +142,9 @@ function BoardInner({
             onCardMove={onCardMove}
             onColumnMove={onColumnMove}
             onCreateColumn={onCreateColumn}
+            members={members}
+            boardId={boardId}
+            repository={repository}
             refetch={handleRefetch}
           />
         );
@@ -148,6 +154,10 @@ function BoardInner({
             dragRef={dragRef}
             onCardClick={handleCardClick}
             onCardMove={onCardMove}
+            members={members}
+            boardId={boardId}
+            repository={repository}
+            refetch={handleRefetch}
           />
         );
       case "grid":
@@ -156,6 +166,10 @@ function BoardInner({
             dragRef={dragRef}
             onCardClick={handleCardClick}
             onCardMove={onCardMove}
+            members={members}
+            boardId={boardId}
+            repository={repository}
+            refetch={handleRefetch}
           />
         );
       case "analytics":
@@ -229,6 +243,8 @@ function BoardInner({
 interface BoardProps {
   boardId: number;
   columns: BoardColumn[];
+  members?: MemberBoard[];
+  repository?: string;
   onCardMove?: (
     fromColumnId: string,
     toColumnId: string,
@@ -244,6 +260,8 @@ export function Board({
   boardId,
   columns,
   onCardMove,
+  members = [],
+  repository,
   onColumnMove,
   className,
   onCreateColumn,
@@ -256,6 +274,8 @@ export function Board({
           onCardMove={onCardMove}
           onColumnMove={onColumnMove}
           onCreateColumn={onCreateColumn}
+          members={members}
+          repository={repository}
         />
       </div>
     </BoardProvider>

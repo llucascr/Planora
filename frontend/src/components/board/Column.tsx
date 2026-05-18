@@ -8,6 +8,7 @@ import { classnames } from "./utils/classnames";
 import { httpClient } from "api";
 import { IssueForm } from "@/pages/Tarefas/IssueForm";
 import { useUI } from "context";
+import type { MemberBoard } from "types";
 
 interface ColumnProps {
   columnId: string;
@@ -21,6 +22,7 @@ interface ColumnProps {
   onColumnHeaderDragEnd?: () => void;
   isColumnDragging?: boolean;
   onCardMove?: (from: string, to: string, cardId: string) => void;
+  members: MemberBoard[];
   refetch: () => void;
 }
 
@@ -34,6 +36,7 @@ export function Column({
   onColumnHeaderDragStart,
   onColumnHeaderDragEnd,
   isColumnDragging = false,
+  members = [],
   onCardMove,
   refetch,
 }: ColumnProps) {
@@ -218,6 +221,7 @@ export function Column({
           columnId={column.id}
           repository={repository}
           refetch={refetch}
+          members={members}
           onClose={() =>
             ui.hide("modal", "issue-form-create")
           }
@@ -341,6 +345,7 @@ export function Column({
                   refetch={refetch}
                   boardId={column.idBoard}
                   repository={repository}
+                  members={members}
                 />
               </React.Fragment>
             );
