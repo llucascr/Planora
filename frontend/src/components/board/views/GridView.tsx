@@ -3,14 +3,27 @@ import { useBoardState } from "../domain/boardStore";
 import { useAllFilteredCards } from "../filters/useFilters";
 import { Card } from "../cards/Card";
 import type { DragInfo } from "../domain/types";
+import type { MemberBoard } from "types";
 
 interface GridViewProps {
   dragRef: React.MutableRefObject<DragInfo | null>;
   onCardClick?: (cardId: string) => void;
   onCardMove?: (from: string, to: string, cardId: string) => void;
+  members?: MemberBoard[];
+  boardId?: number;
+  repository?: string;
+  refetch?: () => void;
 }
 
-export function GridView({ dragRef, onCardClick, onCardMove }: GridViewProps) {
+export function GridView({
+  dragRef,
+  onCardClick,
+  onCardMove,
+  members = [],
+  boardId,
+  repository,
+  refetch,
+}: GridViewProps) {
   const state = useBoardState();
   const allCards = useAllFilteredCards();
 
@@ -37,6 +50,10 @@ export function GridView({ dragRef, onCardClick, onCardMove }: GridViewProps) {
                 dragRef={dragRef}
                 onCardClick={onCardClick}
                 onCardMove={onCardMove}
+                members={members}
+                boardId={boardId}
+                repository={repository}
+                refetch={refetch}
               />
             </div>
           );

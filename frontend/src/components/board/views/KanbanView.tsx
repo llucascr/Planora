@@ -5,14 +5,18 @@ import { useFilteredColumnCards } from "../filters/useFilters";
 import type { DragInfo, ColumnDragInfo } from "../domain/types";
 import { COLUMN_COLORS } from "../Board";
 import { classnames } from "../utils/classnames";
+import type { MemberBoard } from "types";
 
 interface KanbanViewProps {
   dragRef: React.MutableRefObject<DragInfo | null>;
   onCardClick?: (cardId: string) => void;
   onCardMove?: (from: string, to: string, cardId: string) => void;
   onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
-
   onCreateColumn?: () => void;
+  refetch: () => void;
+  members?: MemberBoard[];
+  boardId?: number;
+  repository?: string;
 }
 
 function KanbanColumn({
@@ -29,6 +33,10 @@ function KanbanColumn({
   onColumnDrop,
   onColumnDragEnd,
   onCardMove,
+  refetch,
+  members = [],
+  boardId,
+  repository,
 }: {
   columnId: string;
   columnIndex: number;
@@ -42,6 +50,10 @@ function KanbanColumn({
   onColumnDrop: (e: React.DragEvent, toIdx: number) => void;
   onColumnDragEnd: () => void;
   onCardMove?: (from: string, to: string, cardId: string) => void;
+  refetch: () => void;
+  members?: MemberBoard[];
+  boardId?: number;
+  repository?: string;
 }) {
   const filteredCardIds = useFilteredColumnCards(columnId);
   const isDragging = draggingColIdx === columnIndex;
@@ -81,6 +93,8 @@ function KanbanColumn({
         }
         onColumnHeaderDragEnd={onColumnDragEnd}
         isColumnDragging={isDragging}
+        refetch={refetch}
+        members={members}
       />
     </div>
   );
@@ -92,6 +106,10 @@ export function KanbanView({
   onCardMove,
   onColumnMove,
   onCreateColumn,
+  refetch,
+  members = [],
+  boardId,
+  repository,
 }: KanbanViewProps) {
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -164,6 +182,10 @@ export function KanbanView({
           onColumnDrop={handleColumnDrop}
           onColumnDragEnd={handleColumnDragEnd}
           onCardMove={onCardMove}
+          refetch={refetch}
+          members={members}
+          boardId={boardId}
+          repository={repository}
         />
       ))}
 

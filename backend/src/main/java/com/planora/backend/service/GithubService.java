@@ -4,20 +4,15 @@ import com.planora.backend.client.GithubClient;
 import com.planora.backend.exception.DataNotFoundException;
 import com.planora.backend.model.issue.Issue;
 import com.planora.backend.model.issue.Label;
-import com.planora.backend.model.issue.dto.GithubWebhookCreateRequest;
-import com.planora.backend.model.issue.dto.GithubWebhookResponse;
+import com.planora.backend.model.issue.dto.*;
 import com.planora.backend.model.issue.State;
-import com.planora.backend.model.issue.dto.IssueApiResponse;
-import com.planora.backend.model.issue.dto.IssueRequest;
-import com.planora.backend.model.issue.dto.IssueResponse;
-import com.planora.backend.model.issue.dto.IssueUpdateRequest;
-import com.planora.backend.model.issue.dto.UserRepositoryResponse;
 import com.planora.backend.model.kanban.KanbanBoard;
 import com.planora.backend.model.kanban.KanbanColumn;
 import com.planora.backend.model.user.User;
 import com.planora.backend.repository.IssueRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -310,4 +305,19 @@ public class GithubService {
                 .toList();
     }
 
+    public List<LabelResponse> listRepositoryLabels(
+            Jwt token,
+            String ownerName,
+            String repository
+    ) {
+        return githubClient.getRepositoryLabels(
+                        ownerName,
+                        repository,
+                        "Bearer " + tokenService.getGithubToken(token),
+                        GITHUB_API_VERSION
+                ).stream()
+                .map(labelService::resolveOrCreateLabel)
+                .map(LabelResponse::fromEntity)
+                .toList();
+    }
 }

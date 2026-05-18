@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { DotsSixVertical, Plus, DotsThreeVertical } from "@phosphor-icons/react";
 import { Card } from "./cards/Card";
 import { useBoardState, useBoardDispatch } from "./domain/boardStore";
@@ -6,6 +6,9 @@ import type { DragInfo } from "./domain/types";
 import { COLUMN_COLORS } from "./Board";
 import { classnames } from "./utils/classnames";
 import { httpClient } from "api";
+import { IssueForm } from "@/pages/Tarefas/IssueForm";
+import { useUI } from "context";
+import type { MemberBoard } from "types";
 
 interface ColumnProps {
   columnId: string;
@@ -19,6 +22,8 @@ interface ColumnProps {
   onColumnHeaderDragEnd?: () => void;
   isColumnDragging?: boolean;
   onCardMove?: (from: string, to: string, cardId: string) => void;
+  members: MemberBoard[];
+  refetch: () => void;
 }
 
 export function Column({
@@ -31,8 +36,11 @@ export function Column({
   onColumnHeaderDragStart,
   onColumnHeaderDragEnd,
   isColumnDragging = false,
+  members = [],
   onCardMove,
+  refetch,
 }: ColumnProps) {
+  const ui = useUI();
   const state = useBoardState();
   const dispatch = useBoardDispatch();
   const column = state.normalized.columns[columnId];
@@ -44,10 +52,31 @@ export function Column({
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(column.name);
   const [openMenu, setOpenMenu] = useState(false);
+  const [repository, setRepository] = useState("");
+  const [ownerName, setOwnerName] = useState("");
 
   const accentColor = COLUMN_COLORS[columnIndex % COLUMN_COLORS.length];
 
   if (!column) return null;
+
+  useEffect(() => {
+    async function loadBoard() {
+      try {
+
+        const response: any = await httpClient.get(
+          `/v1/kanban/board/${column.idBoard}`
+        );
+
+        setRepository(response.name);
+        setOwnerName(response.githubOwnerName);
+
+      } catch (err) {
+        console.error("Erro ao buscar board:", err);
+      }
+    }
+
+    loadBoard();
+  }, [column.idBoard]);
 
   function handleToggle() {
     dispatch({ type: "TOGGLE_COLUMN", payload: columnId });
@@ -81,7 +110,7 @@ export function Column({
     }
   }
 
-  function handleDrop(e: React.DragEvent) {
+  async function handleDrop(e: React.DragEvent) {
     // Ignore column drags — handled by KanbanView
     if (e.dataTransfer.types.includes("application/x-column-drag")) return;
     e.preventDefault();
@@ -89,6 +118,12 @@ export function Column({
     setDropIndex(null);
     if (!dragRef.current) return;
     const { cardId, sourceColumnId } = dragRef.current;
+
+    if (sourceColumnId === columnId) {
+      dragRef.current = null;
+      return;
+    }
+
     dispatch({
       type: "MOVE_CARD",
       payload: {
@@ -98,7 +133,30 @@ export function Column({
         toIndex: dropIndex ?? filteredCardIds.length,
       },
     });
-    onCardMove?.(sourceColumnId, columnId, cardId);
+
+    try {
+      await httpClient.patch(
+        `/v1/kanban/board/${column.idBoard}/issue/move`,
+        {
+          issueId: Number(cardId),
+          targetColumnId: Number(columnId),
+        }
+      );
+
+      onCardMove?.(sourceColumnId, columnId, cardId);
+    } catch (err) {
+      console.error("Erro ao mover issue:", err);
+
+      dispatch({
+        type: "MOVE_CARD",
+        payload: {
+          cardId,
+          fromColumnId: columnId,
+          toColumnId: sourceColumnId,
+          toIndex: 0,
+        },
+      });
+    }
     dragRef.current = null;
   }
 
@@ -135,21 +193,45 @@ export function Column({
   }
 
   async function handleDelete() {
-  try {
-    await httpClient.delete(
-      `/v1/kanban/board/${column.idBoard}/column/${column.id}`
-    );
+    try {
+      await httpClient.delete(
+        `/v1/kanban/board/${column.idBoard}/column/${column.id}`
+      );
 
-    dispatch({
-      type: "DELETE_COLUMN",
-      payload: String(columnId),
-    });
+      dispatch({
+        type: "DELETE_COLUMN",
+        payload: String(columnId),
+      });
 
-    setOpenMenu(false);
-  } catch (err) {
-    console.error("erro:", err);
+      setOpenMenu(false);
+    } catch (err) {
+      console.error("erro:", err);
+    }
   }
-}
+
+  function handleOpenIssueModal() {
+    ui.show({
+      id: "issue-form-create",
+      type: "modal",
+      options: {
+        titulo: "Nova Issue",
+      },
+      content: (
+        <IssueForm
+          action="create"
+          boardId={column.idBoard}
+          columnId={column.id}
+          repository={repository}
+          githubOwnerName={ownerName}
+          refetch={refetch}
+          members={members}
+          onClose={() =>
+            ui.hide("modal", "issue-form-create")
+          }
+        />
+      ),
+    });
+  }
 
   return (
     <div
@@ -237,7 +319,7 @@ export function Column({
       {!isCollapsed && (
         <div
           ref={columnRef}
-          className="flex flex-col gap-2 px-2 pt-1 flex-1 min-h-0 overflow-y-auto"
+          className="flex flex-col gap-2 px-2 pt-1 flex-1 min-h-0 overflow-y-auto overflow-x-visible relative"
         >
           {filteredCardIds.length === 0 && !isDragOver && (
             <div className="flex items-center justify-center py-6 text-[11px] text-foreground opacity-20 italic">
@@ -263,6 +345,11 @@ export function Column({
                   compact={compact}
                   dragRef={dragRef}
                   onCardClick={onCardClick}
+                  refetch={refetch}
+                  boardId={column.idBoard}
+                  repository={repository}
+                  members={members}
+                  ownerName={ownerName}
                 />
               </React.Fragment>
             );
@@ -289,7 +376,7 @@ export function Column({
       )}
 
       <div className="px-2 pb-2 pt-1 shrink-0">
-        <button className="flex w-full items-center gap-1.5 rounded-lg p-2 text-[11px] text-foreground hover:bg-accent-hover transition-colors">
+        <button onClick={handleOpenIssueModal} className="flex w-full items-center gap-1.5 rounded-lg p-2 text-[11px] text-foreground hover:bg-accent-hover transition-colors">
           <Plus className="h-3 w-3 shrink-0" />
           Adicionar card
         </button>

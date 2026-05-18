@@ -10,6 +10,7 @@ export interface Lead {
     razaoSocial: string;
     documento: string;
     origem: string;
+    status: string;
     contatos: Contato[];
 }
 
@@ -88,7 +89,8 @@ export type BoardAction =
     | { type: 'TOGGLE_COLUMN'; payload: string }
     | { type: 'SET_SELECTED_CARD'; payload: string | null }
     | { type: "UPDATE_COLUMN"; payload: { columnId: string; name: string } }
-    | { type: "DELETE_COLUMN"; payload: string };
+    | { type: "DELETE_COLUMN"; payload: string }
+    | { type: "DELETE_CARD"; payload: { cardId: string; columnId: string } };
 
 export interface ColumnDragInfo {
     columnId: string;

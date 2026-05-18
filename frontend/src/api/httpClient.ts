@@ -48,4 +48,5 @@ export const httpClient = {
   post: <T, B>(endpoint: string, body: B) => request<T, B>(endpoint, { method: "POST", body }),
   put: <T, B>(endpoint: string, body: B) => request<T, B>(endpoint, { method: "PUT", body }),
   delete: <T>(endpoint: string) => request<T>(endpoint, { method: "DELETE" }),
+  patch: <T, B>(endpoint: string, body: B) => request<T, B>(endpoint, { method: "PATCH", body }),
 };

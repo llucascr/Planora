@@ -74,9 +74,10 @@ public class KanbanController {
             @RequestParam Long columnId,
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody IssueRequest issueRequest,
-            @RequestParam Long userId,
             @RequestParam String repository
     ) {
+        Long userId = tokenService.getUserId(jwt);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 kanbanBoardService.createIssueAndAddToColumn(boardId, columnId, jwt, issueRequest, userId, repository)
         );
@@ -196,7 +197,7 @@ public class KanbanController {
     ) {
         Long userId = tokenService.getUserId(jwt);
 
-        kanbanBoardService.deleteColumn(boardId, columnId, userId);
+        kanbanBoardService.deleteColumn(jwt, boardId, columnId, userId);
 
         return ResponseEntity.ok(Map.of("message", "Column deleted successfully"));
     }

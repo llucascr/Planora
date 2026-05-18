@@ -174,8 +174,8 @@ export const ProjetosPage = () => {
                     {board.githubOwnerName}/{board.githubRepository}
                   </span>
                 </div>
-              )}
-
+              )}        
+                 
               <div className="flex items-center justify-between text-xs text-gray-400 pt-3 border-t border-gray-50">
                 <span className="flex items-center gap-1">
                   <Columns size={13} />
