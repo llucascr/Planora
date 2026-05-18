@@ -20,6 +20,7 @@ interface CardProps {
   boardId?: number;
   repository?: string;
   members?: MemberBoard[];
+  ownerName?: string;
 }
 
 function getCardCode(card: CardData): string | null {
@@ -51,6 +52,7 @@ export function Card({
   members = [],
   repository,
   onCardClick,
+  ownerName,
 }: CardProps) {
   const dispatch = useBoardDispatch();
   const cardType = detectCardType(card);
@@ -112,6 +114,7 @@ export function Card({
                     columnId={Number(columnId)}
                     repository={repository!}
                     refetch={refetch!}
+                    githubOwnerName={ownerName!}
                     members={members}
                     onClose={() =>
                       ui.hide("modal", "issue-form-update")

@@ -33,3 +33,10 @@ export interface ProjetoBoard extends Response {
     columns: ColumnBoard[]
     webhookActive: boolean
 }
+
+interface GithubLabel {
+    url: string;
+    name: string;
+    color: string;
+    description: string;
+}

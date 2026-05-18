@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { httpClient } from "api";
 import { useUI } from "context";
 import { CaretDown, Check } from "@phosphor-icons/react";
-import type { MemberBoard } from "types";
+import type { GithubLabel, MemberBoard } from "types";
 
 interface IssueFormProps {
   action?: "create" | "update";
@@ -11,6 +11,7 @@ interface IssueFormProps {
   boardId: number;
   columnId: number;
   repository: string;
+  githubOwnerName: string;
 
   members: MemberBoard[];
 
@@ -24,6 +25,7 @@ export function IssueForm({
   boardId,
   columnId,
   repository,
+  githubOwnerName,
   members,
   refetch,
   onClose,
@@ -38,13 +40,48 @@ export function IssueForm({
     issue?.assignees?.map((a: any) => a.login) || []
   );
   const [openMembers, setOpenMembers] = useState(false);
+  const [labels, setLabels] = useState<string[]>(
+    issue?.labels?.map((l: any) => l.name) || []
+  );
+  const [availableLabels, setAvailableLabels] = useState<GithubLabel[]>([]);
+  const [openLabels, setOpenLabels] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (issue?.labels) {
+      setLabels(issue.labels.map((l: any) => l.name));
+    }
+  }, [issue]);
+
+  useEffect(() => {
+    async function loadLabels() {
+      try {
+        const response = await httpClient.get<GithubLabel[]>(
+          `/v1/github/repository/labels?ownerName=${githubOwnerName}&repository=${repository}`
+        )
+
+        setAvailableLabels(response);
+      } catch (err) {
+        console.error("Erro ao buscar labels:", err);
+      }
+    }
+
+    loadLabels();
+  }, [repository]);
 
   function toggleAssignee(login: string) {
     setAssignees((prev) =>
       prev.includes(login)
         ? prev.filter((a) => a !== login)
         : [...prev, login]
+    );
+  }
+
+  function toggleLabel(name: string) {
+    setLabels((prev) =>
+      prev.includes(name)
+        ? prev.filter((l) => l !== name)
+        : [...prev, name]
     );
   }
 
@@ -61,7 +98,7 @@ export function IssueForm({
             title,
             body: description,
             assignees,
-            labels: [],
+            labels,
           }
         );
       } else {
@@ -71,7 +108,7 @@ export function IssueForm({
             title,
             body: description,
             assignees,
-            labels: [],
+            labels,
           }
         );
       }
@@ -184,6 +221,66 @@ export function IssueForm({
                   );
                 })
               )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="relative">
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          Labels
+        </label>
+
+        <button
+          type="button"
+          onClick={() => setOpenLabels((prev) => !prev)}
+          className="w-full flex items-center justify-between px-4 py-2.5 border border-gray-200 rounded-xl bg-white text-left"
+        >
+          <span className="text-sm text-gray-700 truncate">
+            {labels.length === 0
+              ? "Selecionar labels"
+              : labels.join(", ")}
+          </span>
+
+          <CaretDown size={16} />
+        </button>
+
+        {openLabels && (
+          <div className="absolute z-20 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+            <div className="max-h-52 overflow-y-auto">
+              {availableLabels.map((label) => {
+                const selected = labels.includes(label.name);
+
+                return (
+                  <button
+                    key={label.name}
+                    type="button"
+                    onClick={() => toggleLabel(label.name)}
+                    className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-gray-50"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-3 h-3 rounded-full"
+                        style={{
+                          backgroundColor: `#${label.color}`,
+                        }}
+                      />
+
+                      <span className="text-sm text-gray-700">
+                        {label.name}
+                      </span>
+                    </div>
+
+                    {selected && (
+                      <Check
+                        size={16}
+                        weight="bold"
+                        className="text-primary"
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}

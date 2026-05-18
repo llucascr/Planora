@@ -111,12 +111,11 @@ function BoardInner({
             descricao: issue.body,
             status: issue.state,
             number: issue.number,
-            assignees: issue.assignees
+            assignees: issue.assignees,
+            labels: issue.labels
           };
         }),
       }));
-
-      console.log(adapted)
 
       dispatch({
         type: "LOAD_BOARD",

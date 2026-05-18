@@ -53,6 +53,7 @@ export function Column({
   const [name, setName] = useState(column.name);
   const [openMenu, setOpenMenu] = useState(false);
   const [repository, setRepository] = useState("");
+  const [ownerName, setOwnerName] = useState("");
 
   const accentColor = COLUMN_COLORS[columnIndex % COLUMN_COLORS.length];
 
@@ -67,6 +68,7 @@ export function Column({
         );
 
         setRepository(response.name);
+        setOwnerName(response.githubOwnerName);
 
       } catch (err) {
         console.error("Erro ao buscar board:", err);
@@ -220,6 +222,7 @@ export function Column({
           boardId={column.idBoard}
           columnId={column.id}
           repository={repository}
+          githubOwnerName={ownerName}
           refetch={refetch}
           members={members}
           onClose={() =>
@@ -346,6 +349,7 @@ export function Column({
                   boardId={column.idBoard}
                   repository={repository}
                   members={members}
+                  ownerName={ownerName}
                 />
               </React.Fragment>
             );
