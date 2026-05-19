@@ -35,7 +35,7 @@ public class ApiPythonService {
         Job job = jobRepository.findById(callbackRequest.jobId())
                 .orElseThrow(() -> new DataNotFoundException("Job not found"));
 
-        Jwt jwt = jwtDecoder.decode(job.getJwtToken()); // NAO SEI SE ISSO VAI FUNCIONAR
+        Jwt jwt = jwtDecoder.decode(job.getJwtToken());
 
         kanbanBoardService.createBulkIssuesAndAddToColumn(job.getBoardId(), job.getColumnId(), jwt,
                 issues, job.getUserId(), job.getRepository());
