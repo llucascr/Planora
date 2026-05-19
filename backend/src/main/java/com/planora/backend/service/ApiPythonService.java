@@ -30,12 +30,13 @@ public class ApiPythonService {
         return apiPythonClient.generateBacklog(backlogRequest);
     }
 
-    public void saveBacklog(CallbackRequest callbackRequest) {
-        List<IssueRequest> issues = callbackRequest.backlog();
+    public void saveBacklog(CallbackRequest callbackRequest, Jwt jwt) throws DataNotFoundException {
         Job job = jobRepository.findById(callbackRequest.jobId())
                 .orElseThrow(() -> new DataNotFoundException("Job not found"));
 
-        Jwt jwt = jwtDecoder.decode(job.getJwtToken()); // NAO SEI SE ISSO VAI FUNCIONAR
+        List<IssueRequest> issues = callbackRequest.backlog().stream()
+                .map(issue -> new IssueRequest(issue.title(), issue.body(), List.of(), List.of()))
+                .toList();
 
         kanbanBoardService.createBulkIssuesAndAddToColumn(job.getBoardId(), job.getColumnId(), jwt,
                 issues, job.getUserId(), job.getRepository());
