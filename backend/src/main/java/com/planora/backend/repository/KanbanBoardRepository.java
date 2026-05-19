@@ -6,12 +6,24 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface KanbanBoardRepository extends JpaRepository<KanbanBoard, Long> {
 
     @Query("SELECT kb FROM KanbanBoard kb JOIN kb.members m WHERE m.user.userId = :userId AND m.invitedStatus = :status")
     List<KanbanBoard> findBoardsByMemberUserIdAndStatus(@Param("userId") Long userId, @Param("status") InvitedStatus status);
+
+    @Query("""
+            SELECT COUNT(DISTINCT kb.kanbanBoardId)
+            FROM Issue i
+            JOIN i.column c
+            JOIN c.kanbanBoard kb
+            JOIN kb.members m
+            WHERE m.user.userId = :userId
+            AND i.updatedAt >= :since
+            """)
+    long countActiveBoardsSince(@Param("userId") Long userId, @Param("since") LocalDateTime since);
 
     @Query("SELECT kb FROM KanbanBoard kb WHERE LOWER(kb.githubOwnerName) = LOWER(:ownerName) AND LOWER(kb.githubRepository) = LOWER(:repository)")
     List<KanbanBoard> findByGithubOwnerAndRepositoryIgnoreCase(@Param("ownerName") String ownerName, @Param("repository") String repository);
