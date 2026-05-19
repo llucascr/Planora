@@ -1,4 +1,8 @@
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Model
 BASE_MODEL_NAME: str = "meta-llama/Llama-3.1-8B-Instruct"
@@ -19,4 +23,5 @@ MAX_CONCURRENT: int = 2
 REQUEST_TIMEOUT_SECONDS: float = 1800.0
 
 # Callback URL for sending results back to the client
-CALLBACK_URL:str = "http://localhost:8080/callback"
+CALLBACK_URL: str = "http://localhost:8080/v1/ia/callback"
+CALLBACK_JWT: str = os.getenv("JWT", "")
