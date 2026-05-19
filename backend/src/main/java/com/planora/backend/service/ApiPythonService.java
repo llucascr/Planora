@@ -9,15 +9,20 @@ import com.planora.backend.model.issue.dto.BacklogRequest;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ApiPythonService {
+
+    private static final int MAX_ATTEMPTS = 5;
+    private static final long RETRY_DELAY_MS = 3000;
 
     private final ApiPythonClient apiPythonClient;
     private final JobRepository jobRepository;
@@ -26,11 +31,37 @@ public class ApiPythonService {
 
     public AcceptedResponse generateBacklog(String description, Long boardId, Long columnId, Jwt jwt,
                                             Long userId, String repository) {
-        BacklogRequest backlogRequest = saveJobAndgetBacklogRequest(description,  boardId, columnId, jwt, userId, repository);
-        return apiPythonClient.generateBacklog(backlogRequest);
+        BacklogRequest backlogRequest = saveJobAndgetBacklogRequest(description, boardId, columnId, jwt, userId, repository);
+        return generateBacklogWithRetry(backlogRequest);
+    }
+
+    private AcceptedResponse generateBacklogWithRetry(BacklogRequest backlogRequest) {
+        Exception lastException = null;
+        for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+            try {
+                return apiPythonClient.generateBacklog(backlogRequest);
+            } catch (Exception e) {
+                lastException = e;
+                log.warn("Attempt {}/{} to reach Python AI server failed: {}", attempt, MAX_ATTEMPTS, e.getMessage());
+                if (attempt < MAX_ATTEMPTS) {
+                    try {
+                        Thread.sleep(RETRY_DELAY_MS);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException("Interrupted while waiting to retry Python AI request", ie);
+                    }
+                }
+            }
+        }
+        throw new RuntimeException("Python AI server unavailable after " + MAX_ATTEMPTS + " attempts", lastException);
     }
 
     public void saveBacklog(CallbackRequest callbackRequest, Jwt jwt) throws DataNotFoundException {
+        if (callbackRequest.backlog() == null || callbackRequest.backlog().isEmpty()) {
+            log.warn("Callback for job={} received with empty or null backlog, skipping", callbackRequest.jobId());
+            return;
+        }
+
         Job job = jobRepository.findById(callbackRequest.jobId())
                 .orElseThrow(() -> new DataNotFoundException("Job not found"));
 
