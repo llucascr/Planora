@@ -1,4 +1,5 @@
 import asyncio
+import json
 from concurrent.futures import ThreadPoolExecutor
 from typing import Tuple
 
@@ -67,12 +68,17 @@ class InferenceQueueManager:
             result = await future
             payload = {"backlog": result, "jobId": job_id}
         except Exception as exc:
-            payload = {"error": str(exc), "jobId": job_id}
+            print(f">>> Inference [job={job_id}] FAILED — {exc}", flush=True)
+            payload = {"backlog": None, "jobId": job_id}
         await self._post_callback(payload)
 
     async def _post_callback(self, payload: dict) -> None:
         job_id = payload.get("jobId")
         headers = {"Authorization": f"Bearer {config.CALLBACK_JWT}"}
+        print(f"\n>>> Callback request [job={job_id}]", flush=True)
+        print(f"    URL:     {config.CALLBACK_URL}", flush=True)
+        print(f"    Headers: {headers}", flush=True)
+        print(f"    Body:    {json.dumps(payload, indent=2, ensure_ascii=False)}", flush=True)
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(config.CALLBACK_URL, json=payload, headers=headers, timeout=30.0)
@@ -108,12 +114,28 @@ class InferenceQueueManager:
                 if future.done():
                     continue
 
-                result = await loop.run_in_executor(
-                    self._executor,
-                    self._model_service.generate,
-                    description,
-                    job_id,
-                )
+                result = None
+                last_error: Exception | None = None
+                for attempt in range(1, config.MAX_GENERATION_RETRIES + 1):
+                    try:
+                        result = await loop.run_in_executor(
+                            self._executor,
+                            self._model_service.generate,
+                            description,
+                            job_id,
+                        )
+                    except Exception as gen_exc:
+                        last_error = gen_exc
+                        print(f">>> [job={job_id}] Erro na geração/parse (tentativa {attempt}/{config.MAX_GENERATION_RETRIES}): {gen_exc}", flush=True)
+                        result = None
+
+                    if result:
+                        break
+                    if attempt < config.MAX_GENERATION_RETRIES:
+                        print(f">>> [job={job_id}] Backlog nulo/vazio (tentativa {attempt}/{config.MAX_GENERATION_RETRIES}), regerando...", flush=True)
+
+                if not result:
+                    raise last_error or RuntimeError(f"Backlog nulo após {config.MAX_GENERATION_RETRIES} tentativas")
 
                 if not future.done():
                     future.set_result(result)
