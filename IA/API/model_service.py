@@ -1,7 +1,7 @@
 import torch
 import json
 import re
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TextStreamer
 from peft import PeftModel
 
 import config
@@ -49,10 +49,13 @@ class ModelService:
         self._eot_token_id = self._tokenizer.convert_tokens_to_ids("<|eot_id|>")
         self._is_loaded = True
 
-    def generate(self, description: str) -> list[dict]:
+    def generate(self, description: str, job_id: int | None = None) -> list[dict]:
         """Run synchronous inference. Intended to be called from a thread executor."""
         if not self._is_loaded:
             raise RuntimeError("Model has not been loaded. Call load() first.")
+
+        label = f"[job={job_id}]" if job_id is not None else ""
+        print(f"\n>>> Gerando resposta {label}...\n", flush=True)
 
         messages = [
             {"role": "system", "content": config.SYSTEM_PROMPT},
@@ -64,6 +67,8 @@ class ModelService:
         )
         inputs = self._tokenizer(prompt, return_tensors="pt").to("cuda")
 
+        streamer = TextStreamer(self._tokenizer, skip_prompt=True, skip_special_tokens=True)
+
         with torch.no_grad():
             output = self._model.generate(
                 **inputs,
@@ -74,7 +79,10 @@ class ModelService:
                 max_new_tokens=config.MAX_NEW_TOKENS,
                 eos_token_id=[self._tokenizer.eos_token_id, self._eot_token_id],
                 pad_token_id=self._tokenizer.eos_token_id,
+                streamer=streamer,
             )
+
+        print(f"\n>>> Geração finalizada {label}", flush=True)
 
         raw = self._tokenizer.decode(
             output[0][inputs["input_ids"].shape[-1]:],

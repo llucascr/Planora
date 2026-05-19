@@ -30,6 +30,7 @@ public class Issue {
 
     private String title;
 
+    @Column(columnDefinition = "TEXT")
     private String body;
 
     @Enumerated(EnumType.STRING)
