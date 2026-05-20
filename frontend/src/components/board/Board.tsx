@@ -86,8 +86,8 @@ function BoardInner({
   const selectedCard = selectedCardId ? normalized.cards[selectedCardId] : null;
   const selectedColumnId = selectedCardId
     ? Object.entries(normalized.columnCards).find(([, ids]) =>
-      ids.includes(selectedCardId),
-    )?.[0]
+        ids.includes(selectedCardId),
+      )?.[0]
     : null;
   const selectedColumn = selectedColumnId
     ? normalized.columns[selectedColumnId]
@@ -96,7 +96,7 @@ function BoardInner({
   async function handleRefetch() {
     try {
       const response: any = await httpClient.get(
-        `/v1/kanban/board/${boardId}/columns/issues`
+        `/v1/kanban/board/${boardId}/columns/issues`,
       );
 
       const rawColumns = response;
@@ -107,7 +107,6 @@ function BoardInner({
         order: col.position,
         idBoard: boardId,
         cards: (col.issues ?? []).map((issue: any) => {
-
           return {
             id: issue.issueId,
             nome: issue.title,
@@ -115,7 +114,7 @@ function BoardInner({
             status: issue.state,
             number: issue.number,
             assignees: issue.assignees,
-            labels: issue.labels
+            labels: issue.labels,
           };
         }),
       }));
@@ -124,7 +123,6 @@ function BoardInner({
         type: "LOAD_BOARD",
         payload: adapted,
       });
-
     } catch (err) {
       console.error("Erro ao buscar board:", err);
     }
@@ -220,8 +218,8 @@ function BoardInner({
                 className={classnames(
                   "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all",
                   viewMode === mode
-                    ? "bg-primary text-foreground shadow-sm"
-                    : "text-foreground opacity-40 hover:opacity-70",
+                    ? "bg-primary text-white shadow-sm"
+                    : "text-black opacity-40 hover:opacity-70",
                 )}
               >
                 {icon}

@@ -55,7 +55,8 @@ export const ProjetosPage = () => {
   useEffect(() => {
     refetch();
     window.addEventListener("planora:projects:refetch", refetch);
-    return () => window.removeEventListener("planora:projects:refetch", refetch);
+    return () =>
+      window.removeEventListener("planora:projects:refetch", refetch);
   }, []);
 
   const filtered = kanbanBoards.filter((b) =>
@@ -68,7 +69,7 @@ export const ProjetosPage = () => {
         <div>
           <h1 className="text-2xl font-bold text-primary">Projetos</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Gerencie e acompanhe todos os seus boards Kanban.
+            Gerencie e acompanhe todos os seus projetos.
           </p>
         </div>
         <button
@@ -118,7 +119,10 @@ export const ProjetosPage = () => {
                 <h3 className="text-sm font-semibold text-gray-800 leading-tight">
                   {board.name}
                 </h3>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 shrink-0 ml-2">
+                <div
+                  className="flex items-center gap-1 opacity-0 group-hover:opacity-100 shrink-0 ml-2"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {confirmDeleteId === board.kanbanBoardId ? (
                     <>
                       <button
@@ -176,8 +180,8 @@ export const ProjetosPage = () => {
                     {board.githubOwnerName}/{board.githubRepository}
                   </span>
                 </div>
-              )}        
-                 
+              )}
+
               <div className="flex items-center justify-between text-xs text-gray-400 pt-3 border-t border-gray-50">
                 <span className="flex items-center gap-1">
                   <Columns size={13} />

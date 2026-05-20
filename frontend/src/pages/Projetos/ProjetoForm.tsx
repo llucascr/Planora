@@ -81,6 +81,14 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
       .get<Repositorio[]>(ENDPOINTS.v1.github.repositories)
       .then((res) => {
         setRepositories(res);
+        if (!isCreate && board?.githubRepository) {
+          const match = res.find(
+            (r) =>
+              r.full_name === board.githubRepository ||
+              r.full_name === `${board.githubOwnerName}/${board.githubRepository}`,
+          );
+          if (match) setGithubRepository(match);
+        }
       });
   }
 
