@@ -34,6 +34,15 @@ export interface ProjetoBoard extends Response {
     webhookActive: boolean
 }
 
+export type PendingInvite = {
+    kanbanMemberId: number;
+    boardId: number;
+    boardName: string;
+    boardDescription: string;
+    invitedByLogin: string;
+    invitedAt: string;
+};
+
 interface GithubLabel {
     url: string;
     name: string;

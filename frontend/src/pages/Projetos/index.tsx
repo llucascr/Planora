@@ -54,6 +54,8 @@ export const ProjetosPage = () => {
 
   useEffect(() => {
     refetch();
+    window.addEventListener("planora:projects:refetch", refetch);
+    return () => window.removeEventListener("planora:projects:refetch", refetch);
   }, []);
 
   const filtered = kanbanBoards.filter((b) =>

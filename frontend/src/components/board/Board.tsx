@@ -17,6 +17,7 @@ import {
   SquaresFour,
   ChartBar,
   ArrowsCounterClockwise,
+  UserPlus,
 } from "@phosphor-icons/react";
 import { classnames } from "./utils/classnames";
 import { httpClient } from "api";
@@ -52,6 +53,7 @@ function BoardInner({
   onCardMove,
   onColumnMove,
   onCreateColumn,
+  onInviteMember,
   members = [],
   repository,
 }: {
@@ -59,6 +61,7 @@ function BoardInner({
   onCardMove?: (from: string, to: string, cardId: string) => void;
   onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
   onCreateColumn?: () => void;
+  onInviteMember?: () => void;
   members?: MemberBoard[];
   repository?: string;
 }) {
@@ -185,6 +188,18 @@ function BoardInner({
 
         <div className="flex items-center gap-2 shrink-0">
           <button
+            title="Convidar membro"
+            className={classnames(
+              "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all",
+              "bg-secondary border border-border text-foreground hover:bg-accent-hover active:scale-95 shadow-sm",
+            )}
+            onClick={onInviteMember}
+          >
+            <UserPlus className="h-3.5 w-3.5" />
+            <span className="hidden lg:inline">Convidar</span>
+          </button>
+
+          <button
             title="Atualizar dados"
             className={classnames(
               "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all group",
@@ -253,6 +268,7 @@ interface BoardProps {
   className?: string;
   refetch?: () => void;
   onCreateColumn?: () => void;
+  onInviteMember?: () => void;
 }
 
 export function Board({
@@ -264,6 +280,7 @@ export function Board({
   onColumnMove,
   className,
   onCreateColumn,
+  onInviteMember,
 }: BoardProps) {
   return (
     <BoardProvider initialColumns={columns}>
@@ -273,6 +290,7 @@ export function Board({
           onCardMove={onCardMove}
           onColumnMove={onColumnMove}
           onCreateColumn={onCreateColumn}
+          onInviteMember={onInviteMember}
           members={members}
           repository={repository}
         />
