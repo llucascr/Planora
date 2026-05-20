@@ -7,6 +7,7 @@ import com.planora.backend.model.kanban.KanbanBoard;
 import com.planora.backend.model.kanban.KanbanMember;
 import com.planora.backend.model.kanban.dto.KanbanMemberResponse;
 import com.planora.backend.model.kanban.dto.MemberInviteRequest;
+import com.planora.backend.model.kanban.dto.PendingInviteResponse;
 import com.planora.backend.model.user.User;
 import com.planora.backend.repository.KanbanMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -65,9 +66,27 @@ public class KanbanMemberService {
         kanbanMemberRepository.delete(member);
     }
 
+    public List<PendingInviteResponse> getPendingInvitesByUser(Long userId) {
+        return kanbanMemberRepository.findByUser_UserIdAndInvitedStatus(userId, InvitedStatus.PENDING).stream()
+                .map(this::toPendingInviteResponse)
+                .toList();
+    }
+
     private KanbanMember findById(Long memberId) {
         return kanbanMemberRepository.findById(memberId).orElseThrow(
                 () -> new DataNotFoundException("Member with id " + memberId + " not found"));
+    }
+
+    private PendingInviteResponse toPendingInviteResponse(KanbanMember member) {
+        KanbanBoard board = member.getKanbanBoard();
+        return new PendingInviteResponse(
+                member.getKanbanMemberId(),
+                board.getKanbanBoardId(),
+                board.getName(),
+                board.getDescription(),
+                board.getOwner().getLogin(),
+                member.getInvitedAt()
+        );
     }
 
     private KanbanMemberResponse toResponse(KanbanMember member) {

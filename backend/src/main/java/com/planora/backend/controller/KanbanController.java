@@ -131,6 +131,11 @@ public class KanbanController {
         return ResponseEntity.ok(kanbanBoardService.updateIssue(jwt, issueId, request));
     }
 
+    @GetMapping("/member/invites/pending")
+    public ResponseEntity<List<PendingInviteResponse>> getPendingInvites(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(kanbanMemberService.getPendingInvitesByUser(tokenService.getUserId(jwt)));
+    }
+
     @PostMapping("/board/{boardId}/member/invite")
     public ResponseEntity<KanbanMemberResponse> inviteMember(
             @PathVariable Long boardId,
