@@ -1,4 +1,4 @@
-@startuml
+@startuml Driagrama de Classes - Modelo de Domínio
 
 class User {
     +Long userId PK

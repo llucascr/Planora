@@ -1,4 +1,4 @@
-@startuml
+@startuml Diagrama de Sequência - Geração de Backlog com IA
 
 participant Frontend
 participant Backend

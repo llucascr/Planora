@@ -1,4 +1,4 @@
-@startuml
+@startuml Diagrama de Sequência - Fluxo de Autenticação OAuth2 com GitHub
 
 actor Usuario
 participant Browser
