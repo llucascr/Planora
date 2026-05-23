@@ -1,6 +1,5 @@
 package com.planora.backend.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.planora.backend.model.user.dto.LoginResponse;
 import com.planora.backend.service.OauthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +10,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -20,11 +20,14 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
     private final OauthService oauthService;
     private final OAuth2AuthorizedClientService authorizedClientService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String frontendBaseUrl;
 
-    public CustomOAuth2SuccessHandler(OauthService oauthService, OAuth2AuthorizedClientService authorizedClientService) {
+    public CustomOAuth2SuccessHandler(OauthService oauthService,
+                                      OAuth2AuthorizedClientService authorizedClientService,
+                                      @Value("${app.frontend.base-url}") String frontendBaseUrl) {
         this.oauthService = oauthService;
         this.authorizedClientService = authorizedClientService;
+        this.frontendBaseUrl = frontendBaseUrl;
     }
 
     @Override
@@ -44,12 +47,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         LoginResponse loginResponse = oauthService.save(user, githubToken);
 
         String token = loginResponse.accessToken();
-        String redirectUrl = "http://localhost:3000/callback/" + token;
-        response.sendRedirect(redirectUrl);
-
-//        response.setContentType("application/json");
-//        response.setCharacterEncoding("UTF-8");
-//        response.getWriter().print(objectMapper.writeValueAsString(loginResponse));
-//        response.getWriter().flush();
+        response.sendRedirect(frontendBaseUrl + "/callback/" + token);
     }
 }

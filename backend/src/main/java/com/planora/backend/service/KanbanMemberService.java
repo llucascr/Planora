@@ -20,7 +20,7 @@ import java.util.List;
 public class KanbanMemberService {
 
     private final KanbanMemberRepository kanbanMemberRepository;
-    private final KanbanBoardService kanbanBoardService;
+    private final IKanbanBoardService kanbanBoardService;
     private final UserService userService;
 
     public KanbanMemberResponse inviteMember(Long boardId, MemberInviteRequest request) {

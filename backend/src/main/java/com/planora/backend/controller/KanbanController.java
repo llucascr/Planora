@@ -6,7 +6,7 @@ import com.planora.backend.model.issue.dto.IssueResponse;
 import com.planora.backend.model.issue.dto.MoveIssueRequest;
 import com.planora.backend.model.issue.dto.IssueUpdateRequest;
 import com.planora.backend.model.kanban.dto.*;
-import com.planora.backend.service.KanbanBoardService;
+import com.planora.backend.service.IKanbanBoardService;
 import com.planora.backend.service.KanbanMemberService;
 import com.planora.backend.service.TokenService;
 import jakarta.validation.Valid;
@@ -17,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +25,7 @@ import java.util.Map;
 @RequestMapping("/v1/kanban")
 public class KanbanController {
 
-    private final KanbanBoardService kanbanBoardService;
+    private final IKanbanBoardService kanbanBoardService;
     private final KanbanMemberService kanbanMemberService;
     private final TokenService tokenService;
 
