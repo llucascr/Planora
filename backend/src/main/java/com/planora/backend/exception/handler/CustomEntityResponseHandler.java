@@ -47,7 +47,7 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     }
 
     @ExceptionHandler(DataAlreadyExistException.class)
-    public final ResponseEntity<ExceptionResponse> handleDataNotFoundException(DataAlreadyExistException ex, WebRequest request) {
+    public final ResponseEntity<ExceptionResponse> handleDataAlreadyExistException(DataAlreadyExistException ex, WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
                 ex.getMessage(),
@@ -57,7 +57,7 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public final ResponseEntity<ExceptionResponse> handleDataNotFoundException(BadCredentialsException ex, WebRequest request) {
+    public final ResponseEntity<ExceptionResponse> handleBadCredentialsException(BadCredentialsException ex, WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
                 ex.getMessage(),
@@ -67,7 +67,7 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public final ResponseEntity<ExceptionResponse> handleDataNotFoundException(UnauthorizedException ex, WebRequest request) {
+    public final ResponseEntity<ExceptionResponse> handleUnauthorizedException(UnauthorizedException ex, WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
                 ex.getMessage(),
