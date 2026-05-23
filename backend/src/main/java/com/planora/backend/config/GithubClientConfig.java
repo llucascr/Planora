@@ -1,6 +1,10 @@
 package com.planora.backend.config;
 
-import com.planora.backend.client.GithubClient;
+import com.planora.backend.client.GithubIssueClient;
+import com.planora.backend.client.GithubLabelClient;
+import com.planora.backend.client.GithubRepositoryClient;
+import com.planora.backend.client.GithubSearchClient;
+import com.planora.backend.client.GithubWebhookClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
@@ -28,8 +32,27 @@ public class GithubClientConfig {
     }
 
     @Bean
-    public GithubClient githubClient(HttpServiceProxyFactory githubHttpServiceProxyFactory) {
-        return githubHttpServiceProxyFactory.createClient(GithubClient.class);
+    public GithubIssueClient githubIssueClient(HttpServiceProxyFactory githubHttpServiceProxyFactory) {
+        return githubHttpServiceProxyFactory.createClient(GithubIssueClient.class);
     }
 
+    @Bean
+    public GithubRepositoryClient githubRepositoryClient(HttpServiceProxyFactory githubHttpServiceProxyFactory) {
+        return githubHttpServiceProxyFactory.createClient(GithubRepositoryClient.class);
+    }
+
+    @Bean
+    public GithubWebhookClient githubWebhookClient(HttpServiceProxyFactory githubHttpServiceProxyFactory) {
+        return githubHttpServiceProxyFactory.createClient(GithubWebhookClient.class);
+    }
+
+    @Bean
+    public GithubLabelClient githubLabelClient(HttpServiceProxyFactory githubHttpServiceProxyFactory) {
+        return githubHttpServiceProxyFactory.createClient(GithubLabelClient.class);
+    }
+
+    @Bean
+    public GithubSearchClient githubSearchClient(HttpServiceProxyFactory githubHttpServiceProxyFactory) {
+        return githubHttpServiceProxyFactory.createClient(GithubSearchClient.class);
+    }
 }

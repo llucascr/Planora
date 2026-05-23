@@ -1,6 +1,6 @@
 package com.planora.backend.service;
 
-import com.planora.backend.client.GithubClient;
+import com.planora.backend.client.GithubSearchClient;
 import com.planora.backend.model.dashboard.dto.ActivityDayEntry;
 import com.planora.backend.model.dashboard.dto.CommitHistoryEntry;
 import com.planora.backend.model.dashboard.dto.DashboardStatsResponse;
@@ -36,7 +36,7 @@ public class DashboardService {
     private static final String COMMITS_ACCEPT_HEADER = "application/vnd.github.cloak-preview+json";
     private static final int COMMIT_HISTORY_LIMIT = 200;
 
-    private final GithubClient githubClient;
+    private final GithubSearchClient githubSearchClient;
     private final UserService userService;
     private final TokenService tokenService;
     private final IssueRepository issueRepository;
@@ -119,7 +119,7 @@ public class DashboardService {
     private GithubCommitSearchResponse fetchCommitSearch(String bearerToken, String login, String sinceDate) {
         try {
             String query = "author:" + login + " committer-date:>=" + sinceDate;
-            return githubClient.searchCommits(bearerToken, GITHUB_API_VERSION, COMMITS_ACCEPT_HEADER, query, COMMIT_HISTORY_LIMIT, "committer-date", "desc");
+            return githubSearchClient.searchCommits(bearerToken, GITHUB_API_VERSION, COMMITS_ACCEPT_HEADER, query, COMMIT_HISTORY_LIMIT, "committer-date", "desc");
         } catch (Exception e) {
             log.warn("Failed to fetch commits for {}: {}", login, e.getMessage());
             return new GithubCommitSearchResponse(0, Collections.emptyList());
@@ -129,7 +129,7 @@ public class DashboardService {
     private int fetchMergedPRsLast30Days(String bearerToken, String login, String sinceDate) {
         try {
             String query = "author:" + login + " is:pr is:merged merged:>=" + sinceDate;
-            return githubClient.searchIssues(bearerToken, GITHUB_API_VERSION, query, 1).totalCount();
+            return githubSearchClient.searchIssues(bearerToken, GITHUB_API_VERSION, query, 1).totalCount();
         } catch (Exception e) {
             log.warn("Failed to fetch merged PR count for {}: {}", login, e.getMessage());
             return 0;
@@ -139,7 +139,7 @@ public class DashboardService {
     private int fetchOpenPRsCount(String bearerToken, String login) {
         try {
             String query = "author:" + login + " is:pr is:open";
-            return githubClient.searchIssues(bearerToken, GITHUB_API_VERSION, query, 1).totalCount();
+            return githubSearchClient.searchIssues(bearerToken, GITHUB_API_VERSION, query, 1).totalCount();
         } catch (Exception e) {
             log.warn("Failed to fetch open PR count for {}: {}", login, e.getMessage());
             return 0;
@@ -149,7 +149,7 @@ public class DashboardService {
     private List<ActivityDayEntry> fetchActivityHistory(String bearerToken, String login) {
         try {
             LocalDate since = LocalDate.now().minusDays(30);
-            List<GithubEventResponse> events = githubClient.getUserEvents(login, bearerToken, GITHUB_API_VERSION, 100);
+            List<GithubEventResponse> events = githubSearchClient.getUserEvents(login, bearerToken, GITHUB_API_VERSION, 100);
 
             return events.stream()
                     .filter(e -> !parseEventDate(e.createdAt()).isBefore(since))
