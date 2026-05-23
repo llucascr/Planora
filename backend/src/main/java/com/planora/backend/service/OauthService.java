@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -65,7 +66,9 @@ public class OauthService {
 
     private LoginResponse generatedLoginResponse(User user) {
         Instant now = Instant.now();
-        long expiresIn = 860000L;
+        Duration tokenDuration = Duration.ofDays(1);
+
+        Instant expiresAt = now.plus(tokenDuration);
 
         String scopes = user.getRoles()
                 .stream()
@@ -76,7 +79,7 @@ public class OauthService {
                 .issuer("Planora")
                 .subject(user.getUserId().toString())
                 .issuedAt(now)
-                .expiresAt(now.plusSeconds(expiresIn))
+                .expiresAt(expiresAt)
                 .claim("scope", scopes)
                 .claim("githubToken", user.getGithubToken())
                 .build();
@@ -84,7 +87,27 @@ public class OauthService {
         String jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 
         log.info("Login efetuado");
-        return new LoginResponse(jwtValue, expiresIn);
+        return new LoginResponse(jwtValue, tokenDuration.toSeconds());
+    }
+
+    public String generateNonExpiringToken(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User not found"));
+
+        String scopes = user.getRoles()
+                .stream()
+                .map(Role::getName)
+                .collect(Collectors.joining(" "));
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("Planora")
+                .subject(user.getUserId().toString())
+                .issuedAt(Instant.now())
+                .claim("scope", scopes)
+                .claim("githubToken", user.getGithubToken())
+                .build();
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
 }
