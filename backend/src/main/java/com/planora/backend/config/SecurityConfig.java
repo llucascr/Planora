@@ -1,6 +1,6 @@
 package com.planora.backend.config;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -13,12 +13,18 @@ import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final CustomOAuth2SuccessHandler successHandler;
+    private final String frontendBaseUrl;
+
+    public SecurityConfig(CustomOAuth2SuccessHandler successHandler,
+                          @Value("${app.frontend.base-url}") String frontendBaseUrl) {
+        this.successHandler = successHandler;
+        this.frontendBaseUrl = frontendBaseUrl;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -26,7 +32,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:3000"));
+                    config.setAllowedOrigins(List.of(frontendBaseUrl));
                     config.setAllowedMethods(List.of("*"));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowCredentials(true);
@@ -39,7 +45,7 @@ public class SecurityConfig {
                 .oauth2ResourceServer(
                         oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("http://localhost:3000/login")
+                        .loginPage(frontendBaseUrl + "/login")
                         .successHandler(successHandler))
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(
