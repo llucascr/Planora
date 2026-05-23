@@ -35,7 +35,7 @@ public class ApiPythonController {
             @RequestBody CallbackRequest callbackRequest
     ) {
         try {
-            apiPythonService.saveBacklog(callbackRequest);
+            apiPythonService.saveBacklog(callbackRequest, jwt);
             return ResponseEntity.status(HttpStatus.OK).body("{success: true}");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{success: false, message: " + e.getMessage() + "}");

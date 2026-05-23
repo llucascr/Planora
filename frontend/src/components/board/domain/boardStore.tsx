@@ -173,6 +173,29 @@ function boardReducer(state: BoardState, action: BoardAction): BoardState {
       };
     }
 
+    case "DELETE_CARD": {
+      const { cardId, columnId } = action.payload;
+
+      const newColumnCards = {
+        ...state.normalized.columnCards,
+        [columnId]: state.normalized.columnCards[columnId].filter(
+          (id) => id !== cardId
+        ),
+      };
+
+      const newCards = { ...state.normalized.cards };
+      delete newCards[cardId];
+
+      return {
+        ...state,
+        normalized: {
+          ...state.normalized,
+          cards: newCards,
+          columnCards: newColumnCards,
+        },
+      };
+    }
+
     case "DELETE_COLUMN": {
       const columnId = String(action.payload);
 

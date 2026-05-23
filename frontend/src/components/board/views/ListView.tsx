@@ -3,11 +3,16 @@ import { useBoardState, useBoardDispatch } from "../domain/boardStore";
 import { useFilteredColumnCards } from "../filters/useFilters";
 import { Card } from "../cards/Card";
 import type { DragInfo } from "../domain/types";
+import type { MemberBoard } from "types";
 
 interface ListViewProps {
   dragRef: React.MutableRefObject<DragInfo | null>;
   onCardClick?: (cardId: string) => void;
   onCardMove?: (from: string, to: string, cardId: string) => void;
+  members?: MemberBoard[];
+  boardId?: number;
+  repository?: string;
+  refetch?: () => void;
 }
 
 function ListColumnSection({
@@ -15,11 +20,19 @@ function ListColumnSection({
   dragRef,
   onCardClick,
   onCardMove,
+  members = [],
+  boardId,
+  repository,
+  refetch,
 }: {
   columnId: string;
   dragRef: React.MutableRefObject<DragInfo | null>;
   onCardClick?: (id: string) => void;
   onCardMove?: (from: string, to: string, cardId: string) => void;
+  members?: MemberBoard[];
+  boardId?: number;
+  repository?: string;
+  refetch?: () => void;
 }) {
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -57,6 +70,10 @@ function ListColumnSection({
                 dragRef={dragRef}
                 onCardClick={onCardClick}
                 onCardMove={onCardMove}
+                members={members}
+                boardId={boardId}
+                repository={repository}
+                refetch={refetch}
               />
             );
           })}
@@ -71,7 +88,15 @@ function ListColumnSection({
   );
 }
 
-export function ListView({ dragRef, onCardClick, onCardMove }: ListViewProps) {
+export function ListView({
+  dragRef,
+  onCardClick,
+  onCardMove,
+  members = [],
+  boardId,
+  repository,
+  refetch,
+}: ListViewProps) {
   const state = useBoardState();
   return (
     <div className="flex-1 overflow-y-auto px-2 pb-4">
@@ -82,6 +107,10 @@ export function ListView({ dragRef, onCardClick, onCardMove }: ListViewProps) {
           dragRef={dragRef}
           onCardClick={onCardClick}
           onCardMove={onCardMove}
+          members={members}
+          boardId={boardId}
+          repository={repository}
+          refetch={refetch}
         />
       ))}
     </div>

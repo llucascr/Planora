@@ -58,12 +58,14 @@ export const TarefasPage = () => {
   const boardId = Number(projectId);
 
   const [columns, setColumns] = useState<BoardColumn[]>([]);
+  const [board, setBoard] = useState<ProjetoBoard | null>(null);
   const ui = useUI();
 
   function refetch() {
     httpClient
       .get<ProjetoBoard>(`/v1/kanban/board/${boardId}`)
       .then((res) => {
+        setBoard(res);
         const mappedColumns: BoardColumn[] = res.columns.map((col) => ({
           id: Number(col.kanbanColumnId),
           name: col.name,
@@ -71,7 +73,7 @@ export const TarefasPage = () => {
           idBoard: res.kanbanBoardId,
           cards: [],
         }));
-
+        
         setColumns(mappedColumns);
       })
       .catch((err) => {
@@ -127,6 +129,9 @@ export const TarefasPage = () => {
         refetch={refetch}
         onColumnMove={handleColumnMove}
         onCreateColumn={openCreateColumnModal}
+        boardId={boardId}
+        members={board?.members}
+        repository={board?.githubRepository}
       />
     </div>
   );

@@ -1,13 +1,16 @@
 package com.planora.backend.client;
 
+import com.planora.backend.model.dashboard.dto.GithubCommitSearchResponse;
+import com.planora.backend.model.dashboard.dto.GithubEventResponse;
+import com.planora.backend.model.dashboard.dto.GithubSearchResponse;
 import com.planora.backend.model.issue.dto.GithubWebhookCreateRequest;
 import com.planora.backend.model.issue.dto.GithubWebhookResponse;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueApiResponse;
-import com.planora.backend.model.issue.dto.IssueResponse;
 import com.planora.backend.model.issue.dto.IssueUpdateRequest;
 import com.planora.backend.model.issue.dto.RepositoryResponse;
 import com.planora.backend.model.issue.dto.UserRepositoryResponse;
+import com.planora.backend.model.issue.dto.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -72,6 +75,40 @@ public interface GithubClient {
             @PathVariable Long hookId,
             @RequestHeader("Authorization") String token,
             @RequestHeader(value = "X-GitHub-Api-Version", defaultValue = "2022-11-28") String apiVersion
+    );
+
+    @GetExchange("/repos/{owner}/{repo}/labels")
+    List<LabelResponse> getRepositoryLabels(
+            @PathVariable("owner") String owner,
+            @PathVariable("repo") String repo,
+            @RequestHeader("Authorization") String authorization,
+            @RequestHeader("X-GitHub-Api-Version") String apiVersion
+    );
+    @GetExchange("/search/commits")
+    GithubCommitSearchResponse searchCommits(
+            @RequestHeader("Authorization") String token,
+            @RequestHeader(value = "X-GitHub-Api-Version", defaultValue = "2022-11-28") String apiVersion,
+            @RequestHeader("Accept") String accept,
+            @RequestParam("q") String query,
+            @RequestParam("per_page") int perPage,
+            @RequestParam("sort") String sort,
+            @RequestParam("order") String order
+    );
+
+    @GetExchange("/search/issues")
+    GithubSearchResponse searchIssues(
+            @RequestHeader("Authorization") String token,
+            @RequestHeader(value = "X-GitHub-Api-Version", defaultValue = "2022-11-28") String apiVersion,
+            @RequestParam("q") String query,
+            @RequestParam("per_page") int perPage
+    );
+
+    @GetExchange("/users/{username}/events")
+    List<GithubEventResponse> getUserEvents(
+            @PathVariable String username,
+            @RequestHeader("Authorization") String token,
+            @RequestHeader(value = "X-GitHub-Api-Version", defaultValue = "2022-11-28") String apiVersion,
+            @RequestParam("per_page") int perPage
     );
 
 }
