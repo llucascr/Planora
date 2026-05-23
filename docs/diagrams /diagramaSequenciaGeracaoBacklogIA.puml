@@ -1,0 +1,29 @@
+@startuml Diagrama de Sequência - Geração de Backlog com IA
+
+participant Frontend
+participant Backend
+participant PostgreSQL
+participant "Python FastAPI" as FastAPI
+participant Ollama
+
+Frontend -> Backend: POST /v1/ia (descricao, boardId, columnId)
+Backend -> PostgreSQL: INSERT Job
+PostgreSQL --> Backend: Job salvo (jobId)
+
+Backend -> FastAPI: POST /api/v1/generate-backlog (jobId, descricao)
+note over Backend, FastAPI: Retry até 5x se conexão falhar
+
+Backend --> Frontend: 200 OK (AcceptedResponse)
+
+FastAPI -> Ollama: Llama infer
+Ollama --> FastAPI: JSON issues
+
+note over FastAPI: Valida JSON\nRetry se JSON inválido
+
+FastAPI -> Backend: POST /v1/ia/callback
+Backend -> PostgreSQL: createBulkIssues no board Kanban
+PostgreSQL --> Backend: 200 OK
+
+note over Frontend: Usuário recarrega o board\npara ver as novas issues
+
+@enduml
