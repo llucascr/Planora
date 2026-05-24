@@ -56,6 +56,7 @@ function BoardInner({
   onInviteMember,
   members = [],
   repository,
+  githubOwnerName,
 }: {
   boardId: number;
   onCardMove?: (from: string, to: string, cardId: string) => void;
@@ -64,6 +65,7 @@ function BoardInner({
   onInviteMember?: () => void;
   members?: MemberBoard[];
   repository?: string;
+  githubOwnerName?: string;
 }) {
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -125,6 +127,20 @@ function BoardInner({
       });
     } catch (err) {
       console.error("Erro ao buscar board:", err);
+    }
+  }
+
+  async function handleDeleteCard(cardId: string) {
+    if (!window.confirm("Deseja realmente excluir esta issue?")) return;
+    try {
+      await httpClient.delete(`/v1/kanban/board/issue/${cardId}`);
+
+      // Update local state by refetching or just removing it from column
+      handleRefetch();
+      handleCloseModal();
+    } catch (err) {
+      console.error("Erro ao excluir issue:", err);
+      alert("Erro ao excluir a issue. Tente novamente.");
     }
   }
 
@@ -246,6 +262,16 @@ function BoardInner({
           card={selectedCard}
           columnName={selectedColumn?.name}
           onClose={handleCloseModal}
+          onDelete={() => handleDeleteCard(selectedCard.id.toString())}
+          boardId={boardId}
+          columnId={Number(selectedColumn?.id)}
+          repository={repository}
+          githubOwnerName={githubOwnerName}
+          members={members}
+          refetch={() => {
+            handleRefetch();
+            // maybe we don't close the modal automatically after save? The user can see the updated issue.
+          }}
         />
       )}
     </div>
@@ -257,6 +283,7 @@ interface BoardProps {
   columns: BoardColumn[];
   members?: MemberBoard[];
   repository?: string;
+  githubOwnerName?: string;
   onCardMove?: (
     fromColumnId: string,
     toColumnId: string,
@@ -275,6 +302,7 @@ export function Board({
   onCardMove,
   members = [],
   repository,
+  githubOwnerName,
   onColumnMove,
   className,
   onCreateColumn,
@@ -291,6 +319,7 @@ export function Board({
           onInviteMember={onInviteMember}
           members={members}
           repository={repository}
+          githubOwnerName={githubOwnerName}
         />
       </div>
     </BoardProvider>

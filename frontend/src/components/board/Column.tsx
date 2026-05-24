@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { DotsSixVertical, Plus, DotsThreeVertical } from "@phosphor-icons/react";
+import {
+  DotsSixVertical,
+  Plus,
+  DotsThreeVertical,
+} from "@phosphor-icons/react";
 import { Card } from "./cards/Card";
 import { useBoardState, useBoardDispatch } from "./domain/boardStore";
 import type { DragInfo } from "./domain/types";
@@ -62,14 +66,12 @@ export function Column({
   useEffect(() => {
     async function loadBoard() {
       try {
-
         const response: any = await httpClient.get(
-          `/v1/kanban/board/${column.idBoard}`
+          `/v1/kanban/board/${column.idBoard}`,
         );
 
         setRepository(response.name);
         setOwnerName(response.githubOwnerName);
-
       } catch (err) {
         console.error("Erro ao buscar board:", err);
       }
@@ -135,13 +137,10 @@ export function Column({
     });
 
     try {
-      await httpClient.patch(
-        `/v1/kanban/board/${column.idBoard}/issue/move`,
-        {
-          issueId: Number(cardId),
-          targetColumnId: Number(columnId),
-        }
-      );
+      await httpClient.patch(`/v1/kanban/board/${column.idBoard}/issue/move`, {
+        issueId: Number(cardId),
+        targetColumnId: Number(columnId),
+      });
 
       onCardMove?.(sourceColumnId, columnId, cardId);
     } catch (err) {
@@ -179,7 +178,7 @@ export function Column({
         {
           name,
           position: column.order,
-        }
+        },
       );
     } catch (err) {
       dispatch({
@@ -195,7 +194,7 @@ export function Column({
   async function handleDelete() {
     try {
       await httpClient.delete(
-        `/v1/kanban/board/${column.idBoard}/column/${column.id}`
+        `/v1/kanban/board/${column.idBoard}/column/${column.id}`,
       );
 
       dispatch({
@@ -215,6 +214,8 @@ export function Column({
       type: "modal",
       options: {
         titulo: "Nova Issue",
+        position: "right",
+        widthFraction: "1/2",
       },
       content: (
         <IssueForm
@@ -225,9 +226,7 @@ export function Column({
           githubOwnerName={ownerName}
           refetch={refetch}
           members={members}
-          onClose={() =>
-            ui.hide("modal", "issue-form-create")
-          }
+          onClose={() => ui.hide("modal", "issue-form-create")}
         />
       ),
     });
@@ -376,7 +375,10 @@ export function Column({
       )}
 
       <div className="px-2 pb-2 pt-1 shrink-0">
-        <button onClick={handleOpenIssueModal} className="flex w-full items-center gap-1.5 rounded-lg p-2 text-[11px] text-foreground hover:bg-accent-hover transition-colors">
+        <button
+          onClick={handleOpenIssueModal}
+          className="flex w-full items-center gap-1.5 rounded-lg p-2 text-[11px] text-foreground hover:bg-accent-hover transition-colors"
+        >
           <Plus className="h-3 w-3 shrink-0" />
           Adicionar card
         </button>

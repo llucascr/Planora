@@ -1,214 +1,340 @@
-import React from "react";
 import { useBoardState } from "../domain/boardStore";
-import { detectCardType, getCardTypeLabel } from "../domain/cardDetector";
-import type { CardType } from "../domain/types";
 import {
-  ChartBar,
-  Users,
-  Target,
   FileText,
   TrendUp,
+  CheckCircle,
+  ClockCounterClockwise,
+  User,
+  Tag,
+  Kanban,
 } from "@phosphor-icons/react";
-
-const TYPE_ICONS: Record<CardType, React.ReactNode> = {
-  lead: <Users weight="duotone" className="h-5 w-5" />,
-  planoAcao: <Target weight="duotone" className="h-5 w-5" />,
-  issues: <FileText weight="duotone" className="h-5 w-5" />,
-};
-
-const TYPE_COLORS: Record<CardType, string> = {
-  lead: "bg-blue-500",
-  planoAcao: "bg-amber-500",
-  issues: "bg-slate-500",
-};
+import { classnames } from "../utils/classnames";
 
 export function AnalyticsView() {
   const state = useBoardState();
   const { normalized } = state;
 
-  // Count by type
-  const typeCounts: Record<CardType, number> = {
-    lead: 0,
-    planoAcao: 0,
-    issues: 0,
-  };
   const total = Object.values(normalized.cards).length;
 
+  // 1. Column Metrics (Backlog vs Done)
+  const columnsCount = normalized.columnOrder.length;
+  const backlogColId = columnsCount > 0 ? normalized.columnOrder[0] : null;
+  const doneColId =
+    columnsCount > 1 ? normalized.columnOrder[columnsCount - 1] : null;
+
+  const backlogCount = backlogColId
+    ? normalized.columnCards[backlogColId]?.length || 0
+    : 0;
+  const doneCount = doneColId
+    ? normalized.columnCards[doneColId]?.length || 0
+    : 0;
+
+  // 2. Assignee Workload
+  const assigneesMap: Record<
+    string,
+    { login: string; avatarUrl: string; count: number }
+  > = {};
+
+  // 3. Labels Distribution
+  const labelsMap: Record<
+    string,
+    { name: string; color: string; count: number }
+  > = {};
+
+  // Parse cards to calculate assignees and labels
   for (const card of Object.values(normalized.cards)) {
-    const t = detectCardType(card);
-    typeCounts[t]++;
+    // Assignees
+    if (card.assignees && card.assignees.length > 0) {
+      card.assignees.forEach((assignee) => {
+        if (!assigneesMap[assignee.login]) {
+          assigneesMap[assignee.login] = {
+            login: assignee.login,
+            avatarUrl: assignee.avatarUrl,
+            count: 0,
+          };
+        }
+        assigneesMap[assignee.login].count++;
+      });
+    } else {
+      // Unassigned
+      if (!assigneesMap["unassigned"]) {
+        assigneesMap["unassigned"] = {
+          login: "Unassigned",
+          avatarUrl: "",
+          count: 0,
+        };
+      }
+      assigneesMap["unassigned"].count++;
+    }
+
+    // Labels
+    if (card.labels && card.labels.length > 0) {
+      card.labels.forEach((label) => {
+        if (!labelsMap[label.name]) {
+          labelsMap[label.name] = {
+            name: label.name,
+            color: label.color,
+            count: 0,
+          };
+        }
+        labelsMap[label.name].count++;
+      });
+    } else {
+      // No label
+      if (!labelsMap["none"]) {
+        labelsMap["none"] = {
+          name: "Sem Label",
+          color: "808080", // default gray
+          count: 0,
+        };
+      }
+      labelsMap["none"].count++;
+    }
   }
 
-  // Count by column
-  const columnStats = normalized.columnOrder.map((colId) => {
+  // Sort Assignees
+  const sortedAssignees = Object.values(assigneesMap).sort(
+    (a, b) => b.count - a.count,
+  );
+
+  // Sort Labels
+  const sortedLabels = Object.values(labelsMap).sort(
+    (a, b) => b.count - a.count,
+  );
+
+  // Column Flow Array
+  const columnFlow = normalized.columnOrder.map((colId) => {
     const col = normalized.columns[colId];
-    const ids = normalized.columnCards[colId] ?? [];
-    const byType: Record<CardType, number> = {
-      lead: 0,
-      planoAcao: 0,
-      issues: 0,
+    const count = normalized.columnCards[colId]?.length || 0;
+    return {
+      colId,
+      nome: col?.name || "Desconhecido",
+      count,
     };
-    for (const cid of ids) {
-      const card = normalized.cards[cid];
-      if (card) byType[detectCardType(card)]++;
-    }
-    return { colId, nome: col.name, count: ids.length, byType };
   });
 
   return (
-    <div className="flex-1 overflow-y-auto px-6 pb-8">
-      <div className="max-w-5xl mx-auto flex flex-col gap-10 pt-6">
-        {/* Summary KPI cards */}
-        <div>
-          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-4 px-1">
-            Visão Geral por Tipo
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {(Object.keys(typeCounts) as CardType[]).map((type) => {
-              const count = typeCounts[type];
-              const pct = total ? Math.round((count / total) * 100) : 0;
-              const color = TYPE_COLORS[type];
+    <div className="flex-1 overflow-y-auto px-6 pb-8 bg-background">
+      <div className="max-w-6xl mx-auto flex flex-col gap-10 pt-6">
+        {/* TOP KPIs */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Total Issues */}
+          <div className="group relative overflow-hidden rounded-3xl bg-primary p-6 text-primary-foreground shadow-lg hover:shadow-primary/30 transition-all">
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 h-48 w-48 rounded-full bg-white opacity-10 blur-2xl" />
+            <div className="relative flex items-start justify-between">
+              <div>
+                <p className="text-sm font-semibold opacity-80 uppercase tracking-widest mb-1">
+                  Total de Issues
+                </p>
+                <p className="text-5xl font-black tracking-tight tabular-nums">
+                  {total}
+                </p>
+              </div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md">
+                <FileText weight="duotone" className="h-6 w-6 text-white" />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center gap-2 text-sm font-medium text-white/80">
+              <TrendUp weight="bold" />
+              <span>Geral no Board</span>
+            </div>
+          </div>
 
-              return (
-                <div
-                  key={type}
-                  className="group relative flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 transition-all hover:border-primary/30 hover:shadow-xl hover:shadow-black/5"
-                >
-                  <div className="flex items-center justify-between">
-                    <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-xl bg-opacity-10 ${color} ${color.replace("bg-", "text-")} shadow-sm`}
-                    >
-                      {TYPE_ICONS[type]}
-                    </div>
-                    <span className="text-xl font-black text-foreground tabular-nums">
-                      {count}
-                    </span>
-                  </div>
+          {/* Backlog */}
+          <div className="group relative overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-1">
+                  A Fazer (Backlog)
+                </p>
+                <p className="text-4xl font-black text-foreground tabular-nums">
+                  {backlogCount}
+                </p>
+              </div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
+                <ClockCounterClockwise weight="duotone" className="h-6 w-6" />
+              </div>
+            </div>
+            <div className="mt-4 h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+              <div
+                className="h-full rounded-full bg-amber-500"
+                style={{
+                  width: `${total ? (backlogCount / total) * 100 : 0}%`,
+                }}
+              />
+            </div>
+          </div>
 
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">
-                      {getCardTypeLabel(type)}
-                    </p>
-                    <div className="mt-3">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-                          Distribuição
+          {/* Done */}
+          <div className="group relative overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-1">
+                  Concluídas
+                </p>
+                <p className="text-4xl font-black text-foreground tabular-nums">
+                  {doneCount}
+                </p>
+              </div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-secondary-foreground">
+                <CheckCircle
+                  weight="duotone"
+                  className="h-6 w-6 text-emerald-500"
+                />
+              </div>
+            </div>
+            <div className="mt-4 h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+              <div
+                className="h-full rounded-full bg-emerald-500"
+                style={{ width: `${total ? (doneCount / total) * 100 : 0}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          {/* ASSIGNEES WORKLOAD */}
+          <div>
+            <div className="flex items-center gap-2 mb-4 px-1">
+              <User weight="bold" className="text-muted-foreground" />
+              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                Carga de Trabalho (Assignees)
+              </h3>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-2 flex flex-col gap-1">
+              {sortedAssignees.length === 0 && (
+                <div className="p-6 text-center text-sm text-muted-foreground">
+                  Nenhuma issue encontrada.
+                </div>
+              )}
+              {sortedAssignees.map((assignee) => {
+                const pct = total ? (assignee.count / total) * 100 : 0;
+                return (
+                  <div
+                    key={assignee.login}
+                    className="flex items-center gap-4 rounded-xl p-3 hover:bg-accent/50 transition-colors"
+                  >
+                    {assignee.avatarUrl ? (
+                      <img
+                        src={assignee.avatarUrl}
+                        alt={assignee.login}
+                        className="h-10 w-10 rounded-full bg-secondary object-cover border border-border"
+                      />
+                    ) : (
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary border border-border text-muted-foreground">
+                        <User weight="fill" className="h-5 w-5" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-bold text-foreground">
+                          {assignee.login}
                         </span>
-                        <span className="text-[10px] font-bold text-foreground">
-                          {pct}%
+                        <span className="text-sm font-black text-foreground tabular-nums">
+                          {assignee.count}
                         </span>
                       </div>
                       <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
                         <div
-                          className={`h-full rounded-full ${color} transition-all duration-1000 ease-out`}
+                          className={classnames(
+                            "h-full rounded-full transition-all duration-1000",
+                            assignee.login === "Unassigned"
+                              ? "bg-slate-400"
+                              : "bg-primary",
+                          )}
                           style={{ width: `${pct}%` }}
                         />
                       </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Column breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-10">
-          <div>
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-4 px-1">
-              Desempenho por Coluna
-            </h3>
-            <div className="space-y-3">
-              {columnStats.map(({ colId, nome, count, byType }) => {
-                return (
-                  <div
-                    key={colId}
-                    className="group rounded-2xl border border-border bg-card p-5 transition-all hover:bg-accent/30"
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-1.5 rounded-full bg-primary opacity-20 group-hover:opacity-100 transition-opacity" />
-                        <span className="text-sm font-bold text-foreground">
-                          {nome}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground font-medium">
-                          Total:
-                        </span>
-                        <span className="text-sm font-black text-foreground tabular-nums">
-                          {count}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Stacked bar */}
-                    <div className="relative flex h-3 w-full rounded-full bg-secondary overflow-hidden mb-5">
-                      {(Object.keys(byType) as CardType[]).map((t) =>
-                        byType[t] > 0 ? (
-                          <div
-                            key={t}
-                            className={`${TYPE_COLORS[t]} h-full transition-all duration-500`}
-                            style={{
-                              width: `${(byType[t] / Math.max(count, 1)) * 100}%`,
-                            }}
-                            title={`${getCardTypeLabel(t)}: ${byType[t]}`}
-                          />
-                        ) : null,
-                      )}
-                      {count === 0 && (
-                        <div className="flex-1 bg-secondary opacity-50" />
-                      )}
-                    </div>
-
-                    {/* Legend Labels */}
-                    <div className="flex gap-4 flex-wrap">
-                      {(Object.keys(byType) as CardType[]).map((t) =>
-                        byType[t] > 0 ? (
-                          <div
-                            key={t}
-                            className="flex items-center gap-2 rounded-full border border-border bg-background/50 px-2.5 py-1 transition-colors hover:bg-background"
-                          >
-                            <span
-                              className={`h-2 w-2 rounded-full ${TYPE_COLORS[t]}`}
-                            />
-                            <span className="text-[10px] font-semibold text-foreground uppercase tracking-wider">
-                              {getCardTypeLabel(t)}
-                            </span>
-                            <span className="text-[10px] font-black text-foreground/50 tabular-nums border-l border-border pl-1.5 ml-0.5">
-                              {byType[t]}
-                            </span>
-                          </div>
-                        ) : null,
-                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
           </div>
+
+          {/* LABELS DISTRIBUTION */}
+          <div>
+            <div className="flex items-center gap-2 mb-4 px-1">
+              <Tag weight="bold" className="text-muted-foreground" />
+              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                Adoção de Labels
+              </h3>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-5">
+              <div className="flex flex-wrap gap-3">
+                {sortedLabels.length === 0 && (
+                  <div className="text-sm text-muted-foreground w-full text-center py-4">
+                    Nenhuma label encontrada.
+                  </div>
+                )}
+                {sortedLabels.map((label) => {
+                  const hex = label.color.startsWith("#")
+                    ? label.color
+                    : `#${label.color}`;
+                  return (
+                    <div
+                      key={label.name}
+                      className="flex items-center gap-2.5 rounded-full border border-border bg-background/50 px-3 py-1.5 transition-all hover:bg-accent hover:border-border/80"
+                    >
+                      <span
+                        className="h-2.5 w-2.5 rounded-full shadow-sm"
+                        style={{ backgroundColor: hex }}
+                      />
+                      <span className="text-xs font-bold text-foreground">
+                        {label.name}
+                      </span>
+                      <span className="text-xs font-black text-muted-foreground border-l border-border pl-2 tabular-nums">
+                        {label.count}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Total Summary Footer */}
-        <div className="relative overflow-hidden rounded-3xl bg-primary p-8 text-foreground shadow-2xl shadow-primary/20">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-white opacity-10 blur-3xl" />
-          <div className="relative flex items-center justify-between gap-6">
-            <div className="flex items-center gap-6">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white bg-opacity-20 backdrop-blur-md shadow-inner text-white">
-                <TrendUp weight="bold" className="h-8 w-8" />
-              </div>
-              <div>
-                <p className="text-4xl font-black tracking-tight tabular-nums">
-                  {total}
-                </p>
-                <p className="text-sm font-medium opacity-80 uppercase tracking-widest">
-                  Total de cards no workflow
-                </p>
-              </div>
-            </div>
-            <div className="hidden md:block">
-              <ChartBar weight="fill" className="h-24 w-24 opacity-50" />
-            </div>
+        {/* COLUMN DISTRIBUTION (FLOW) */}
+        <div>
+          <div className="flex items-center gap-2 mb-4 px-1">
+            <Kanban weight="bold" className="text-muted-foreground" />
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              Visão do Fluxo (Colunas)
+            </h3>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {columnFlow.map((col, idx) => {
+              const pct = total ? (col.count / total) * 100 : 0;
+              return (
+                <div
+                  key={col.colId}
+                  className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 hover:border-primary/30 transition-all"
+                >
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-[10px] font-bold">
+                      {idx + 1}
+                    </span>
+                    <span
+                      className="text-sm font-semibold truncate"
+                      title={col.nome}
+                    >
+                      {col.nome}
+                    </span>
+                  </div>
+                  <div className="flex items-end justify-between">
+                    <span className="text-3xl font-black tabular-nums">
+                      {col.count}
+                    </span>
+                  </div>
+                  <div className="mt-1 h-1 w-full rounded-full bg-secondary overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-primary/60"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

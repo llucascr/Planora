@@ -29,17 +29,11 @@ function getCardCode(card: CardData): string | null {
 }
 
 const typeBorder: Record<string, string> = {
-  lead: "border-l-blue-500",
-  diagnostico: "border-l-violet-500",
-  planoAcao: "border-l-amber-500",
-  generic: "border-l-slate-600",
+  issues: "border-l-slate-600",
 };
 
 const typeLabel: Record<string, { bg: string; text: string }> = {
-  lead: { bg: "bg-blue-500/20", text: "text-blue-500" },
-  diagnostico: { bg: "bg-violet-500/20", text: "text-violet-500" },
-  planoAcao: { bg: "bg-amber-500/20", text: "text-amber-500" },
-  generic: { bg: "bg-slate-500/20", text: "text-slate-500" },
+  issues: { bg: "bg-slate-500/20", text: "text-slate-500" },
 };
 
 export function Card({

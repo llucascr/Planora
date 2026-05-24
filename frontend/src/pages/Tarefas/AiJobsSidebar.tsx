@@ -6,7 +6,7 @@ import {
   CheckCircle,
   XCircle,
   SpinnerGap,
-  Plus,
+  PlusIcon,
 } from "@phosphor-icons/react";
 
 type JobStatus = "PROCESSING" | "DONE" | "ERROR";
@@ -140,7 +140,9 @@ export const AiJobsSidebar = ({ boardId }: { boardId: number }) => {
     ui.show({
       id: "create-issue-ai",
       type: "modal",
-      options: { titulo: "Nova Issue com IA" },
+      options: {
+        titulo: "Nova backlog com IA",
+      },
       content: (
         <CreateIssueForm
           boardId={boardId}
@@ -156,10 +158,9 @@ export const AiJobsSidebar = ({ boardId }: { boardId: number }) => {
         onClick={openCreateModal}
         className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-[#1a2f7a] transition-colors"
       >
-        <Plus size={15} weight="bold" />
-        Nova Issue com IA
+        <PlusIcon size={15} weight="bold" />
+        Nova backlog com IA
       </button>
-
       <div>
         <p className="text-xs text-foreground/50 mb-3">Processamentos de IA</p>
 

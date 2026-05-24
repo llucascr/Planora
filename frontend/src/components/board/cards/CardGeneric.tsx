@@ -3,6 +3,7 @@ import moment from "moment";
 import { Trash, PencilSimple } from "@phosphor-icons/react";
 import { httpClient } from "api";
 import { useState } from "react";
+import { Avatar } from "../design/Avatar";
 
 interface CardGenericProps {
   card: Card;
@@ -93,9 +94,47 @@ export function CardGeneric({ card, onClick, onDelete, onEdit }: CardGenericProp
           {card.descricao}
         </p>
       )}
-      {date && (
-        <p className="text-[10px] text-muted-foreground mt-0.5">{date}</p>
+
+      {card.labels && card.labels.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-1">
+          {card.labels.map((label) => (
+            <span
+              key={label.name}
+              className="text-[9px] font-medium px-1.5 py-0.5 rounded-full"
+              style={{
+                backgroundColor: `#${label.color}20`, // 20% opacity
+                color: `#${label.color}`,
+                border: `1px solid #${label.color}40`,
+              }}
+              title={label.description}
+            >
+              {label.name}
+            </span>
+          ))}
+        </div>
       )}
+
+      <div className="flex items-center justify-between mt-1">
+        {date ? (
+          <p className="text-[10px] text-muted-foreground">{date}</p>
+        ) : (
+          <div />
+        )}
+        
+        {card.assignees && card.assignees.length > 0 && (
+          <div className="flex -space-x-1">
+            {card.assignees.map((assignee) => (
+              <Avatar
+                key={assignee.login}
+                name={assignee.login}
+                src={assignee.avatarUrl}
+                size="xs"
+                className="border border-card"
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
