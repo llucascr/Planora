@@ -161,8 +161,9 @@ public class GithubService {
     }
 
     private IssueResponse buildAndPersistIssue(User user, String repository, Jwt token, KanbanColumn column, IssueRequest issueRequest) {
+        String ownerName = column.getKanbanBoard().getGithubOwnerName();
         IssueApiResponse apiResponse = githubIssueClient.createIssue(
-                user.getLogin(),
+                ownerName,
                 repository,
                 "Bearer " + tokenService.getGithubToken(token),
                 GITHUB_API_VERSION,
