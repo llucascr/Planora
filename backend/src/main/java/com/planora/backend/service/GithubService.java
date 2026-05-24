@@ -1,6 +1,9 @@
 package com.planora.backend.service;
 
-import com.planora.backend.client.GithubClient;
+import com.planora.backend.client.GithubIssueClient;
+import com.planora.backend.client.GithubLabelClient;
+import com.planora.backend.client.GithubRepositoryClient;
+import com.planora.backend.client.GithubWebhookClient;
 import com.planora.backend.exception.DataNotFoundException;
 import com.planora.backend.model.issue.Issue;
 import com.planora.backend.model.issue.Label;
@@ -36,7 +39,10 @@ public class GithubService {
     private final IssueRepository issueRepository;
     private final UserService userService;
     private final LabelService labelService;
-    private final GithubClient githubClient;
+    private final GithubIssueClient githubIssueClient;
+    private final GithubRepositoryClient githubRepositoryClient;
+    private final GithubWebhookClient githubWebhookClient;
+    private final GithubLabelClient githubLabelClient;
     private final TokenService tokenService;
 
     @Value("${app.base-url:http://localhost:8080}")
@@ -65,7 +71,7 @@ public class GithubService {
 
         KanbanBoard board = issue.getColumn().getKanbanBoard();
 
-        IssueApiResponse apiResponse = githubClient.updateIssue(
+        IssueApiResponse apiResponse = githubIssueClient.updateIssue(
                 board.getGithubOwnerName(),
                 board.getGithubRepository(),
                 issue.getNumber(),
@@ -91,7 +97,7 @@ public class GithubService {
 
         KanbanBoard board = issue.getColumn().getKanbanBoard();
 
-        IssueApiResponse apiResponse = githubClient.updateIssue(
+        IssueApiResponse apiResponse = githubIssueClient.updateIssue(
                 board.getGithubOwnerName(),
                 board.getGithubRepository(),
                 issue.getNumber(),
@@ -118,7 +124,7 @@ public class GithubService {
 
         KanbanBoard board = issue.getColumn().getKanbanBoard();
 
-        IssueApiResponse apiResponse = githubClient.updateIssue(
+        IssueApiResponse apiResponse = githubIssueClient.updateIssue(
                 board.getGithubOwnerName(),
                 board.getGithubRepository(),
                 issue.getNumber(),
@@ -141,7 +147,7 @@ public class GithubService {
 
         if (issue.getState() != State.CLOSED) {
             KanbanBoard board = issue.getColumn().getKanbanBoard();
-            githubClient.updateIssue(
+            githubIssueClient.updateIssue(
                     board.getGithubOwnerName(),
                     board.getGithubRepository(),
                     issue.getNumber(),
@@ -155,7 +161,7 @@ public class GithubService {
     }
 
     private IssueResponse buildAndPersistIssue(User user, String repository, Jwt token, KanbanColumn column, IssueRequest issueRequest) {
-        IssueApiResponse apiResponse = githubClient.createIssue(
+        IssueApiResponse apiResponse = githubIssueClient.createIssue(
                 user.getLogin(),
                 repository,
                 "Bearer " + tokenService.getGithubToken(token),
@@ -181,7 +187,7 @@ public class GithubService {
         final int perPage = 100;
         List<UserRepositoryResponse> pageResult;
         do {
-            pageResult = githubClient.getUserRepositories("Bearer " + githubToken, GITHUB_API_VERSION, perPage, page++);
+            pageResult = githubRepositoryClient.getUserRepositories("Bearer " + githubToken, GITHUB_API_VERSION, perPage, page++);
             all.addAll(pageResult);
         } while (pageResult.size() == perPage);
         return all;
@@ -189,7 +195,7 @@ public class GithubService {
 
     public boolean checkIfRepositoryAndOwnerNameAreValid(String token, String ownerName, String repository) {
         try {
-            return githubClient
+            return githubRepositoryClient
                     .getRepository(ownerName, repository, "Bearer " + token, GITHUB_API_VERSION) != null;
         } catch (Exception e) {
             log.warn("Repository validation failed for owner='{}' repo='{}': {}", ownerName, repository, e.getMessage());
@@ -215,7 +221,7 @@ public class GithubService {
                 List.of("issues"),
                 true
         );
-        GithubWebhookResponse response = githubClient.createWebhook(
+        GithubWebhookResponse response = githubWebhookClient.createWebhook(
                 owner, repo, "Bearer " + githubToken, GITHUB_API_VERSION, request
         );
         log.info("GitHub webhook created (id={}) for {}/{}", response.id(), owner, repo);
@@ -241,7 +247,7 @@ public class GithubService {
 
     public void deleteRepositoryWebhook(String githubToken, String owner, String repo, Long webhookId) {
         try {
-            githubClient.deleteWebhook(owner, repo, webhookId, "Bearer " + githubToken, GITHUB_API_VERSION);
+            githubWebhookClient.deleteWebhook(owner, repo, webhookId, "Bearer " + githubToken, GITHUB_API_VERSION);
             log.info("GitHub webhook deleted (id={}) for {}/{}", webhookId, owner, repo);
         } catch (Exception e) {
             log.warn("Failed to delete webhook {} for {}/{}: {}", webhookId, owner, repo, e.getMessage());
@@ -310,7 +316,7 @@ public class GithubService {
             String ownerName,
             String repository
     ) {
-        return githubClient.getRepositoryLabels(
+        return githubLabelClient.getRepositoryLabels(
                         ownerName,
                         repository,
                         "Bearer " + tokenService.getGithubToken(token),
