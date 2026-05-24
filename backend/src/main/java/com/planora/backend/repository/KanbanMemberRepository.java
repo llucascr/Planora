@@ -2,6 +2,7 @@ package com.planora.backend.repository;
 
 import com.planora.backend.model.kanban.KanbanBoard;
 import com.planora.backend.model.kanban.KanbanMember;
+import com.planora.backend.model.kanban.dto.InvitedStatus;
 import com.planora.backend.model.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,4 +16,6 @@ public interface KanbanMemberRepository extends JpaRepository<KanbanMember, Long
     Optional<KanbanMember> findByKanbanBoard_KanbanBoardIdAndUser_UserId(Long boardId, Long userId);
 
     List<KanbanMember> findByKanbanBoard_KanbanBoardId(Long boardId);
+
+    List<KanbanMember> findByUser_UserIdAndInvitedStatus(Long userId, InvitedStatus invitedStatus);
 }

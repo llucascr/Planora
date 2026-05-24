@@ -1,5 +1,3 @@
-// ⚠️ Arquivo gerado automaticamente — NÃO EDITE
-
 export const ENDPOINTS = {
   v1: {
     kanban: {
@@ -12,7 +10,14 @@ export const ENDPOINTS = {
         create: '/v1/kanban/board/create',
         update: (id: number) => `/v1/kanban/board/update/${id}`,
         delete: (id: number) => `/v1/kanban/board/delete/${id}`,
-      }
+        member: {
+          invite: (boardId: number) => `/v1/kanban/board/${boardId}/member/invite`,
+        },
+      },
+      member: {
+        pendingInvites: '/v1/kanban/member/invites/pending',
+        updateStatus: (memberId: number) => `/v1/kanban/member/${memberId}/status/update`,
+      },
     },
     github: {
       repositories: '/v1/github/repositories',

@@ -20,8 +20,8 @@ const CARD_TYPES: {
   icon: React.ReactNode;
 }[] = [
   {
-    type: "generic",
-    label: "Genérico",
+    type: "issues",
+    label: "Issues",
     color: "#94a3b8",
     icon: <FileText className="h-3 w-3" />,
   },
@@ -185,7 +185,7 @@ export function FilterBar() {
               payload: { search: e.target.value },
             })
           }
-          placeholder="Buscar cards..."
+          placeholder="Buscar issues..."
           className="h-8 w-44 rounded-lg border border-border bg-input pl-7 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500/50 focus:bg-white/8 transition-all"
         />
         {filters.search && (

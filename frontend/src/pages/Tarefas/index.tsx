@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import type { ProjetoBoard } from "types";
 import { useUI } from "context";
 import { ColumnForm } from "./ColumnForm";
+import { InviteMemberForm } from "./InviteMemberForm";
 
 // const projectsData: Record<string, { name: string; color: string }> = {
 //   "1": { name: "Redesign do App", color: "#0E1F63" },
@@ -96,6 +97,20 @@ export const TarefasPage = () => {
     });
   }
 
+  function openInviteMemberModal() {
+    ui.show({
+      id: "invite-member",
+      type: "modal",
+      options: { titulo: "Convidar Membro" },
+      content: (
+        <InviteMemberForm
+          boardId={boardId}
+          onClose={() => ui.hide("modal", "invite-member")}
+        />
+      ),
+    });
+  }
+
   useEffect(() => {
     if (!boardId || isNaN(boardId)) return;
     refetch();
@@ -129,6 +144,7 @@ export const TarefasPage = () => {
         refetch={refetch}
         onColumnMove={handleColumnMove}
         onCreateColumn={openCreateColumnModal}
+        onInviteMember={openInviteMemberModal}
         boardId={boardId}
         members={board?.members}
         repository={board?.githubRepository}

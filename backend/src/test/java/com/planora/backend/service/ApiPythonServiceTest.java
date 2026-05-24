@@ -17,8 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtException;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -48,7 +45,6 @@ class ApiPythonServiceTest {
     @Mock private ApiPythonClient apiPythonClient;
     @Mock private JobRepository jobRepository;
     @Mock private KanbanBoardService kanbanBoardService;
-    @Mock private JwtDecoder jwtDecoder;
     @Mock private Jwt jwt;
 
     @InjectMocks private ApiPythonService apiPythonService;
@@ -92,7 +88,7 @@ class ApiPythonServiceTest {
         }
 
         @Test
-        @DisplayName("deve propagar exceção quando ApiPythonClient falha")
+        @DisplayName("deve propagar exceção quando ApiPythonClient falha em todas as tentativas")
         void devePropagarExcecao_quandoApiPythonClientFalha() {
             when(jwt.getClaims()).thenReturn(Map.of("token", JWT_TOKEN_VALUE));
             when(jobRepository.save(any(Job.class))).thenAnswer(invocation -> {
@@ -106,7 +102,7 @@ class ApiPythonServiceTest {
             assertThatThrownBy(() -> apiPythonService.generateBacklog(
                     DESCRIPTION, BOARD_ID, COLUMN_ID, jwt, USER_ID, REPOSITORY))
                     .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("timeout");
+                    .hasMessageContaining("unavailable");
         }
     }
 
@@ -117,19 +113,20 @@ class ApiPythonServiceTest {
         @Test
         @DisplayName("deve lançar DataNotFoundException quando Job não existe")
         void deveLancarDataNotFoundException_quandoJobNaoExiste() {
-            CallbackRequest callback = new CallbackRequest(List.of(), JOB_ID);
+            IssueRequest issue = new IssueRequest("t", "b", List.of(), List.of());
+            CallbackRequest callback = new CallbackRequest(List.of(issue), JOB_ID);
             when(jobRepository.findById(JOB_ID)).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> apiPythonService.saveBacklog(callback))
+            assertThatThrownBy(() -> apiPythonService.saveBacklog(callback, jwt))
                     .isInstanceOf(DataNotFoundException.class)
                     .hasMessageContaining("Job not found");
 
-            verifyNoInteractions(kanbanBoardService, jwtDecoder);
+            verifyNoInteractions(kanbanBoardService);
         }
 
         @Test
-        @DisplayName("deve decodar JWT e delegar issues para KanbanBoardService quando Job existe")
-        void deveDecodarJwtEDelegarIssues_quandoJobExiste() {
+        @DisplayName("deve delegar issues para KanbanBoardService quando Job existe")
+        void deveDelegarIssues_quandoJobExiste() {
             IssueRequest issue = new IssueRequest("Título", "corpo", List.of(), List.of());
             CallbackRequest callback = new CallbackRequest(List.of(issue), JOB_ID);
             Job job = Job.builder()
@@ -141,24 +138,30 @@ class ApiPythonServiceTest {
                     .jwtToken(JWT_TOKEN_VALUE)
                     .description(DESCRIPTION)
                     .build();
-            Jwt decoded = Jwt.withTokenValue(JWT_TOKEN_VALUE)
-                    .header("alg", "RS256")
-                    .subject(USER_ID.toString())
-                    .build();
             when(jobRepository.findById(JOB_ID)).thenReturn(Optional.of(job));
-            when(jwtDecoder.decode(JWT_TOKEN_VALUE)).thenReturn(decoded);
 
-            apiPythonService.saveBacklog(callback);
+            apiPythonService.saveBacklog(callback, jwt);
 
             verify(kanbanBoardService).createBulkIssuesAndAddToColumn(
-                    eq(BOARD_ID), eq(COLUMN_ID), eq(decoded),
+                    eq(BOARD_ID), eq(COLUMN_ID), eq(jwt),
                     eq(List.of(issue)), eq(USER_ID), eq(REPOSITORY));
         }
 
         @Test
-        @DisplayName("deve passar lista vazia de issues quando callback não trouxer backlog")
-        void devePassarListaVaziaDeIssues_quandoCallbackVazio() {
+        @DisplayName("não deve interagir com KanbanBoardService quando backlog está vazio")
+        void naoDeveInteragir_quandoBacklogEhVazio() {
             CallbackRequest callback = new CallbackRequest(List.of(), JOB_ID);
+
+            apiPythonService.saveBacklog(callback, jwt);
+
+            verifyNoInteractions(jobRepository, kanbanBoardService);
+        }
+
+        @Test
+        @DisplayName("deve propagar exceção quando KanbanBoardService falha")
+        void devePropagarExcecao_quandoKanbanBoardServiceFalha() {
+            IssueRequest issue = new IssueRequest("t", "b", List.of(), List.of());
+            CallbackRequest callback = new CallbackRequest(List.of(issue), JOB_ID);
             Job job = Job.builder()
                     .id(JOB_ID)
                     .boardId(BOARD_ID)
@@ -167,33 +170,13 @@ class ApiPythonServiceTest {
                     .repository(REPOSITORY)
                     .jwtToken(JWT_TOKEN_VALUE)
                     .build();
-            Jwt decoded = Jwt.withTokenValue(JWT_TOKEN_VALUE).header("alg", "RS256").subject("42").build();
             when(jobRepository.findById(JOB_ID)).thenReturn(Optional.of(job));
-            when(jwtDecoder.decode(JWT_TOKEN_VALUE)).thenReturn(decoded);
+            when(kanbanBoardService.createBulkIssuesAndAddToColumn(any(), any(), any(), any(), any(), any()))
+                    .thenThrow(new RuntimeException("board error"));
 
-            apiPythonService.saveBacklog(callback);
-
-            verify(kanbanBoardService).createBulkIssuesAndAddToColumn(
-                    eq(BOARD_ID), eq(COLUMN_ID), eq(decoded),
-                    eq(List.of()), eq(USER_ID), eq(REPOSITORY));
-        }
-
-        @Test
-        @DisplayName("deve propagar exceção quando JwtDecoder falha")
-        void devePropagarExcecao_quandoJwtDecoderFalha() {
-            CallbackRequest callback = new CallbackRequest(List.of(), JOB_ID);
-            Job job = Job.builder()
-                    .id(JOB_ID)
-                    .jwtToken(JWT_TOKEN_VALUE)
-                    .build();
-            when(jobRepository.findById(JOB_ID)).thenReturn(Optional.of(job));
-            when(jwtDecoder.decode(JWT_TOKEN_VALUE)).thenThrow(new JwtException("invalid"));
-
-            assertThatThrownBy(() -> apiPythonService.saveBacklog(callback))
-                    .isInstanceOf(JwtException.class);
-
-            verify(kanbanBoardService, never()).createBulkIssuesAndAddToColumn(
-                    any(), any(), any(), any(), any(), any());
+            assertThatThrownBy(() -> apiPythonService.saveBacklog(callback, jwt))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("board error");
         }
     }
 }

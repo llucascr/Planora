@@ -49,7 +49,7 @@ export interface Card {
     planoAcao: PlanoAcao | null;
 }
 
-export type CardType = 'lead' | 'planoAcao' | 'generic';
+export type CardType = 'lead' | 'planoAcao' | 'issues';
 
 export interface BoardColumn {
     id: number;
