@@ -26,64 +26,35 @@ import java.util.stream.Collectors;
 @RestController
 public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(Exception.class) // Global
+    @ExceptionHandler(Exception.class)
     public final ResponseEntity<ExceptionResponse> handleAllException(Exception ex, WebRequest request) {
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(buildResponse(ex.getMessage(), request));
     }
 
     @ExceptionHandler(DataNotFoundException.class)
     public final ResponseEntity<ExceptionResponse> handleDataNotFoundException(DataNotFoundException ex, WebRequest request) {
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(buildResponse(ex.getMessage(), request));
     }
 
     @ExceptionHandler(DataAlreadyExistException.class)
     public final ResponseEntity<ExceptionResponse> handleDataAlreadyExistException(DataAlreadyExistException ex, WebRequest request) {
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(buildResponse(ex.getMessage(), request));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public final ResponseEntity<ExceptionResponse> handleBadCredentialsException(BadCredentialsException ex, WebRequest request) {
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(buildResponse(ex.getMessage(), request));
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public final ResponseEntity<ExceptionResponse> handleUnauthorizedException(UnauthorizedException ex, WebRequest request) {
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(buildResponse(ex.getMessage(), request));
     }
 
     @ExceptionHandler(WebClientResponseException.class)
     public final ResponseEntity<ExceptionResponse> handleWebClientResponseException(WebClientResponseException ex, WebRequest request) {
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                "GitHub API error: " + ex.getStatusCode() + " - " + ex.getStatusText(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(response, ex.getStatusCode());
+        String message = "GitHub API error: " + ex.getStatusCode() + " - " + ex.getStatusText();
+        return ResponseEntity.status(ex.getStatusCode()).body(buildResponse(message, request));
     }
 
     @Override
@@ -95,12 +66,10 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
                 .collect(Collectors.joining("; "));
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                message,
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(buildResponse(message, request), HttpStatus.BAD_REQUEST);
     }
 
+    private ExceptionResponse buildResponse(String message, WebRequest request) {
+        return new ExceptionResponse(LocalDateTime.now(), message, request.getDescription(false));
+    }
 }
