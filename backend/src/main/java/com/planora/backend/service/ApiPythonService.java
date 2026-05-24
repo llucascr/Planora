@@ -1,9 +1,12 @@
 package com.planora.backend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.planora.backend.client.ApiPythonClient;
 import com.planora.backend.exception.DataNotFoundException;
 import com.planora.backend.model.Job.Job;
+import com.planora.backend.model.Job.JobStatus;
 import com.planora.backend.model.Job.dto.CallbackRequest;
+import com.planora.backend.model.Job.dto.JobResponse;
 import com.planora.backend.model.issue.dto.AcceptedResponse;
 import com.planora.backend.model.issue.dto.BacklogRequest;
 import com.planora.backend.model.issue.dto.IssueRequest;
@@ -13,8 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,15 +32,18 @@ public class ApiPythonService {
     private final ApiPythonClient apiPythonClient;
     private final JobRepository jobRepository;
     private final KanbanBoardService kanbanBoardService;
-    private final JwtDecoder jwtDecoder;
+    private final ObjectMapper objectMapper;
 
-    public AcceptedResponse generateBacklog(String description, Long boardId, Long columnId, Jwt jwt,
-                                            Long userId, String repository) {
-        BacklogRequest backlogRequest = saveJobAndgetBacklogRequest(description, boardId, columnId, jwt, userId, repository);
+    public AcceptedResponse generateBacklog(String title, String description, Long boardId, Long columnId, Jwt jwt, Long userId) {
+        String repository = kanbanBoardService.findById(boardId).getGithubRepository();
+        BacklogRequest backlogRequest = saveJobAndgetBacklogRequest(title, description, boardId, columnId, jwt, userId, repository);
         return generateBacklogWithRetry(backlogRequest);
     }
 
     private AcceptedResponse generateBacklogWithRetry(BacklogRequest backlogRequest) {
+        // TEMP: simula sucesso sem servidor Python
+//        return new AcceptedResponse(backlogRequest.jobId(), "accepted");
+
         Exception lastException = null;
         for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
             try {
@@ -69,14 +77,36 @@ public class ApiPythonService {
                 .map(issue -> new IssueRequest(issue.title(), issue.body(), List.of(), List.of()))
                 .toList();
 
-        kanbanBoardService.createBulkIssuesAndAddToColumn(job.getBoardId(), job.getColumnId(), jwt,
-                issues, job.getUserId(), job.getRepository());
+        try {
+            kanbanBoardService.createBulkIssuesAndAddToColumn(job.getBoardId(), job.getColumnId(), jwt,
+                    issues, job.getUserId(), job.getRepository());
+            job.setStatus(JobStatus.COMPLETED);
+        } catch (Exception e) {
+            job.setStatus(JobStatus.ERROR);
+            throw e;
+        } finally {
+            jobRepository.save(job);
+        }
     }
 
-    private BacklogRequest saveJobAndgetBacklogRequest(String description, Long boardId, Long columnId, Jwt jwt,
-                                                       Long userId, String repository) {
+    public JobResponse getJobStatus(Long jobId) {
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new DataNotFoundException("Job not found"));
+        return new JobResponse(job.getId(), job.getStatus(), job.getTitle(), job.getDescription());
+    }
+
+    public List<JobResponse> getJobsByBoard(Long boardId) {
+        return jobRepository.findByBoardId(boardId).stream()
+                .map(job -> new JobResponse(job.getId(), job.getStatus(), job.getTitle(), job.getDescription()))
+                .toList();
+    }
+
+    private BacklogRequest saveJobAndgetBacklogRequest(String title, String description, Long boardId, Long columnId,
+                                                       Jwt jwt, Long userId, String repository) {
+        String jsonDescription = toJsonDescription(description);
         Job job = Job.builder()
-                .description(description)
+                .title(title)
+                .description(jsonDescription)
                 .boardId(boardId)
                 .columnId(columnId)
                 .jwtToken((String) jwt.getClaims().get("token"))
@@ -86,6 +116,10 @@ public class ApiPythonService {
 
         jobRepository.save(job);
         return new BacklogRequest(job.getId(), job.getDescription());
+    }
+
+    private String toJsonDescription(String description) {
+        return objectMapper.writeValueAsString(Map.of("description", description));
     }
 
 }

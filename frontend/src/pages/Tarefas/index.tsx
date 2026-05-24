@@ -7,53 +7,6 @@ import { useUI } from "context";
 import { ColumnForm } from "./ColumnForm";
 import { InviteMemberForm } from "./InviteMemberForm";
 
-// const projectsData: Record<string, { name: string; color: string }> = {
-//   "1": { name: "Redesign do App", color: "#0E1F63" },
-//   "2": { name: "API de Pagamentos", color: "#3d5aad" },
-//   "3": { name: "Dashboard Analytics", color: "#16a34a" },
-//   "4": { name: "Módulo de Relatórios", color: "#dc2626" },
-//   "5": { name: "App Mobile", color: "#0E1F63" },
-//   "6": { name: "Portal do Cliente", color: "#3d5aad" },
-// };
-
-// const initialColumns: BoardColumn[] = [
-//   {
-//     id: 1,
-//     idBoard: 1,
-//     nome: "Teste 01",
-//     ordem: 1,
-//     cards: [
-//       {
-//         id: 1,
-//         codigo: 123,
-//         createdAt: "2026-03-23T11:57:28.000Z",
-//         descricao: "teste",
-//         nome: "teste 01",
-//         planoAcao: null,
-//         lead: null,
-//       },
-//     ],
-//   },
-
-//   {
-//     id: 2,
-//     idBoard: 1,
-//     nome: "Teste 02",
-//     ordem: 2,
-//     cards: [
-//       {
-//         id: 2,
-//         codigo: 123,
-//         createdAt: "2026-03-20T11:57:28.000Z",
-//         descricao: "teste",
-//         nome: "teste 02",
-//         planoAcao: null,
-//         lead: null,
-//       },
-//     ],
-//   },
-// ];
-
 export const TarefasPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const boardId = Number(projectId);
@@ -74,7 +27,7 @@ export const TarefasPage = () => {
           idBoard: res.kanbanBoardId,
           cards: [],
         }));
-        
+
         setColumns(mappedColumns);
       })
       .catch((err) => {
@@ -119,19 +72,16 @@ export const TarefasPage = () => {
   async function handleColumnMove(
     fromIndex: number,
     toIndex: number,
-    columnId: string
+    columnId: string,
   ) {
     const reordered = [...columns];
 
     const [moved] = reordered.splice(fromIndex, 1);
     reordered.splice(toIndex, 0, moved);
 
-    await httpClient.put(
-      `/v1/kanban/board/${boardId}/column/${columnId}`,
-      {
-        position: toIndex,
-      }
-    );
+    await httpClient.put(`/v1/kanban/board/${boardId}/column/${columnId}`, {
+      position: toIndex,
+    });
 
     setColumns(reordered);
   }
@@ -148,6 +98,7 @@ export const TarefasPage = () => {
         boardId={boardId}
         members={board?.members}
         repository={board?.githubRepository}
+        githubOwnerName={board?.githubOwnerName}
       />
     </div>
   );

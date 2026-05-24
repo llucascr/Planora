@@ -9,27 +9,16 @@ import type { Card, CardType } from './types';
  * 3. Has planoMensal → 'diagnostico'
  * 4. Fallback → 'generic'
  */
-export function detectCardType(card: Card): CardType {
-    if (card.lead != null) {
-        return 'lead';
-    }
-
-    if (card.planoAcao != null) {
-        return 'planoAcao';
-    }
-
-    return 'generic';
+export function detectCardType(_: Card): CardType {
+    return 'issues';
 }
-
 /**
  * getCardTypeLabel
  * Human-readable label for display in UI
  */
 export function getCardTypeLabel(type: CardType): string {
     const labels: Record<CardType, string> = {
-        lead: 'Lead',
-        planoAcao: 'Plano de Ação',
-        generic: 'Card',
+        issues: 'Issue',
     };
     return labels[type];
 }
@@ -40,9 +29,7 @@ export function getCardTypeLabel(type: CardType): string {
  */
 export function getCardTypeColor(type: CardType): string {
     const colors: Record<CardType, string> = {
-        lead: 'blue',
-        planoAcao: 'amber',
-        generic: 'slate',
+        issues: 'slate',
     };
     return colors[type];
 }

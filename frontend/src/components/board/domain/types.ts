@@ -47,9 +47,11 @@ export interface Card {
     createdAt: string;
     lead: Lead | null;
     planoAcao: PlanoAcao | null;
+    assignees?: { login: string; avatarUrl: string; }[];
+    labels?: { name: string; color: string; description?: string; url?: string; }[];
 }
 
-export type CardType = 'lead' | 'planoAcao' | 'issues';
+export type CardType = 'issues';
 
 export interface BoardColumn {
     id: number;

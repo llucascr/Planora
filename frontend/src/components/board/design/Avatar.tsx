@@ -4,6 +4,7 @@ interface AvatarProps {
   name: string;
   size?: "xs" | "sm" | "md";
   className?: string;
+  src?: string;
 }
 
 function getInitials(name: string): string {
@@ -32,7 +33,7 @@ function getAvatarColor(name: string): string {
   return colors[Math.abs(hash) % colors.length];
 }
 
-export function Avatar({ name, size = "sm", className }: AvatarProps) {
+export function Avatar({ name, size = "sm", className, src }: AvatarProps) {
   const initials = getInitials(name);
   const color = getAvatarColor(name);
   const sizeClass =
@@ -41,6 +42,21 @@ export function Avatar({ name, size = "sm", className }: AvatarProps) {
       : size === "sm"
         ? "h-7 w-7 text-xs"
         : "h-9 w-9 text-sm";
+
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={name}
+        title={name}
+        className={classnames(
+          "inline-block rounded-full shrink-0 object-cover",
+          sizeClass,
+          className
+        )}
+      />
+    );
+  }
 
   return (
     <span
