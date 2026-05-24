@@ -1,8 +1,10 @@
 package com.planora.backend.controller;
 
 import com.planora.backend.model.Job.dto.CallbackRequest;
+import com.planora.backend.model.Job.dto.GenerateBacklogRequest;
 import com.planora.backend.model.issue.dto.AcceptedResponse;
 import com.planora.backend.service.ApiPythonService;
+import com.planora.backend.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,17 +18,17 @@ import org.springframework.web.bind.annotation.*;
 public class ApiPythonController {
 
     private final ApiPythonService apiPythonService;
+    private final TokenService tokenService;
 
     @PostMapping
     public ResponseEntity<AcceptedResponse> generateBacklog(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody String description,
+            @RequestBody GenerateBacklogRequest request,
+            @RequestParam String title,
             @RequestParam Long boardId,
-            @RequestParam Long columnId,
-            @RequestParam Long userId,
-            @RequestParam String repository
+            @RequestParam Long columnId
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(apiPythonService.generateBacklog(description, boardId, columnId, jwt, userId, repository));
+        return ResponseEntity.status(HttpStatus.OK).body(apiPythonService.generateBacklog(title, request.description(), boardId, columnId, jwt, tokenService.getUserId(jwt)));
     }
 
     @PostMapping("/callback")

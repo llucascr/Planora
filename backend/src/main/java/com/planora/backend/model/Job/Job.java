@@ -16,6 +16,7 @@ public class Job {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String title;
     private String description;
 
     private Long boardId;
@@ -26,5 +27,9 @@ public class Job {
 
     private Long userId;
     private String repository;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private JobStatus status = JobStatus.PROCESSING;
 
 }
