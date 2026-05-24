@@ -18,7 +18,7 @@ public class WebhookController {
             @RequestHeader(value = "X-Hub-Signature-256", required = false) String signature,
             @RequestBody String rawPayload
     ) {
-        webhookService.processIssueEvent(event, signature, rawPayload);
-        return ResponseEntity.ok().build();
+        boolean handled = webhookService.processEvent(event, signature, rawPayload);
+        return handled ? ResponseEntity.ok().build() : ResponseEntity.noContent().build();
     }
 }

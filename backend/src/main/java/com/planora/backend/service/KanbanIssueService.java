@@ -85,7 +85,9 @@ public class KanbanIssueService {
     }
 
     private void validateBoardMember(Long boardId, Long userId) {
-        if (kanbanMemberRepository.findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId).isEmpty()) {
+        if (kanbanMemberRepository
+            .findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId)
+            .isEmpty()) {
             throw new UnauthorizedException("Kanban member not found");
         }
     }
