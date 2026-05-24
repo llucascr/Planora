@@ -71,9 +71,10 @@ export function CardGeneric({ card, onClick, onDelete, onEdit }: CardGenericProp
                   e.stopPropagation();
                   onEdit?.(card);
                 }}
-                className="text-gray-300 hover:text-gray-500 transition-colors"
+                className="p-1 text-muted-foreground/60 hover:text-foreground transition-colors rounded hover:bg-accent"
+                title="Editar"
               >
-                <PencilSimple size={15} weight="bold" />
+                <PencilSimple size={18} weight="bold" />
               </button>
 
               <button
@@ -81,9 +82,10 @@ export function CardGeneric({ card, onClick, onDelete, onEdit }: CardGenericProp
                   e.stopPropagation();
                   setConfirmDelete(true);
                 }}
-                className="text-gray-300 hover:text-red-400 transition-colors"
+                className="p-1 text-muted-foreground/60 hover:text-red-500 transition-colors rounded hover:bg-red-500/10"
+                title="Excluir"
               >
-                <Trash size={15} weight="bold" />
+                <Trash size={18} weight="bold" />
               </button>
             </>
           )}

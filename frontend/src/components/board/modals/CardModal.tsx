@@ -383,18 +383,18 @@ export function CardModal({
                   {boardId && (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-accent text-[12px] font-semibold text-foreground transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card hover:bg-accent text-sm font-semibold text-foreground transition-colors shadow-sm"
                     >
-                      <PencilSimple size={14} /> Editar
+                      <PencilSimple size={16} /> Editar
                     </button>
                   )}
                   {onDelete && (
                     <button
                       onClick={onDelete}
-                      className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-600 text-[12px] font-semibold transition-colors"
+                      className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-600 text-sm font-semibold transition-colors shadow-sm"
                       title="Excluir"
                     >
-                      <Trash size={14} />
+                      <Trash size={16} />
                     </button>
                   )}
                 </div>
