@@ -56,7 +56,9 @@ public class KanbanColumnService implements IKanbanColumnService {
     }
 
     public KanbanColumnResponse updateColumn(Long boardId, Long columnId, String name, Integer position, Long userId) {
-        validateBoardMember(boardId, userId);
+        if (kanbanMemberRepository.findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId).isEmpty()) {
+            throw new UnauthorizedException("Kanban member not found");
+        }
 
         KanbanColumn column = kanbanColumnRepository.findById(columnId)
                 .orElseThrow(() -> new DataNotFoundException("Column not found"));
@@ -116,7 +118,9 @@ public class KanbanColumnService implements IKanbanColumnService {
     }
 
     public List<KanbanColumnResponse> getColumns(Long boardId, Long userId) {
-        validateBoardMember(boardId, userId);
+        if (kanbanMemberRepository.findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId).isEmpty()) {
+            throw new UnauthorizedException("Kanban member not found");
+        }
 
         return kanbanColumnRepository.findByKanbanBoard_KanbanBoardIdOrderByPositionAsc(boardId).stream()
                 .map(col -> new KanbanColumnResponse(col.getKanbanColumnId(), col.getName(), col.getPosition()))
@@ -124,7 +128,9 @@ public class KanbanColumnService implements IKanbanColumnService {
     }
 
     public List<KanbanColumnWithIssuesResponse> getColumnsWithIssues(Long boardId, Long userId) {
-        validateBoardMember(boardId, userId);
+        if (kanbanMemberRepository.findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId).isEmpty()) {
+            throw new UnauthorizedException("Kanban member not found");
+        }
 
         return kanbanColumnRepository.findByKanbanBoard_KanbanBoardIdOrderByPositionAsc(boardId).stream()
                 .map(col -> new KanbanColumnWithIssuesResponse(
@@ -134,12 +140,6 @@ public class KanbanColumnService implements IKanbanColumnService {
                         col.getIssues().stream().map(IssueSummaryResponse::fromEntity).toList()
                 ))
                 .toList();
-    }
-
-    private void validateBoardMember(Long boardId, Long userId) {
-        if (kanbanMemberRepository.findByKanbanBoard_KanbanBoardIdAndUser_UserId(boardId, userId).isEmpty()) {
-            throw new UnauthorizedException("Kanban member not found");
-        }
     }
 
     private KanbanColumn buildColumn(String name, int position, KanbanBoard board) {

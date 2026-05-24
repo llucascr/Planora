@@ -9,7 +9,6 @@ import {
   House,
   FolderOpen,
   Gear,
-  Bell,
   List,
   X,
   CaretRight,
@@ -19,6 +18,7 @@ import {
   Sparkle,
 } from "@phosphor-icons/react";
 import { AiJobsSidebar } from "./Tarefas/AiJobsSidebar";
+import { PendingInvitesPanel } from "../components/PendingInvitesPanel";
 
 const BoardAiButton = () => {
   const location = useLocation();
@@ -351,11 +351,7 @@ export const LayoutPage = ({ children }: LayoutProps) => {
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Notifications */}
-                <button className="relative flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
-                  <Bell size={20} weight="duotone" />
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full ring-2 ring-white" />
-                </button>
+                <PendingInvitesPanel />
               </div>
             </header>
 

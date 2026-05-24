@@ -13,13 +13,13 @@ import {
 const TYPE_ICONS: Record<CardType, React.ReactNode> = {
   lead: <Users weight="duotone" className="h-5 w-5" />,
   planoAcao: <Target weight="duotone" className="h-5 w-5" />,
-  generic: <FileText weight="duotone" className="h-5 w-5" />,
+  issues: <FileText weight="duotone" className="h-5 w-5" />,
 };
 
 const TYPE_COLORS: Record<CardType, string> = {
   lead: "bg-blue-500",
   planoAcao: "bg-amber-500",
-  generic: "bg-slate-500",
+  issues: "bg-slate-500",
 };
 
 export function AnalyticsView() {
@@ -30,7 +30,7 @@ export function AnalyticsView() {
   const typeCounts: Record<CardType, number> = {
     lead: 0,
     planoAcao: 0,
-    generic: 0,
+    issues: 0,
   };
   const total = Object.values(normalized.cards).length;
 
@@ -46,13 +46,13 @@ export function AnalyticsView() {
     const byType: Record<CardType, number> = {
       lead: 0,
       planoAcao: 0,
-      generic: 0,
+      issues: 0,
     };
     for (const cid of ids) {
       const card = normalized.cards[cid];
       if (card) byType[detectCardType(card)]++;
     }
-    return { colId, nome: col.nome, count: ids.length, byType };
+    return { colId, nome: col.name, count: ids.length, byType };
   });
 
   return (

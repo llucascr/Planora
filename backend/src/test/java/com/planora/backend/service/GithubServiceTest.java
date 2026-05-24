@@ -1,6 +1,9 @@
 package com.planora.backend.service;
 
-import com.planora.backend.client.GithubClient;
+import com.planora.backend.client.GithubIssueClient;
+import com.planora.backend.client.GithubLabelClient;
+import com.planora.backend.client.GithubRepositoryClient;
+import com.planora.backend.client.GithubWebhookClient;
 import com.planora.backend.exception.DataNotFoundException;
 import com.planora.backend.model.issue.Issue;
 import com.planora.backend.model.issue.Label;
@@ -70,7 +73,10 @@ class GithubServiceTest {
     @Mock private IssueRepository issueRepository;
     @Mock private UserService userService;
     @Mock private LabelService labelService;
-    @Mock private GithubClient githubClient;
+    @Mock private GithubIssueClient githubIssueClient;
+    @Mock private GithubRepositoryClient githubRepositoryClient;
+    @Mock private GithubWebhookClient githubWebhookClient;
+    @Mock private GithubLabelClient githubLabelClient;
     @Mock private TokenService tokenService;
     @Mock private Jwt jwt;
 
@@ -157,7 +163,7 @@ class GithubServiceTest {
             persistedLabel.setName("bug");
 
             when(userService.findById(USER_ID)).thenReturn(user);
-            when(githubClient.createIssue(OWNER, REPOSITORY, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, issueRequest))
+            when(githubIssueClient.createIssue(OWNER, REPOSITORY, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, issueRequest))
                     .thenReturn(apiResponse);
             when(labelService.resolveOrCreateLabel(labelResponse)).thenReturn(persistedLabel);
             when(userService.findOptionalByLogin("alice")).thenReturn(Optional.of(assigneeAlice));
@@ -191,7 +197,7 @@ class GithubServiceTest {
             assertThatThrownBy(() -> githubService.createIssue(jwt, issueRequest, USER_ID, REPOSITORY, column))
                     .isInstanceOf(EntityNotFoundException.class);
 
-            verifyNoInteractions(githubClient, issueRepository, labelService);
+            verifyNoInteractions(githubIssueClient, githubRepositoryClient, githubWebhookClient, issueRepository, labelService);
         }
     }
 
@@ -207,11 +213,11 @@ class GithubServiceTest {
             IssueRequest r3 = new IssueRequest("t3", "b3", List.of(), List.of());
 
             when(userService.findById(USER_ID)).thenReturn(user);
-            when(githubClient.createIssue(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), eq(r1)))
+            when(githubIssueClient.createIssue(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), eq(r1)))
                     .thenReturn(buildOpenApiResponseWithTitle("t1"));
-            when(githubClient.createIssue(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), eq(r2)))
+            when(githubIssueClient.createIssue(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), eq(r2)))
                     .thenReturn(buildOpenApiResponseWithTitle("t2"));
-            when(githubClient.createIssue(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), eq(r3)))
+            when(githubIssueClient.createIssue(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), eq(r3)))
                     .thenReturn(buildOpenApiResponseWithTitle("t3"));
 
             List<IssueResponse> responses = githubService.createBulkIssues(jwt, List.of(r1, r2, r3), USER_ID, REPOSITORY, column);
@@ -230,7 +236,7 @@ class GithubServiceTest {
             List<IssueResponse> responses = githubService.createBulkIssues(jwt, List.of(), USER_ID, REPOSITORY, column);
 
             assertThat(responses).isEmpty();
-            verifyNoInteractions(githubClient, issueRepository, labelService);
+            verifyNoInteractions(githubIssueClient, githubRepositoryClient, githubWebhookClient, issueRepository, labelService);
         }
 
         private IssueApiResponse buildOpenApiResponseWithTitle(String title) {
@@ -251,7 +257,7 @@ class GithubServiceTest {
 
             when(issueRepository.findById(ISSUE_ID)).thenReturn(Optional.of(existing));
             ArgumentCaptor<IssueUpdateRequest> updateCaptor = ArgumentCaptor.forClass(IssueUpdateRequest.class);
-            when(githubClient.updateIssue(
+            when(githubIssueClient.updateIssue(
                     eq(OWNER), eq(REPOSITORY), eq(ISSUE_NUMBER),
                     eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), updateCaptor.capture()))
                     .thenReturn(apiResponse);
@@ -281,7 +287,7 @@ class GithubServiceTest {
                     .isInstanceOf(DataNotFoundException.class)
                     .hasMessageContaining("Issue not found");
 
-            verifyNoInteractions(githubClient);
+            verifyNoInteractions(githubIssueClient);
             verify(issueRepository, never()).save(any());
         }
     }
@@ -298,7 +304,7 @@ class GithubServiceTest {
 
             when(issueRepository.findById(ISSUE_ID)).thenReturn(Optional.of(existing));
             ArgumentCaptor<IssueUpdateRequest> updateCaptor = ArgumentCaptor.forClass(IssueUpdateRequest.class);
-            when(githubClient.updateIssue(
+            when(githubIssueClient.updateIssue(
                     eq(OWNER), eq(REPOSITORY), eq(ISSUE_NUMBER),
                     eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), updateCaptor.capture()))
                     .thenReturn(apiResponse);
@@ -321,7 +327,7 @@ class GithubServiceTest {
             assertThatThrownBy(() -> githubService.closeIssue(jwt, ISSUE_ID))
                     .isInstanceOf(DataNotFoundException.class);
 
-            verifyNoInteractions(githubClient);
+            verifyNoInteractions(githubIssueClient);
             verify(issueRepository, never()).save(any());
         }
     }
@@ -345,7 +351,7 @@ class GithubServiceTest {
             persistedLabel.setName("feature");
 
             when(issueRepository.findById(ISSUE_ID)).thenReturn(Optional.of(existing));
-            when(githubClient.updateIssue(OWNER, REPOSITORY, ISSUE_NUMBER, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, request))
+            when(githubIssueClient.updateIssue(OWNER, REPOSITORY, ISSUE_NUMBER, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, request))
                     .thenReturn(apiResponse);
             when(labelService.resolveOrCreateLabel(newLabel)).thenReturn(persistedLabel);
             when(userService.findOptionalByLogin("alice")).thenReturn(Optional.of(assigneeAlice));
@@ -372,7 +378,7 @@ class GithubServiceTest {
             IssueUpdateRequest request = new IssueUpdateRequest(null, null, "open", null, null);
 
             when(issueRepository.findById(ISSUE_ID)).thenReturn(Optional.of(existing));
-            when(githubClient.updateIssue(OWNER, REPOSITORY, ISSUE_NUMBER, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, request))
+            when(githubIssueClient.updateIssue(OWNER, REPOSITORY, ISSUE_NUMBER, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, request))
                     .thenReturn(apiResponse);
 
             githubService.updateIssue(jwt, ISSUE_ID, request);
@@ -390,7 +396,7 @@ class GithubServiceTest {
             assertThatThrownBy(() -> githubService.updateIssue(jwt, ISSUE_ID, request))
                     .isInstanceOf(DataNotFoundException.class);
 
-            verifyNoInteractions(githubClient);
+            verifyNoInteractions(githubIssueClient);
             verify(issueRepository, never()).save(any());
         }
     }
@@ -406,7 +412,7 @@ class GithubServiceTest {
             when(issueRepository.findById(ISSUE_ID)).thenReturn(Optional.of(existing));
 
             ArgumentCaptor<IssueUpdateRequest> updateCaptor = ArgumentCaptor.forClass(IssueUpdateRequest.class);
-            when(githubClient.updateIssue(
+            when(githubIssueClient.updateIssue(
                     eq(OWNER), eq(REPOSITORY), eq(ISSUE_NUMBER),
                     eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), updateCaptor.capture()))
                     .thenReturn(buildApiResponse("closed", List.of(), List.of()));
@@ -425,7 +431,7 @@ class GithubServiceTest {
 
             githubService.deleteIssue(jwt, ISSUE_ID);
 
-            verifyNoInteractions(githubClient);
+            verifyNoInteractions(githubIssueClient);
             verify(issueRepository).delete(existing);
         }
 
@@ -437,7 +443,7 @@ class GithubServiceTest {
             assertThatThrownBy(() -> githubService.deleteIssue(jwt, ISSUE_ID))
                     .isInstanceOf(DataNotFoundException.class);
 
-            verifyNoInteractions(githubClient);
+            verifyNoInteractions(githubIssueClient);
             verify(issueRepository, never()).delete(any(Issue.class));
         }
     }
@@ -450,38 +456,38 @@ class GithubServiceTest {
         @DisplayName("deve retornar tudo em uma única página quando há menos de 100 resultados")
         void deveRetornarTudoEmUmaUnicaPagina_quandoMenosDe100Resultados() {
             List<UserRepositoryResponse> page = repos(50);
-            when(githubClient.getUserRepositories(BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, 100, 1))
+            when(githubRepositoryClient.getUserRepositories(BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, 100, 1))
                     .thenReturn(page);
 
             List<UserRepositoryResponse> result = githubService.listUserRepositories(GITHUB_TOKEN);
 
             assertThat(result).hasSize(50);
-            verify(githubClient, times(1)).getUserRepositories(anyString(), anyString(), anyInt(), anyInt());
+            verify(githubRepositoryClient, times(1)).getUserRepositories(anyString(), anyString(), anyInt(), anyInt());
         }
 
         @Test
         @DisplayName("deve paginar até resposta parcial")
         void devePaginarAteRespostaParcial() {
-            when(githubClient.getUserRepositories(BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, 100, 1)).thenReturn(repos(100));
-            when(githubClient.getUserRepositories(BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, 100, 2)).thenReturn(repos(100));
-            when(githubClient.getUserRepositories(BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, 100, 3)).thenReturn(repos(30));
+            when(githubRepositoryClient.getUserRepositories(BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, 100, 1)).thenReturn(repos(100));
+            when(githubRepositoryClient.getUserRepositories(BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, 100, 2)).thenReturn(repos(100));
+            when(githubRepositoryClient.getUserRepositories(BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, 100, 3)).thenReturn(repos(30));
 
             List<UserRepositoryResponse> result = githubService.listUserRepositories(GITHUB_TOKEN);
 
             assertThat(result).hasSize(230);
-            verify(githubClient, times(3)).getUserRepositories(anyString(), anyString(), anyInt(), anyInt());
+            verify(githubRepositoryClient, times(3)).getUserRepositories(anyString(), anyString(), anyInt(), anyInt());
         }
 
         @Test
         @DisplayName("deve retornar lista vazia quando primeira página é vazia")
         void deveRetornarListaVazia_quandoPrimeiraPaginaEhVazia() {
-            when(githubClient.getUserRepositories(BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, 100, 1))
+            when(githubRepositoryClient.getUserRepositories(BEARER_GITHUB_TOKEN, GITHUB_API_VERSION, 100, 1))
                     .thenReturn(List.of());
 
             List<UserRepositoryResponse> result = githubService.listUserRepositories(GITHUB_TOKEN);
 
             assertThat(result).isEmpty();
-            verify(githubClient, times(1)).getUserRepositories(anyString(), anyString(), anyInt(), anyInt());
+            verify(githubRepositoryClient, times(1)).getUserRepositories(anyString(), anyString(), anyInt(), anyInt());
         }
 
         private List<UserRepositoryResponse> repos(int n) {
@@ -498,7 +504,7 @@ class GithubServiceTest {
         @Test
         @DisplayName("deve retornar true quando client retorna repositório")
         void deveRetornarTrue_quandoClientRetornaRepositorio() {
-            when(githubClient.getRepository(OWNER, REPOSITORY, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION))
+            when(githubRepositoryClient.getRepository(OWNER, REPOSITORY, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION))
                     .thenReturn(new RepositoryResponse("1", REPOSITORY, OWNER + "/" + REPOSITORY, "false"));
 
             boolean valid = githubService.checkIfRepositoryAndOwnerNameAreValid(GITHUB_TOKEN, OWNER, REPOSITORY);
@@ -509,7 +515,7 @@ class GithubServiceTest {
         @Test
         @DisplayName("deve retornar false quando client retorna nulo")
         void deveRetornarFalse_quandoClientRetornaNulo() {
-            when(githubClient.getRepository(OWNER, REPOSITORY, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION))
+            when(githubRepositoryClient.getRepository(OWNER, REPOSITORY, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION))
                     .thenReturn(null);
 
             boolean valid = githubService.checkIfRepositoryAndOwnerNameAreValid(GITHUB_TOKEN, OWNER, REPOSITORY);
@@ -520,7 +526,7 @@ class GithubServiceTest {
         @Test
         @DisplayName("deve retornar false quando client lança exceção")
         void deveRetornarFalse_quandoClientLancaExcecao() {
-            when(githubClient.getRepository(OWNER, REPOSITORY, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION))
+            when(githubRepositoryClient.getRepository(OWNER, REPOSITORY, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION))
                     .thenThrow(new RuntimeException("404"));
 
             boolean valid = githubService.checkIfRepositoryAndOwnerNameAreValid(GITHUB_TOKEN, OWNER, REPOSITORY);
@@ -537,7 +543,7 @@ class GithubServiceTest {
         @DisplayName("deve criar webhook e retornar id quando base URL é pública")
         void deveCriarWebhookERetornarId_quandoBaseUrlEhPublica() {
             ArgumentCaptor<GithubWebhookCreateRequest> captor = ArgumentCaptor.forClass(GithubWebhookCreateRequest.class);
-            when(githubClient.createWebhook(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), captor.capture()))
+            when(githubWebhookClient.createWebhook(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), captor.capture()))
                     .thenReturn(new GithubWebhookResponse(555L, "url", "web", List.of("issues"), true));
 
             Long webhookId = githubService.createRepositoryWebhook(GITHUB_TOKEN, OWNER, REPOSITORY);
@@ -558,7 +564,7 @@ class GithubServiceTest {
         void devePassarSecret_quandoWebhookSecretConfigurado() {
             ReflectionTestUtils.setField(githubService, "webhookSecret", "s3cret");
             ArgumentCaptor<GithubWebhookCreateRequest> captor = ArgumentCaptor.forClass(GithubWebhookCreateRequest.class);
-            when(githubClient.createWebhook(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), captor.capture()))
+            when(githubWebhookClient.createWebhook(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), captor.capture()))
                     .thenReturn(new GithubWebhookResponse(1L, "url", "web", List.of("issues"), true));
 
             githubService.createRepositoryWebhook(GITHUB_TOKEN, OWNER, REPOSITORY);
@@ -580,7 +586,7 @@ class GithubServiceTest {
             Long webhookId = githubService.createRepositoryWebhook(GITHUB_TOKEN, OWNER, REPOSITORY);
 
             assertThat(webhookId).isNull();
-            verifyNoInteractions(githubClient);
+            verifyNoInteractions(githubWebhookClient);
         }
 
         @Test
@@ -588,7 +594,7 @@ class GithubServiceTest {
         void deveConstruirUrlComPortaCustomizada() {
             ReflectionTestUtils.setField(githubService, "appBaseUrl", "https://app.example.com:9000");
             ArgumentCaptor<GithubWebhookCreateRequest> captor = ArgumentCaptor.forClass(GithubWebhookCreateRequest.class);
-            when(githubClient.createWebhook(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), captor.capture()))
+            when(githubWebhookClient.createWebhook(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), captor.capture()))
                     .thenReturn(new GithubWebhookResponse(1L, "url", "web", List.of("issues"), true));
 
             githubService.createRepositoryWebhook(GITHUB_TOKEN, OWNER, REPOSITORY);
@@ -607,7 +613,7 @@ class GithubServiceTest {
         void deveDelegarParaCliente_quandoChamado() {
             githubService.deleteRepositoryWebhook(GITHUB_TOKEN, OWNER, REPOSITORY, 99L);
 
-            verify(githubClient).deleteWebhook(OWNER, REPOSITORY, 99L, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION);
+            verify(githubWebhookClient).deleteWebhook(OWNER, REPOSITORY, 99L, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION);
         }
 
         @Test
@@ -621,7 +627,7 @@ class GithubServiceTest {
 
         private void doThrowOnDelete() {
             org.mockito.Mockito.doThrow(new RuntimeException("boom"))
-                    .when(githubClient)
+                    .when(githubWebhookClient)
                     .deleteWebhook(OWNER, REPOSITORY, 99L, BEARER_GITHUB_TOKEN, GITHUB_API_VERSION);
         }
     }
