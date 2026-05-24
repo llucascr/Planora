@@ -3,6 +3,7 @@ import { Outlet, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { NotificationProvider, UIProvider, useUI } from "context";
 import { useCookie } from "hooks";
 import { config } from "config";
+import { httpClient } from "api";
 import logo from "../img/logo_horizontal_white.png";
 import logoSmall from "../img/logo_solo_white.png";
 import {
@@ -23,11 +24,36 @@ import { PendingInvitesPanel } from "../components/PendingInvitesPanel";
 const BoardAiButton = () => {
   const location = useLocation();
   const ui = useUI();
+  const [hasProcessing, setHasProcessing] = useState(false);
 
   const match = location.pathname.match(/^\/projetos\/(\d+)\/tarefas$/);
-  if (!match) return null;
+  const boardId = match ? Number(match[1]) : null;
 
-  const boardId = Number(match[1]);
+  useEffect(() => {
+    if (!boardId) return;
+
+    let mounted = true;
+
+    async function checkJobs() {
+      try {
+        const jobs = await httpClient.get<any[]>(`/v1/jobs?boardId=${boardId}`);
+        if (mounted) {
+          setHasProcessing(jobs.some((j) => j.status === "PROCESSING"));
+        }
+      } catch (err) {
+        // ignore
+      }
+    }
+
+    checkJobs();
+    const intervalId = setInterval(checkJobs, 10000); // 10 seconds polling
+    return () => {
+      mounted = false;
+      clearInterval(intervalId);
+    };
+  }, [boardId]);
+
+  if (!boardId) return null;
 
   function openAiSidebar() {
     ui.show({
@@ -38,7 +64,7 @@ const BoardAiButton = () => {
         position: "right",
         widthFraction: "1/3",
       },
-      content: <AiJobsSidebar boardId={boardId} />,
+      content: <AiJobsSidebar boardId={boardId!} />,
     });
   }
 
@@ -46,10 +72,13 @@ const BoardAiButton = () => {
     <div className="fixed bottom-6 right-6 z-40">
       <button
         onClick={openAiSidebar}
-        className="w-14 h-14 rounded-full shadow-lg flex items-center justify-center bg-linear-to-br from-primary to-[#3d5aad] hover:scale-110 transition-all duration-200"
+        className="relative w-14 h-14 rounded-full shadow-lg flex items-center justify-center bg-linear-to-br from-primary to-[#3d5aad] hover:scale-110 transition-all duration-200"
         title="Assistente de IA"
       >
         <Sparkle size={26} weight="fill" className="text-white" />
+        {hasProcessing && (
+          <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-background rounded-full animate-pulse shadow-sm" />
+        )}
       </button>
     </div>
   );
