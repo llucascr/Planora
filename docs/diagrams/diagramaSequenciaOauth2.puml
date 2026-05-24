@@ -1,0 +1,21 @@
+@startuml Diagrama de Sequência - Fluxo de Autenticação OAuth2 com GitHub
+
+actor Usuario
+participant Browser
+participant Backend
+participant "GitHub API" as GitHubAPI
+participant OauthService
+
+Usuario -> Backend: GET /oauth2/authorization/github
+Backend --> Browser: 302 redirect para página de login GitHub
+Browser -> GitHubAPI: Redireciona para GitHub login
+Usuario -> GitHubAPI: Autoriza o Planora no GitHub
+GitHubAPI -> Backend: code de autorização (callback)
+Backend -> GitHubAPI: POST /login/oauth/access_token (code)
+GitHubAPI --> Backend: access_token do GitHub
+Backend -> OauthService: save(oAuth2User, githubToken)
+OauthService --> Backend: LoginResponse (userId, jwtString)
+Backend --> Browser: 302 redirect http://localhost:3000/callback/{jwt}
+Browser --> Usuario: Armazena JWT em cookie, redireciona para home
+
+@enduml

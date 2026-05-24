@@ -1,0 +1,31 @@
+@startuml Diagrama de Contêineres - Arquitetura de Sistema
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Arquitetura de Sistema - Diagrama de Contêineres
+
+Person(usuario, "Usuário", "Acessa o sistema via navegador")
+
+System_Boundary(frontendBoundary, "Camada Frontend") {
+    Container(frontend, "Frontend", "React SPA · TypeScript + Vite", "Porta 3000")
+}
+
+System_Boundary(backendBoundary, "Camada Backend") {
+    Container(backend, "Backend", "API REST · Java Spring Boot 4.0.3", "Porta 8080")
+    ContainerDb(postgresDb, "Banco de Dados", "PostgreSQL", "Armazena dados do sistema")
+}
+
+System_Boundary(iaBoundary, "Camada IA") {
+    Container(fastapi, "Serviço de IA", "FastAPI · Meta-Llama 3.1 8B", "Porta 8000")
+}
+
+System_Ext(github, "GitHub (Externo)", "API REST para issues e webhooks")
+
+Rel(usuario, frontend, "HTTPS")
+Rel(frontend, backend, "HTTP/JSON com JWT (Cookie)")
+Rel(backend, fastapi, "POST /api/v1/generate-backlog", "HTTP/JSON")
+Rel(fastapi, backend, "POST /v1/ia/callback", "HTTP/JSON")
+Rel(backend, postgresDb, "Leitura e escrita", "JDBC/SQL")
+Rel(backend, github, "Gerencia issues e repositórios", "HTTPS/REST")
+Rel(github, backend, "Webhook: POST /v1/webhook/github/issues")
+
+@enduml
