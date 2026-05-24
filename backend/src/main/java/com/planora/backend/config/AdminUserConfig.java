@@ -34,6 +34,11 @@ public class AdminUserConfig implements CommandLineRunner {
         Role roleAdmin = roleRepository.findByName(Role.Values.ADMIN.getDescription());
         Optional<User> userAdmin = userRepository.findByEmail("admin@email.com");
 
+        if (roleAdmin == null) {
+            log.warn("ADMIN role not found in database, skipping admin user creation");
+            return;
+        }
+
         userAdmin.ifPresentOrElse(
                 user -> {
                     log.info("Admin already exist");
