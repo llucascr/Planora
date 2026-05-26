@@ -157,6 +157,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- WireMock for stubbing external HTTP services in integration tests -->
+		<dependency>
+			<groupId>org.wiremock</groupId>
+			<artifactId>wiremock-standalone</artifactId>
+			<version>3.13.1</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

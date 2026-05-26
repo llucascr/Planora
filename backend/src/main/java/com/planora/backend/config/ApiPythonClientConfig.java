@@ -1,6 +1,7 @@
 package com.planora.backend.config;
 
 import com.planora.backend.client.ApiPythonClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
@@ -12,6 +13,9 @@ public class ApiPythonClientConfig {
 
     private static final int BUFFER_SIZE_10_MB = 10 * 1024 * 1024;
 
+    @Value("${api-python.base-url:http://localhost:8000/api/v1}")
+    private String baseUrl;
+
     @Bean
     public HttpServiceProxyFactory apiPythonHttpServiceProxyFactory() {
         ExchangeStrategies strategies = ExchangeStrategies.builder()
@@ -19,7 +23,7 @@ public class ApiPythonClientConfig {
                 .build();
 
         WebClient webClient = WebClient.builder()
-                .baseUrl("http://localhost:8000/api/v1")
+                .baseUrl(baseUrl)
                 .exchangeStrategies(strategies)
                 .build();
 
