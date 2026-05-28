@@ -5,6 +5,7 @@ import com.planora.backend.client.GithubLabelClient;
 import com.planora.backend.client.GithubRepositoryClient;
 import com.planora.backend.client.GithubSearchClient;
 import com.planora.backend.client.GithubWebhookClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
@@ -17,6 +18,9 @@ public class GithubClientConfig {
 
     private static final int BUFFER_SIZE_10_MB = 10 * 1024 * 1024;
 
+    @Value("${github.api.base-url:https://api.github.com}")
+    private String baseUrl;
+
     @Bean
     public HttpServiceProxyFactory githubHttpServiceProxyFactory() {
         ExchangeStrategies strategies = ExchangeStrategies.builder()
@@ -24,7 +28,7 @@ public class GithubClientConfig {
                 .build();
 
         WebClient webClient = WebClient.builder()
-                .baseUrl("https://api.github.com")
+                .baseUrl(baseUrl)
                 .exchangeStrategies(strategies)
                 .build();
 

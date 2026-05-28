@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.oauth2.jwt.Jwt;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -43,11 +44,13 @@ class ApiPythonServiceTest {
     private static final String REPOSITORY = "planora";
     private static final String TITLE = "Backlog de autenticação";
     private static final String DESCRIPTION = "Gerar backlog de autenticação";
+    private static final String JSON_DESCRIPTION = "{\"description\":\"" + DESCRIPTION + "\"}";
     private static final String JWT_TOKEN_VALUE = "encoded-jwt";
 
     @Mock private ApiPythonClient apiPythonClient;
     @Mock private JobRepository jobRepository;
     @Mock private KanbanBoardService kanbanBoardService;
+    @Mock private ObjectMapper objectMapper;
     @Mock private Jwt jwt;
 
     @InjectMocks private ApiPythonService apiPythonService;
@@ -62,11 +65,14 @@ class ApiPythonServiceTest {
             KanbanBoard board = KanbanBoard.builder().githubRepository(REPOSITORY).build();
             when(kanbanBoardService.findById(BOARD_ID)).thenReturn(board);
             when(jwt.getClaims()).thenReturn(Map.of("token", JWT_TOKEN_VALUE));
+            when(objectMapper.writeValueAsString(any())).thenReturn(JSON_DESCRIPTION);
             when(jobRepository.save(any(Job.class))).thenAnswer(invocation -> {
                 Job job = invocation.getArgument(0);
                 job.setId(JOB_ID);
                 return job;
             });
+            when(apiPythonClient.generateBacklog(any(BacklogRequest.class)))
+                    .thenReturn(new AcceptedResponse(JOB_ID, "accepted"));
 
             AcceptedResponse response = apiPythonService.generateBacklog(
                     TITLE, DESCRIPTION, BOARD_ID, COLUMN_ID, jwt, USER_ID);
@@ -76,7 +82,7 @@ class ApiPythonServiceTest {
             Job saved = jobCaptor.getValue();
 
             assertThat(saved.getTitle()).isEqualTo(TITLE);
-            assertThat(saved.getDescription()).isEqualTo(DESCRIPTION);
+            assertThat(saved.getDescription()).isEqualTo(JSON_DESCRIPTION);
             assertThat(saved.getBoardId()).isEqualTo(BOARD_ID);
             assertThat(saved.getColumnId()).isEqualTo(COLUMN_ID);
             assertThat(saved.getUserId()).isEqualTo(USER_ID);
