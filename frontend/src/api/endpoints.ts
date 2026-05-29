@@ -21,7 +21,13 @@ export const ENDPOINTS = {
     },
     github: {
       repositories: '/v1/github/repositories',
-    }
+    },
+    dashboard: {
+      stats: '/v1/dashboard/stats',
+      activity: '/v1/dashboard/activity',
+      commits: '/v1/dashboard/commits',
+      progress: '/v1/dashboard/progress',
+    },
   },
   login: '/login'
 } as const;
