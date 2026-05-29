@@ -8,7 +8,11 @@ load_dotenv()
 BASE_MODEL_NAME: str = "meta-llama/Llama-3.1-8B-Instruct"
 ADAPTER_PATH: Path = Path(__file__).parent.parent / "Treinamento" / "llama-backlog-lora"
 
-SYSTEM_PROMPT: str = "Convert project description into structured GitHub issues JSON."
+SYSTEM_PROMPT: str = (
+    "Convert project description into structured GitHub issues JSON. "
+    "Generate at most 12 issues covering: backend, frontend, tests, and infrastructure. "
+    "All your response must be less than 1700 characters."
+)
 
 # Generation
 MAX_NEW_TOKENS: int = 5000

@@ -15,10 +15,22 @@ class ModelService:
         self._is_loaded: bool = False
 
     def _parse_output(self, rawText: str) -> list[dict]:
-        # strip markdown code fences se o modelo gerar ```json ... ```
         text = re.sub(r"^```(?:json)?\s*", "", rawText.strip())
         text = re.sub(r"\s*```$", "", text)
-        return json.loads(text)
+        text = re.sub(r',\s*(\[[^\[\]]*\])\s*}', r', "labels": \1}', text)
+
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            # JSON truncado: descarta o último objeto incompleto e fecha o array
+            last_complete = text.rfind('},')
+            if last_complete != -1:
+                text = text[:last_complete + 1] + ']'
+            else:
+                last_brace = text.rfind('}')
+                if last_brace != -1:
+                    text = text[:last_brace + 1] + ']'
+            return json.loads(text)
 
     @property
     def is_loaded(self) -> bool:
