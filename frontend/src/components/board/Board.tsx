@@ -1,0 +1,327 @@
+import React, { useRef, useCallback, useEffect } from "react";
+import {
+  BoardProvider,
+  useBoardState,
+  useBoardDispatch,
+} from "./domain/boardStore";
+import { KanbanView } from "./views/KanbanView";
+import { ListView } from "./views/ListView";
+import { GridView } from "./views/GridView";
+import { AnalyticsView } from "./views/AnalyticsView";
+import { CardModal } from "./modals/CardModal";
+import { FilterBar } from "./filters/FilterBar";
+import type { BoardColumn, DragInfo, ViewMode } from "./domain/types";
+import {
+  Kanban,
+  List,
+  SquaresFour,
+  ChartBar,
+  ArrowsCounterClockwise,
+  UserPlus,
+} from "@phosphor-icons/react";
+import { classnames } from "./utils/classnames";
+import { httpClient } from "api";
+import type { MemberBoard } from "types";
+
+export const COLUMN_COLORS = [
+  "#60a5fa", // blue
+  "#f59e0b", // amber
+  "#34d399", // emerald
+  "#a78bfa", // violet
+  "#f87171", // red
+  "#38bdf8", // sky
+  "#fb923c", // orange
+];
+
+const VIEWS: { mode: ViewMode; icon: React.ReactNode; label: string }[] = [
+  { mode: "kanban", icon: <Kanban className="h-3.5 w-3.5" />, label: "Board" },
+  { mode: "list", icon: <List className="h-3.5 w-3.5" />, label: "Lista" },
+  {
+    mode: "grid",
+    icon: <SquaresFour className="h-3.5 w-3.5" />,
+    label: "Grid",
+  },
+  {
+    mode: "analytics",
+    icon: <ChartBar className="h-3.5 w-3.5" />,
+    label: "Analytics",
+  },
+];
+
+function BoardInner({
+  boardId,
+  onCardMove,
+  onColumnMove,
+  onCreateColumn,
+  onInviteMember,
+  members = [],
+  repository,
+  githubOwnerName,
+}: {
+  boardId: number;
+  onCardMove?: (from: string, to: string, cardId: string) => void;
+  onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
+  onCreateColumn?: () => void;
+  onInviteMember?: () => void;
+  members?: MemberBoard[];
+  repository?: string;
+  githubOwnerName?: string;
+}) {
+  const state = useBoardState();
+  const dispatch = useBoardDispatch();
+  const dragRef = useRef<DragInfo | null>(null);
+  const { viewMode, selectedCardId, normalized } = state;
+  const setView = useCallback(
+    (m: ViewMode) => dispatch({ type: "SET_VIEW", payload: m }),
+    [dispatch],
+  );
+  const handleCardClick = useCallback(
+    (cardId: string) =>
+      dispatch({ type: "SET_SELECTED_CARD", payload: cardId }),
+    [dispatch],
+  );
+  const handleCloseModal = useCallback(
+    () => dispatch({ type: "SET_SELECTED_CARD", payload: null }),
+    [dispatch],
+  );
+
+  const selectedCard = selectedCardId ? normalized.cards[selectedCardId] : null;
+  const selectedColumnId = selectedCardId
+    ? Object.entries(normalized.columnCards).find(([, ids]) =>
+        ids.includes(selectedCardId),
+      )?.[0]
+    : null;
+  const selectedColumn = selectedColumnId
+    ? normalized.columns[selectedColumnId]
+    : null;
+
+  async function handleRefetch() {
+    try {
+      const response: any = await httpClient.get(
+        `/v1/kanban/board/${boardId}/columns/issues`,
+      );
+
+      const rawColumns = response;
+
+      const adapted = rawColumns.map((col: any) => ({
+        id: col.kanbanColumnId,
+        name: col.name,
+        order: col.position,
+        idBoard: boardId,
+        cards: (col.issues ?? []).map((issue: any) => {
+          return {
+            id: issue.issueId,
+            nome: issue.title,
+            descricao: issue.body,
+            status: issue.state,
+            number: issue.number,
+            assignees: issue.assignees,
+            labels: issue.labels,
+          };
+        }),
+      }));
+
+      dispatch({
+        type: "LOAD_BOARD",
+        payload: adapted,
+      });
+    } catch (err) {
+      console.error("Erro ao buscar board:", err);
+    }
+  }
+
+  async function handleDeleteCard(cardId: string) {
+    if (!window.confirm("Deseja realmente excluir esta issue?")) return;
+    try {
+      await httpClient.delete(`/v1/kanban/board/issue/${cardId}`);
+
+      // Update local state by refetching or just removing it from column
+      handleRefetch();
+      handleCloseModal();
+    } catch (err) {
+      console.error("Erro ao excluir issue:", err);
+      alert("Erro ao excluir a issue. Tente novamente.");
+    }
+  }
+
+  useEffect(() => {
+    handleRefetch();
+  }, []);
+
+  function renderView() {
+    switch (viewMode) {
+      case "kanban":
+        return (
+          <KanbanView
+            dragRef={dragRef}
+            onCardClick={handleCardClick}
+            onCardMove={onCardMove}
+            onColumnMove={onColumnMove}
+            onCreateColumn={onCreateColumn}
+            members={members}
+            boardId={boardId}
+            repository={repository}
+            refetch={handleRefetch}
+          />
+        );
+      case "list":
+        return (
+          <ListView
+            dragRef={dragRef}
+            onCardClick={handleCardClick}
+            onCardMove={onCardMove}
+            members={members}
+            boardId={boardId}
+            repository={repository}
+            refetch={handleRefetch}
+          />
+        );
+      case "grid":
+        return (
+          <GridView
+            dragRef={dragRef}
+            onCardClick={handleCardClick}
+            onCardMove={onCardMove}
+            members={members}
+            boardId={boardId}
+            repository={repository}
+            refetch={handleRefetch}
+          />
+        );
+      case "analytics":
+        return <AnalyticsView />;
+    }
+  }
+
+  return (
+    <div className="flex h-full w-full flex-col overflow-x-auto">
+      <div className="relative p-2 z-20 flex items-center gap-3 border-b border-border backdrop-blur shrink-0 px-4">
+        <div className="flex-1 min-w-0">
+          <FilterBar />
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            title="Convidar membro"
+            className={classnames(
+              "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all",
+              "bg-secondary border border-border text-foreground hover:bg-accent-hover active:scale-95 shadow-sm",
+            )}
+            onClick={onInviteMember}
+          >
+            <UserPlus className="h-3.5 w-3.5" />
+            <span className="hidden lg:inline">Convidar</span>
+          </button>
+
+          <button
+            title="Atualizar dados"
+            className={classnames(
+              "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all group",
+              "bg-secondary border border-border text-foreground hover:bg-accent-hover active:scale-95 shadow-sm",
+            )}
+            onClick={handleRefetch}
+          >
+            <ArrowsCounterClockwise className="h-3.5 w-3.5 transition-transform group-hover:rotate-180 duration-500" />
+            <span className="hidden lg:inline">Atualizar</span>
+          </button>
+
+          <div className="flex items-center gap-px rounded-lg bg-secondary border border-border p-0.5">
+            {VIEWS.map(({ mode, icon, label }) => (
+              <button
+                key={mode}
+                title={label}
+                onClick={() => setView(mode)}
+                className={classnames(
+                  "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all",
+                  viewMode === mode
+                    ? "bg-primary text-white shadow-sm"
+                    : "text-black opacity-40 hover:opacity-70",
+                )}
+              >
+                {icon}
+                <span className="hidden lg:inline">{label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div
+        className={classnames(
+          "flex-1 min-h-0",
+          viewMode === "kanban"
+            ? "overflow-x-auto overflow-y-hidden"
+            : "overflow-y-auto px-4 py-4",
+        )}
+      >
+        {renderView()}
+      </div>
+
+      {selectedCard && (
+        <CardModal
+          card={selectedCard}
+          columnName={selectedColumn?.name}
+          onClose={handleCloseModal}
+          onDelete={() => handleDeleteCard(selectedCard.id.toString())}
+          boardId={boardId}
+          columnId={Number(selectedColumn?.id)}
+          repository={repository}
+          githubOwnerName={githubOwnerName}
+          members={members}
+          refetch={() => {
+            handleRefetch();
+            // maybe we don't close the modal automatically after save? The user can see the updated issue.
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+interface BoardProps {
+  boardId: number;
+  columns: BoardColumn[];
+  members?: MemberBoard[];
+  repository?: string;
+  githubOwnerName?: string;
+  onCardMove?: (
+    fromColumnId: string,
+    toColumnId: string,
+    cardId: string,
+  ) => void;
+  onColumnMove?: (fromIndex: number, toIndex: number, columnId: string) => void;
+  className?: string;
+  refetch?: () => void;
+  onCreateColumn?: () => void;
+  onInviteMember?: () => void;
+}
+
+export function Board({
+  boardId,
+  columns,
+  onCardMove,
+  members = [],
+  repository,
+  githubOwnerName,
+  onColumnMove,
+  className,
+  onCreateColumn,
+  onInviteMember,
+}: BoardProps) {
+  return (
+    <BoardProvider initialColumns={columns}>
+      <div className={classnames("h-full flex flex-col", className)}>
+        <BoardInner
+          boardId={boardId}
+          onCardMove={onCardMove}
+          onColumnMove={onColumnMove}
+          onCreateColumn={onCreateColumn}
+          onInviteMember={onInviteMember}
+          members={members}
+          repository={repository}
+          githubOwnerName={githubOwnerName}
+        />
+      </div>
+    </BoardProvider>
+  );
+}
