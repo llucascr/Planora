@@ -11,6 +11,11 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# O backend fica em backend/; todos os passos `run` executam a partir dele.
+defaults:
+  run:
+    working-directory: backend
+
 jobs:
   test:
     name: Run Tests
