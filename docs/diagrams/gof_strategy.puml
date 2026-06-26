@@ -1,0 +1,39 @@
+@startuml Strategy
+
+skinparam classBackgroundColor #FFF9E6
+skinparam classBorderColor #C8A000
+skinparam classHeaderBackgroundColor #F5DEB3
+skinparam ArrowColor #7B5EA7
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+interface WebhookEventHandler <<Strategy>> {
+    +boolean supports(String eventType)
+    +void handle(String rawPayload)
+}
+
+class IssueEventHandler <<ConcreteStrategy>> {
+    -KanbanBoardRepository kanbanBoardRepository
+    -IssueRepository issueRepository
+    -LabelService labelService
+    -UserService userService
+    +boolean supports(String eventType)
+    +void handle(String rawPayload)
+    -void syncIssueToBoard(...)
+    -void updateExistingIssue(...)
+    -void createIssueInFirstColumn(...)
+}
+
+class WebhookService <<Context>> {
+    -List<WebhookEventHandler> handlers
+    -String webhookSecret
+    +boolean processEvent(String event, String signature, String payload)
+    -boolean isValidSignature(String payload, String signatureHeader)
+}
+
+WebhookService "1" o--> "*" WebhookEventHandler : handlers
+IssueEventHandler ..|> WebhookEventHandler
+
+@enduml

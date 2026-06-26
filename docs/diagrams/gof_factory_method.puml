@@ -1,0 +1,30 @@
+@startuml Factory Method
+
+skinparam classBackgroundColor #FFF9E6
+skinparam classBorderColor #C8A000
+skinparam classHeaderBackgroundColor #F5DEB3
+skinparam ArrowColor #7B5EA7
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+class ExceptionResponse <<Product>> {
+    +LocalDateTime timestamp
+    +String message
+    +String details
+}
+
+class CustomEntityResponseHandler <<Creator>> {
+    +handleAllException(Exception, WebRequest)
+    +handleDataNotFoundException(DataNotFoundException, WebRequest)
+    +handleDataAlreadyExistException(DataAlreadyExistException, WebRequest)
+    +handleBadCredentialsException(BadCredentialsException, WebRequest)
+    +handleUnauthorizedException(UnauthorizedException, WebRequest)
+    +handleWebClientResponseException(WebClientResponseException, WebRequest)
+    -ExceptionResponse buildResponse(String message, WebRequest request)
+}
+
+CustomEntityResponseHandler ..> ExceptionResponse : <<cria via buildResponse()>>
+
+@enduml

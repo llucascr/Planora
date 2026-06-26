@@ -1,0 +1,61 @@
+@startuml Facade
+
+skinparam classBackgroundColor #FFF9E6
+skinparam classBorderColor #C8A000
+skinparam classHeaderBackgroundColor #F5DEB3
+skinparam ArrowColor #7B5EA7
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+interface IKanbanBoardService {
+    +createKanbanBoard(...)
+    +getAllBoardsByUser(Long userId)
+    +getBoardById(Long id)
+    +updateBoard(...)
+    +deleteBoard(Long id)
+    +createColumn(...)
+    +createIssueAndAddToColumn(...)
+    +moveIssue(...)
+}
+
+class KanbanBoardService <<Facade>> {
+    -IKanbanColumnService kanbanColumnService
+    -KanbanIssueService kanbanIssueService
+    -KanbanWebhookService kanbanWebhookService
+}
+
+interface IKanbanColumnService {
+    +createDefaultColumns(KanbanBoard)
+    +createColumn(...)
+    +updateColumn(...)
+    +deleteColumn(...)
+    +getColumns(...)
+    +getColumnsWithIssues(...)
+}
+
+class KanbanColumnService {
+    -void validateBoardMember(Long boardId, Long userId)
+}
+
+class KanbanIssueService {
+    -void validateBoardMember(Long boardId, Long userId)
+    +createIssueAndAddToColumn(...)
+    +moveIssue(...)
+    +openIssue(...)
+    +closeIssue(...)
+}
+
+class KanbanWebhookService {
+    +registerWebhookIfNeeded(...)
+    +removeWebhookIfLastBoard(...)
+}
+
+KanbanBoardService ..|> IKanbanBoardService
+KanbanColumnService ..|> IKanbanColumnService
+KanbanBoardService --> IKanbanColumnService : delega colunas
+KanbanBoardService --> KanbanIssueService   : delega issues
+KanbanBoardService --> KanbanWebhookService : delega webhooks
+
+@enduml
