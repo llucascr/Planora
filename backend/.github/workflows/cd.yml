@@ -1,0 +1,57 @@
+name: CD
+
+# Dispara só depois que o workflow "CI" concluir na main.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+# Evita deploys concorrentes da main.
+concurrency:
+  group: cd-main
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    # Só builda/publica se o CI passou.
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Constrói exatamente o commit que o CI testou.
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      # O Dockerfile multi-stage compila e empacota o JAR; as chaves RSA precisam
+      # estar em src/main/resources para entrarem no contexto do build (COPY src/).
+      - name: Restore RSA keys
+        run: |
+          echo "${{ secrets.APP_KEY_B64 }}" | base64 -d > src/main/resources/app.key
+          echo "${{ secrets.APP_PUB_B64 }}" | base64 -d > src/main/resources/app.pub
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/planora-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/planora-backend:${{ github.event.workflow_run.head_sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
