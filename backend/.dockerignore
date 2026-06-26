@@ -1,0 +1,22 @@
+# Artefatos de build (refeitos dentro do container)
+target/
+
+# IDE / metadados
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docs e SO
+HELP.md
+.DS_Store
+
+# NAO ignorar src/main/resources/app.key e app.pub:
+# eles precisam entrar no contexto para serem empacotados no JAR.

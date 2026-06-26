@@ -1,29 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="74c1c74b-758c-454b-bde5-4a042c6e902c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Login/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Login/index.tsx" afterDir="false" />
-    </list>
+    <list default="true" id="74c1c74b-758c-454b-bde5-4a042c6e902c" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="557" />
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Hugo-02"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Hugo-02&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
-    "url": "https://github.com/llucascr/Planora.git",
-    "accountId": "9d10f9ea-4bdb-4367-b88b-2965c5e80a4b"
+    "url": "git@github.com:llucascr/Planora.git",
+    "accountId": "4dd51a95-e842-43c7-96a7-862277a5f7b0"
   }
 }]]></component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -35,13 +40,16 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "hugo",
+    "git-widget-placeholder": "feat/ci__cd",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/hugop/OneDrive/Documentos/GitHub/Planora",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/lucasdecamposranzani/Developer/Projetos/Planora",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   },
@@ -54,8 +62,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.27812.49" />
-        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.27812.49" />
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.24374.151" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.24374.151" />
       </set>
     </attachedChunks>
   </component>
@@ -67,6 +75,7 @@
       <option name="presentableId" value="Default" />
       <updated>1772479779487</updated>
       <workItem from="1775736359913" duration="200000" />
+      <workItem from="1780687381982" duration="187000" />
     </task>
     <servers />
   </component>
