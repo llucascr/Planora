@@ -33,8 +33,8 @@ jobs:
       # estar em src/main/resources para entrarem no contexto do build (COPY src/).
       - name: Restore RSA keys
         run: |
-          echo "${{ secrets.APP_KEY_B64 }}" | base64 -d > src/main/resources/app.key
-          echo "${{ secrets.APP_PUB_B64 }}" | base64 -d > src/main/resources/app.pub
+          echo "${{ secrets.APP_KEY_B64 }}" | base64 -d > backend/src/main/resources/app.key
+          echo "${{ secrets.APP_PUB_B64 }}" | base64 -d > backend/src/main/resources/app.pub
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -48,7 +48,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./backend
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/planora-backend:latest
