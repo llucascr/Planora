@@ -1,5 +1,6 @@
 import { config } from "config";
-import logo from "../../img/logo_vertical_blue.png";
+import logoWhite from "../../img/logo_vertical_white.png";
+import logoSmall from "../../img/logo_solo_white.png";
 
 const GitHubMark = () => (
   <svg
@@ -36,28 +37,69 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#eef0f7]">
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 px-10 py-12 flex flex-col items-center gap-8 w-full max-w-sm">
-        <img src={logo} alt="Planora" className="h-24 object-contain" />
+    <div className="flex min-h-screen bg-background">
+      {/* Brand panel */}
+      <div className="relative hidden lg:flex lg:w-1/2 flex-col justify-between overflow-hidden bg-linear-to-br from-primary to-primary-hover p-12 text-white">
+        {/* decorative glows */}
+        <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
 
-        <div className="text-center space-y-1">
-          <h1 className="text-xl font-bold text-[#0E1F63]">Bem-vindo ao Planora</h1>
-          <p className="text-sm text-gray-500">
-            Faça login para acessar seus projetos e tarefas.
+        <div className="relative flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm">
+            <img src={logoSmall} alt="" className="h-6 w-6 object-contain" />
+          </div>
+          <span className="text-xl font-extrabold tracking-tight">Planora</span>
+        </div>
+
+        <div className="relative max-w-md">
+          <img
+            src={logoWhite}
+            alt="Planora"
+            className="mb-10 h-24 object-contain opacity-95 drop-shadow-lg"
+          />
+          <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
+            Transforme documentação em backlogs estruturados.
+          </h2>
+          <p className="mt-5 text-lg leading-relaxed text-white/70">
+            Organize projetos, issues e tarefas com IA — tudo integrado ao seu
+            GitHub, num só lugar.
           </p>
         </div>
 
-        <button
-          onClick={handleGithubLogin}
-          className="flex items-center justify-center gap-3 w-full px-5 py-3 rounded-xl bg-[#0E1F63] text-white text-sm font-semibold hover:bg-[#1a2f7a] active:scale-[0.98] transition-all duration-150 shadow-sm"
-        >
-          <GitHubMark />
-          Entrar com GitHub
-        </button>
-
-        <p className="text-xs text-gray-400 text-center">
-          Ao entrar, você concorda com os termos de uso da plataforma.
+        <p className="relative text-sm text-white/50">
+          © {new Date().getFullYear()} Planora
         </p>
+      </div>
+
+      {/* Form panel */}
+      <div className="flex flex-1 items-center justify-center p-6 lg:p-12">
+        <div className="flex w-full max-w-sm flex-col gap-8">
+          {/* logo (mobile only) */}
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-primary to-primary-hover shadow-sm lg:hidden">
+            <img src={logoSmall} alt="Planora" className="h-7 w-7 object-contain" />
+          </div>
+
+          <div className="space-y-2">
+            <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
+              Entrar na Planora
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Bem-vindo de volta! Acesse sua conta para continuar.
+            </p>
+          </div>
+
+          <button
+            onClick={handleGithubLogin}
+            className="flex w-full items-center justify-center gap-3 rounded-xl bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary-hover active:scale-[0.98]"
+          >
+            <GitHubMark />
+            Continuar com GitHub
+          </button>
+
+          <p className="text-center text-xs leading-relaxed text-muted-foreground">
+            Ao entrar, você concorda com os termos de uso da plataforma.
+          </p>
+        </div>
       </div>
     </div>
   );
