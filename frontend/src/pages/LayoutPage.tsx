@@ -4,7 +4,6 @@ import { NotificationProvider, UIProvider, useUI } from "context";
 import { useCookie } from "hooks";
 import { config } from "config";
 import { httpClient } from "api";
-import logo from "../img/logo_horizontal_white.png";
 import logoSmall from "../img/logo_solo_white.png";
 import {
   House,
@@ -72,7 +71,7 @@ const BoardAiButton = () => {
     <div className="fixed bottom-6 right-6 z-40">
       <button
         onClick={openAiSidebar}
-        className="relative w-14 h-14 rounded-full shadow-lg flex items-center justify-center bg-linear-to-br from-primary to-[#3d5aad] hover:scale-110 transition-all duration-200"
+        className="relative w-14 h-14 rounded-full shadow-lg flex items-center justify-center bg-linear-to-br from-primary to-primary-hover hover:scale-110 transition-all duration-200"
         title="Assistente de IA"
       >
         <Sparkle size={26} weight="fill" className="text-white" />
@@ -165,7 +164,7 @@ export const LayoutPage = ({ children }: LayoutProps) => {
   return (
     <NotificationProvider>
       <UIProvider>
-        <div className="flex h-screen bg-[#eef0f7] overflow-hidden">
+        <div className="flex h-screen bg-background overflow-hidden">
           {/* Mobile overlay */}
           {mobileOpen && (
             <div
@@ -177,46 +176,39 @@ export const LayoutPage = ({ children }: LayoutProps) => {
           {/* Sidebar */}
           <aside
             className={[
-              "fixed lg:relative z-30 flex flex-col h-full bg-linear-to-b from-primary to-[#091550] text-white shadow-2xl overflow-hidden",
+              "fixed lg:relative z-30 flex flex-col h-full bg-sidebar text-sidebar-foreground border-r border-sidebar-border shadow-sm overflow-hidden",
               "transition-[width] duration-300 ease-in-out",
-              collapsed ? "w-20" : "w-60",
+              collapsed ? "w-20" : "w-64",
               mobileOpen
                 ? "translate-x-0"
                 : "-translate-x-full lg:translate-x-0",
             ].join(" ")}
           >
             {/* Logo */}
-            <div className="flex items-center border-b border-white/10 px-3 py-4 shrink-0">
-              <div
-                className="relative flex-1 flex items-center justify-center overflow-hidden"
-                style={{ height: 48 }}
-              >
-                {/* Logo expandido */}
-                <img
-                  src={logo}
-                  alt="Planora"
-                  className={[
-                    "absolute h-12 object-contain transition-all duration-300",
-                    collapsed
-                      ? "opacity-0 scale-90 pointer-events-none"
-                      : "opacity-100 scale-100",
-                  ].join(" ")}
-                />
-                {/* Logo recolhido */}
+            <div className="flex items-center gap-3 px-4 py-5 shrink-0">
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-linear-to-br from-primary to-primary-hover shadow-sm shrink-0">
                 <img
                   src={logoSmall}
                   alt="Planora"
-                  className={[
-                    "absolute h-10 object-contain transition-all duration-300",
-                    collapsed
-                      ? "opacity-100 scale-100"
-                      : "opacity-0 scale-90 pointer-events-none",
-                  ].join(" ")}
+                  className="h-6 w-6 object-contain"
                 />
               </div>
+              <span
+                className={[
+                  "text-lg font-extrabold tracking-tight text-foreground transition-all duration-300 whitespace-nowrap",
+                  collapsed
+                    ? "opacity-0 w-0 overflow-hidden"
+                    : "opacity-100 w-auto flex-1",
+                ].join(" ")}
+              >
+                Planora
+              </span>
               <button
                 onClick={() => setCollapsed((c) => !c)}
-                className="hidden lg:flex items-center justify-center w-7 h-7 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+                className={[
+                  "hidden lg:flex items-center justify-center w-7 h-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0",
+                  collapsed ? "hidden" : "",
+                ].join(" ")}
                 title={collapsed ? "Expandir menu" : "Recolher menu"}
               >
                 <CaretRight
@@ -231,7 +223,7 @@ export const LayoutPage = ({ children }: LayoutProps) => {
             </div>
 
             {/* Nav items */}
-            <nav className="flex-1 overflow-y-auto py-4 space-y-1 px-2">
+            <nav className="flex-1 overflow-y-auto py-4 space-y-1 px-3">
               {navItems.map(({ to, label, icon: Icon, exact }) => (
                 <NavLink
                   key={to}
@@ -239,56 +231,72 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                   end={exact}
                   className={({ isActive }) =>
                     [
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150",
+                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors duration-150",
                       isActive
-                        ? "bg-white/20 text-white shadow-inner"
-                        : "text-white/70 hover:bg-white/10 hover:text-white",
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
+                        : "text-muted-foreground font-medium hover:bg-muted hover:text-foreground",
                     ].join(" ")
                   }
                   title={collapsed ? label : undefined}
                 >
-                  <Icon size={22} weight="duotone" className="shrink-0" />
-                  <span
-                    className={[
-                      "truncate transition-all duration-300 whitespace-nowrap",
-                      collapsed
-                        ? "opacity-0 w-0 overflow-hidden"
-                        : "opacity-100 w-auto",
-                    ].join(" ")}
-                  >
-                    {label}
-                  </span>
+                  {({ isActive }) => (
+                    <>
+                      <Icon
+                        size={20}
+                        weight={isActive ? "fill" : "regular"}
+                        className="shrink-0"
+                      />
+                      <span
+                        className={[
+                          "truncate transition-all duration-300 whitespace-nowrap",
+                          collapsed
+                            ? "opacity-0 w-0 overflow-hidden"
+                            : "opacity-100 w-auto",
+                        ].join(" ")}
+                      >
+                        {label}
+                      </span>
+                    </>
+                  )}
                 </NavLink>
               ))}
             </nav>
 
             {/* Bottom items */}
-            <div className="border-t border-white/10 py-4 space-y-1 px-2">
+            <div className="py-4 space-y-1 px-3">
               {bottomItems.map(({ to, label, icon: Icon }) => (
                 <NavLink
                   key={to}
                   to={to}
                   className={({ isActive }) =>
                     [
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150",
+                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors duration-150",
                       isActive
-                        ? "bg-white/20 text-white"
-                        : "text-white/70 hover:bg-white/10 hover:text-white",
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
+                        : "text-muted-foreground font-medium hover:bg-muted hover:text-foreground",
                     ].join(" ")
                   }
                   title={collapsed ? label : undefined}
                 >
-                  <Icon size={22} weight="duotone" className="shrink-0" />
-                  <span
-                    className={[
-                      "truncate transition-all duration-300 whitespace-nowrap",
-                      collapsed
-                        ? "opacity-0 w-0 overflow-hidden"
-                        : "opacity-100 w-auto",
-                    ].join(" ")}
-                  >
-                    {label}
-                  </span>
+                  {({ isActive }) => (
+                    <>
+                      <Icon
+                        size={20}
+                        weight={isActive ? "fill" : "regular"}
+                        className="shrink-0"
+                      />
+                      <span
+                        className={[
+                          "truncate transition-all duration-300 whitespace-nowrap",
+                          collapsed
+                            ? "opacity-0 w-0 overflow-hidden"
+                            : "opacity-100 w-auto",
+                        ].join(" ")}
+                      >
+                        {label}
+                      </span>
+                    </>
+                  )}
                 </NavLink>
               ))}
 
@@ -297,11 +305,11 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                 <div ref={profileMenuRef} className="relative mt-2">
                   <div
                     onClick={() => setProfileMenuOpen((o) => !o)}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 cursor-pointer hover:bg-white/20 transition-colors"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-sidebar-accent cursor-pointer hover:bg-accent-hover transition-colors"
                     title={collapsed ? "Meu perfil" : undefined}
                   >
-                    <div className="w-7 h-7 rounded-full bg-[#3d5aad] flex items-center justify-center shrink-0">
-                      <User size={16} weight="fill" className="text-white" />
+                    <div className="w-9 h-9 rounded-lg bg-linear-to-br from-primary to-primary-hover flex items-center justify-center shrink-0">
+                      <User size={18} weight="fill" className="text-white" />
                     </div>
                     <div
                       className={[
@@ -311,20 +319,20 @@ export const LayoutPage = ({ children }: LayoutProps) => {
                           : "opacity-100 w-auto",
                       ].join(" ")}
                     >
-                      <p className="text-sm font-medium text-white truncate whitespace-nowrap">
+                      <p className="text-sm font-semibold text-foreground truncate whitespace-nowrap">
                         Meu Perfil
                       </p>
-                      <p className="text-xs text-white/50 truncate whitespace-nowrap">
+                      <p className="text-xs text-muted-foreground truncate whitespace-nowrap">
                         Ver conta
                       </p>
                     </div>
                   </div>
 
                   {profileMenuOpen && (
-                    <div className="absolute bottom-full left-0 mb-1 w-full bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                    <div className="absolute bottom-full left-0 mb-1 w-full bg-popover rounded-xl shadow-lg border border-border overflow-hidden z-50">
                       <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors"
                       >
                         <SignOut size={16} weight="bold" />
                         Sair da conta
@@ -335,15 +343,15 @@ export const LayoutPage = ({ children }: LayoutProps) => {
               ) : (
                 <button
                   onClick={() => navigate("/login")}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg mt-2 w-full bg-white/10 hover:bg-white/20 transition-colors"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl mt-2 w-full bg-sidebar-accent hover:bg-accent-hover transition-colors"
                   title={collapsed ? "Entrar" : undefined}
                 >
-                  <div className="w-7 h-7 rounded-full bg-[#3d5aad] flex items-center justify-center shrink-0">
-                    <SignIn size={16} weight="fill" className="text-white" />
+                  <div className="w-9 h-9 rounded-lg bg-linear-to-br from-primary to-primary-hover flex items-center justify-center shrink-0">
+                    <SignIn size={18} weight="fill" className="text-white" />
                   </div>
                   <span
                     className={[
-                      "text-sm font-medium text-white transition-all duration-300 whitespace-nowrap",
+                      "text-sm font-semibold text-foreground transition-all duration-300 whitespace-nowrap",
                       collapsed
                         ? "opacity-0 w-0 overflow-hidden"
                         : "opacity-100 w-auto",
@@ -359,21 +367,21 @@ export const LayoutPage = ({ children }: LayoutProps) => {
           {/* Main area */}
           <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
             {/* Topbar */}
-            <header className="flex items-center justify-between h-14 px-4 bg-white border-b border-gray-200 shadow-sm shrink-0">
+            <header className="flex items-center justify-between h-16 px-6 bg-card border-b border-border shrink-0">
               <div className="flex items-center gap-3">
                 {/* Mobile hamburger */}
                 <button
                   onClick={() => setMobileOpen((o) => !o)}
-                  className="lg:hidden flex items-center justify-center w-8 h-8 rounded-md text-gray-500 hover:bg-gray-100 transition-colors"
+                  className="lg:hidden flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:bg-muted transition-colors"
                 >
                   {mobileOpen ? <X size={20} /> : <List size={20} />}
                 </button>
 
                 {/* Breadcrumb / page title */}
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span className="hidden sm:inline">Planora</span>
-                  <span className="hidden sm:inline text-gray-300">/</span>
-                  <span className="font-semibold text-gray-800">
+                  <span className="hidden sm:inline text-border">/</span>
+                  <span className="font-semibold text-foreground">
                     {pageTitle}
                   </span>
                 </div>
