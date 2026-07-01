@@ -2,47 +2,73 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-card: oklch(0.21 0.006 285.885);
-  --color-radius: 0.65rem;
-  --color-background: oklch(98.463% 0.00181 249.248);
-  --color-foreground: oklch(0.141 0.005 285.823);
-  --color-card: oklch(1 0 0);
-  --color-card-foreground: oklch(0.141 0.005 285.823);
-  --color-popover: oklch(1 0 0);
-  --color-popover-foreground: oklch(0.141 0.005 285.823);
-  --color-primary: #0E1F63;
-  --color-primary-foreground: oklch(1 0 0);
-  --color-secondary: oklch(0.967 0.001 286.375);
-  --color-secondary-foreground: oklch(0.21 0.006 285.885);
-  --color-muted: oklch(0.967 0.001 286.375);
-  --color-muted-foreground: oklch(0.552 0.016 285.938);
-  --color-accent: oklch(0.967 0.001 286.375);
-  --color-accent-hover: oklch(88.866% 0.00145 285.331);
-  --color-accent-foreground: oklch(0.21 0.006 285.885);
-  --color-destructive: oklch(0.577 0.245 27.325);
-  --color-border: oklch(0.92 0.004 286.32);
-  --color-input: oklch(0.92 0.004 286.32);
-  --color-ring: oklch(0.45 0.12 262.8);
-  --color-chart-1: oklch(0.646 0.222 41.116);
-  --color-chart-2: oklch(0.6 0.118 184.704);
-  --color-chart-3: oklch(0.398 0.07 227.392);
-  --color-chart-4: oklch(0.828 0.189 84.429);
-  --color-chart-5: oklch(0.769 0.188 70.08);
-  --color-sidebar: oklch(0.985 0 0);
-  --color-sidebar-foreground: oklch(0.141 0.005 285.823);
-  --color-sidebar-primary: oklch(0.723 0.219 149.579);
-  --color-sidebar-primary-foreground: oklch(0.982 0.018 155.826);
-  --color-sidebar-accent: oklch(0.967 0.001 286.375);
-  --color-sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --color-sidebar-border: oklch(0.92 0.004 286.32);
-  --color-sidebar-ring: oklch(0.723 0.219 149.579);
-  --color-warning: oklch(0.75 0.15 65);
-  --color-warning-foreground: oklch(0.15 0 0);
+  /* Typography — Planora redesign (Plus Jakarta Sans + JetBrains Mono) */
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --radius: 0.75rem;
+
+  /* Surfaces */
+  --color-background: #faf9fd;
+  --color-foreground: #140f1e;
+  --color-card: #ffffff;
+  --color-card-foreground: #140f1e;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #140f1e;
+
+  /* Brand — violet */
+  --color-primary: #7c3aed;
+  --color-primary-foreground: #ffffff;
+  --color-primary-hover: #6d28d9;
+
+  --color-secondary: #f5f3fb;
+  --color-secondary-foreground: #241934;
+  --color-muted: #f0eef6;
+  --color-muted-foreground: #8a8798;
+  --color-accent: #f3effe;
+  --color-accent-hover: #ebe7f4;
+  --color-accent-foreground: #6d28d9;
+
+  /* Semantic */
+  --color-destructive: #e5484d;
+  --color-destructive-foreground: #ffffff;
+  --color-success: #22c55e;
+  --color-success-foreground: #ffffff;
+  --color-warning: #f59e0b;
+  --color-warning-foreground: #ffffff;
+
+  /* Lines & focus */
+  --color-border: #eceaf2;
+  --color-input: #e4e1ee;
+  --color-ring: #7c3aed;
+
+  /* Charts — violet family */
+  --color-chart-1: #7c3aed;
+  --color-chart-2: #8b5cf6;
+  --color-chart-3: #a78bfa;
+  --color-chart-4: #6366f1;
+  --color-chart-5: #22c55e;
+
+  /* Sidebar */
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #140f1e;
+  --color-sidebar-primary: #7c3aed;
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: #f3effe;
+  --color-sidebar-accent-foreground: #6d28d9;
+  --color-sidebar-border: #eceaf2;
+  --color-sidebar-ring: #7c3aed;
 }
 
 body {
   margin: 0;
   padding: 0;
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   /* overflow: hidden; */
 }
 
