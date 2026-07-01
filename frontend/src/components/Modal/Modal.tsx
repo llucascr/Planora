@@ -15,7 +15,7 @@ export const Modal = ({
       onClick={onClose} // Fecha modal clicando fora do conteúdo
     >
       <div
-        className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 relative"
+        className="bg-card rounded-xl shadow-xl max-w-lg w-full p-6 relative"
         onClick={(e) => e.stopPropagation()} // Impede fechar ao clicar dentro do modal
       >
         <div className="flex items-center justify-between mb-2 relative">

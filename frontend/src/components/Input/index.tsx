@@ -38,7 +38,7 @@ export function Input<T>({
               error,
             "p-2.5": icon,
             "bg-input cursor-pointer": !rest.disabled,
-            "bg-gray-400/40 cursor-not-allowed": rest.disabled,
+            "bg-muted cursor-not-allowed": rest.disabled,
           }
         )}
       >

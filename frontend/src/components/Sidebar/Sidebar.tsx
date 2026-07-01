@@ -47,7 +47,7 @@ export const Sidebar = ({
             {opt.titulo}
           </h2>
           <button
-            className="top-3 text-foreground hover:text-red-600"
+            className="top-3 text-foreground hover:text-destructive"
             onClick={onClose}
             aria-label="Fechar sidebar"
           >

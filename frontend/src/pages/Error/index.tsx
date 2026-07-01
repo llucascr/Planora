@@ -125,25 +125,25 @@ export const ErrorPage = () => {
 
   if (!secretUnlocked) {
     return (
-      <div className="relative flex flex-col items-center justify-center h-screen bg-[#eef0f7]">
+      <div className="relative flex flex-col items-center justify-center h-screen bg-background">
         <button
           onClick={() => navigate("/")}
-          className="absolute top-4 right-4 z-20 bg-[#0E1F63] text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-lg hover:bg-[#162a85] transition-colors"
+          className="absolute top-4 right-4 z-20 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-lg hover:bg-primary-hover transition-colors"
         >
           Voltar pra Home
         </button>
-        <p className="text-8xl font-black text-[#0E1F63] mb-4">404</p>
-        <p className="text-2xl font-semibold text-[#0E1F63] mb-2">Página não encontrada</p>
-        <p className="text-sm text-gray-500">O endereço que você tentou acessar não existe.</p>
+        <p className="text-8xl font-black text-primary mb-4">404</p>
+        <p className="text-2xl font-semibold text-primary mb-2">Página não encontrada</p>
+        <p className="text-sm text-muted-foreground">O endereço que você tentou acessar não existe.</p>
       </div>
     );
   }
 
   return (
-    <div className="relative flex flex-col items-center justify-center h-screen bg-[#eef0f7] overflow-hidden">
+    <div className="relative flex flex-col items-center justify-center h-screen bg-background overflow-hidden">
       <button
         onClick={() => navigate("/")}
-        className="absolute top-4 right-4 z-20 bg-[#0E1F63] text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-lg hover:bg-[#162a85] transition-colors"
+        className="absolute top-4 right-4 z-20 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-lg hover:bg-primary-hover transition-colors"
       >
         Voltar pra Home
       </button>
@@ -302,13 +302,13 @@ export const ErrorPage = () => {
         </div>
       ))}
 
-      <p className="relative z-10 text-2xl font-bold text-[#0E1F63] mb-6">SABOR ENERGÉTICO</p>
+      <p className="relative z-10 text-2xl font-bold text-primary mb-6">SABOR ENERGÉTICO</p>
 
       <div className="relative z-10">
         <ImageGroup />
       </div>
 
-      <p className="relative z-10 text-2xl font-bold text-[#0E1F63] mt-6">KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK TU É BETA</p>
+      <p className="relative z-10 text-2xl font-bold text-primary mt-6">KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK TU É BETA</p>
     </div>
   );
 };

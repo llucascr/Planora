@@ -79,7 +79,7 @@ export function PendingInvitesPanel() {
     <div ref={panelRef} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
+        className="relative flex items-center justify-center w-9 h-9 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
         title="Convites pendentes"
       >
         <Bell size={20} weight="duotone" />
@@ -91,12 +91,12 @@ export function PendingInvitesPanel() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-800">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-popover rounded-2xl shadow-xl border border-border z-50 overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <h3 className="text-sm font-semibold text-foreground">
               Convites pendentes
             </h3>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground">
               {invites.length} {invites.length === 1 ? "convite" : "convites"}
             </span>
           </div>
@@ -104,28 +104,28 @@ export function PendingInvitesPanel() {
           <div className="max-h-80 overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <span className="text-sm text-gray-400">Carregando...</span>
+                <span className="text-sm text-muted-foreground">Carregando...</span>
               </div>
             ) : invites.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+              <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
                 <FolderOpen size={36} weight="duotone" className="mb-2 opacity-40" />
                 <p className="text-sm">Nenhum convite pendente</p>
               </div>
             ) : (
-              <ul className="divide-y divide-gray-50">
+              <ul className="divide-y divide-border">
                 {invites.map((invite) => (
                   <li key={invite.kanbanMemberId} className="px-4 py-3">
-                    <p className="text-sm font-medium text-gray-800 truncate">
+                    <p className="text-sm font-medium text-foreground truncate">
                       {invite.boardName}
                     </p>
                     {invite.boardDescription && (
-                      <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
                         {invite.boardDescription}
                       </p>
                     )}
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       Convidado por{" "}
-                      <span className="font-medium text-gray-600">
+                      <span className="font-medium text-muted-foreground">
                         @{invite.invitedByLogin}
                       </span>
                     </p>
@@ -133,7 +133,7 @@ export function PendingInvitesPanel() {
                       <button
                         disabled={processingId === invite.kanbanMemberId}
                         onClick={() => respond(invite.kanbanMemberId, "ACCEPTED")}
-                        className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-white bg-primary rounded-lg hover:bg-[#1a2f7a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-white bg-primary rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <CheckCircle size={13} weight="bold" />
                         Aceitar
@@ -141,7 +141,7 @@ export function PendingInvitesPanel() {
                       <button
                         disabled={processingId === invite.kanbanMemberId}
                         onClick={() => respond(invite.kanbanMemberId, "DECLINED")}
-                        className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-muted-foreground bg-muted rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <XCircle size={13} weight="bold" />
                         Recusar
