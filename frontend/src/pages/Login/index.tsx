@@ -1,6 +1,5 @@
 import { config } from "config";
-import logoWhite from "../../img/logo_vertical_white.png";
-import logoSmall from "../../img/logo_solo_white.png";
+import planoraIcon from "../../img/planora_icon.png";
 
 const GitHubMark = () => (
   <svg
@@ -45,17 +44,19 @@ export const LoginPage = () => {
         <div className="pointer-events-none absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
 
         <div className="relative flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm">
-            <img src={logoSmall} alt="" className="h-6 w-6 object-contain" />
-          </div>
+          <img
+            src={planoraIcon}
+            alt=""
+            className="h-9 w-9 rounded-xl shadow-md"
+          />
           <span className="text-xl font-extrabold tracking-tight">Planora</span>
         </div>
 
         <div className="relative max-w-md">
           <img
-            src={logoWhite}
+            src={planoraIcon}
             alt="Planora"
-            className="mb-10 h-24 object-contain opacity-95 drop-shadow-lg"
+            className="mb-10 h-20 w-20 rounded-2xl shadow-xl ring-1 ring-white/20"
           />
           <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
             Transforme documentação em backlogs estruturados.
@@ -75,9 +76,11 @@ export const LoginPage = () => {
       <div className="flex flex-1 items-center justify-center p-6 lg:p-12">
         <div className="flex w-full max-w-sm flex-col gap-8">
           {/* logo (mobile only) */}
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-primary to-primary-hover shadow-sm lg:hidden">
-            <img src={logoSmall} alt="Planora" className="h-7 w-7 object-contain" />
-          </div>
+          <img
+            src={planoraIcon}
+            alt="Planora"
+            className="h-12 w-12 rounded-xl shadow-sm lg:hidden"
+          />
 
           <div className="space-y-2">
             <h1 className="text-2xl font-extrabold tracking-tight text-foreground">

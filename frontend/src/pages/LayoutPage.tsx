@@ -4,7 +4,7 @@ import { NotificationProvider, UIProvider, useUI } from "context";
 import { useCookie } from "hooks";
 import { config } from "config";
 import { httpClient } from "api";
-import logoSmall from "../img/logo_solo_white.png";
+import planoraIcon from "../img/planora_icon.png";
 import {
   House,
   FolderOpen,
@@ -145,7 +145,7 @@ export const LayoutPage = ({ children }: LayoutProps) => {
       document.querySelector<HTMLLinkElement>("link[rel~='icon']") ??
       document.createElement("link");
     link.rel = "icon";
-    link.href = logoSmall;
+    link.href = planoraIcon;
     document.head.appendChild(link);
   }, []);
 
@@ -186,13 +186,11 @@ export const LayoutPage = ({ children }: LayoutProps) => {
           >
             {/* Logo */}
             <div className="flex items-center gap-3 px-4 py-5 shrink-0">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-linear-to-br from-primary to-primary-hover shadow-sm shrink-0">
-                <img
-                  src={logoSmall}
-                  alt="Planora"
-                  className="h-6 w-6 object-contain"
-                />
-              </div>
+              <img
+                src={planoraIcon}
+                alt="Planora"
+                className="h-10 w-10 rounded-xl shadow-sm shrink-0"
+              />
               <span
                 className={[
                   "text-lg font-extrabold tracking-tight text-foreground transition-all duration-300 whitespace-nowrap",
