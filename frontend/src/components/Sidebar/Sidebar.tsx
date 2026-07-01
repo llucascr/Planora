@@ -36,22 +36,22 @@ export const Sidebar = ({
         {/* Header */}
         <div
           className={classnames(
-            "flex items-center justify-between p-4 border-b",
+            "flex items-center justify-between p-4 border-b border-border",
             {
               "flex-row-reverse": !isLeft,
               "flex-row": isLeft,
             }
           )}
         >
-          <h2 className="text-xl font-semibold text-foreground">
+          <h2 className="text-lg font-bold tracking-tight text-foreground">
             {opt.titulo}
           </h2>
           <button
-            className="top-3 text-foreground hover:text-destructive"
+            className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
             onClick={onClose}
             aria-label="Fechar sidebar"
           >
-            <X size={24} />
+            <X size={18} weight="bold" />
           </button>
         </div>
 

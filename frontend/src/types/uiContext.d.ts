@@ -3,10 +3,13 @@ export interface UIContextProps {
   hide: (type: UIContextType, id: string) => void;
 }
 
-type ModalOptions = { titulo?: string; size?: "small" | "medium" | "large" };
-type UIOptions = ModalOptions | SidebarOptions;
+export type ModalOptions = {
+  titulo?: string;
+  size?: "small" | "medium" | "large";
+};
+export type UIOptions = ModalOptions | SidebarOptions;
 
-type SidebarOptions = {
+export type SidebarOptions = {
   titulo?: string;
   position?: "left" | "right";
   widthFraction?: `${number}/${number}`;
