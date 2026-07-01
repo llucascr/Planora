@@ -6,6 +6,8 @@ export interface UIContextProps {
 export type ModalOptions = {
   titulo?: string;
   size?: "small" | "medium" | "large";
+  /** Desloca o modal para a esquerda quando aberto junto de um drawer lateral (1/3). */
+  sidebarOffset?: boolean;
 };
 export type UIOptions = ModalOptions | SidebarOptions;
 

@@ -293,6 +293,7 @@ export const AiJobsSidebar = ({ boardId }: { boardId: number }) => {
       options: {
         titulo: "Nova backlog com IA",
         size: "large",
+        sidebarOffset: true,
       },
       content: (
         <CreateIssueForm
