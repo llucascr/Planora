@@ -56,11 +56,11 @@ export function CardPlanoAcao({ card, compact = false }: CardPlanoAcaoProps) {
 
       {totalClientes > 0 && (
         <div className="grid grid-cols-3 gap-1.5">
-          <div className="flex flex-col items-center rounded-md bg-blue-500/10 py-1 px-1">
-            <span className="text-sm font-black text-blue-500">
+          <div className="flex flex-col items-center rounded-md bg-primary/10 py-1 px-1">
+            <span className="text-sm font-black text-primary">
               {totalClientes}
             </span>
-            <span className="text-[9px] text-blue-500/70 font-medium">
+            <span className="text-[9px] text-primary/70 font-medium">
               Clientes
             </span>
           </div>

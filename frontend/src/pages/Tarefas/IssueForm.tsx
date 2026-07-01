@@ -145,7 +145,7 @@ export function IssueForm({
           placeholder="Title"
           required
           autoFocus
-          className="w-full px-3 py-2 bg-card border border-border rounded-md outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-[14px]"
+          className="w-full px-3 py-2 bg-card border border-border rounded-md outline-none focus:border-primary focus:ring-1 focus:ring-primary transition text-[14px]"
         />
       </div>
 
@@ -155,7 +155,7 @@ export function IssueForm({
           Add a description
         </label>
 
-        <div className="flex flex-col flex-1 border border-border rounded-md bg-card overflow-hidden focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition">
+        <div className="flex flex-col flex-1 border border-border rounded-md bg-card overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition">
           {/* Tabs header */}
           <div className="flex items-center gap-1 bg-secondary/50 border-b border-border px-2 py-1.5">
             <button
@@ -197,7 +197,7 @@ export function IssueForm({
                 prose prose-sm max-w-none
                 prose-headings:text-foreground prose-headings:font-bold prose-headings:border-b prose-headings:border-border prose-headings:pb-2 prose-headings:mb-3
                 prose-p:text-foreground/80 prose-p:my-2.5 prose-p:leading-relaxed
-                prose-a:text-blue-600 hover:prose-a:underline prose-a:font-medium
+                prose-a:text-primary hover:prose-a:underline prose-a:font-medium
                 prose-code:bg-secondary prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-foreground prose-code:text-[13px] prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
                 prose-pre:bg-secondary prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-xl prose-pre:border prose-pre:border-border
                 prose-ul:my-3 prose-ol:my-3 prose-ul:pl-5 prose-ol:pl-5
@@ -359,7 +359,7 @@ export function IssueForm({
           <button
             type="submit"
             disabled={loading}
-            className="px-3 py-1.5 text-[13px] font-semibold text-white bg-primary hover:bg-[#1a2f7a] border border-primary rounded-md transition-colors disabled:opacity-50 flex items-center gap-1.5"
+            className="px-3 py-1.5 text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover border border-primary rounded-md transition-colors disabled:opacity-50 flex items-center gap-1.5"
           >
             {loading
               ? "Saving..."

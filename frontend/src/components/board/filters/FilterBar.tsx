@@ -186,7 +186,7 @@ export function FilterBar() {
             })
           }
           placeholder="Buscar issues..."
-          className="h-8 w-44 rounded-lg border border-border bg-input pl-7 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-blue-500/50 focus:bg-white/8 transition-all"
+          className="h-8 w-44 rounded-lg border border-border bg-input pl-7 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:bg-white/8 transition-all"
         />
         {filters.search && (
           <button
@@ -206,14 +206,14 @@ export function FilterBar() {
           className={classnames(
             "inline-flex items-center gap-1.5 rounded-lg border px-2.5 h-8 text-xs font-medium transition-all",
             panelOpen
-              ? "border-blue-500/50 bg-blue-500/10 text-blue-500"
+              ? "border-primary/50 bg-primary/10 text-primary"
               : "border-border bg-input text-foreground hover:border-border hover:text-foreground",
           )}
         >
           <Sliders className="h-3 w-3" />
           Filtros
           {activeCount > 0 && (
-            <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-500 px-1 text-[9px] font-bold text-foreground">
+            <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-foreground">
               {activeCount}
             </span>
           )}
@@ -299,7 +299,7 @@ export function FilterBar() {
                         className={classnames(
                           "rounded-full px-2 py-0.5 text-[10px] font-medium border transition-all capitalize",
                           active
-                            ? "bg-blue-500/20 border-blue-500/50 text-blue-400"
+                            ? "bg-primary/20 border-primary/50 text-primary"
                             : "border-border text-muted-foreground hover:border-border hover:text-foreground",
                         )}
                       >
@@ -327,14 +327,14 @@ export function FilterBar() {
                       className={classnames(
                         "flex items-center gap-2 rounded-lg px-2 py-1.5 text-[11px] transition-all text-left",
                         active
-                          ? "bg-blue-500/15 text-blue-400"
+                          ? "bg-primary/15 text-primary"
                           : "text-muted-foreground hover:text-foreground hover:bg-border",
                       )}
                     >
                       {opt.icon}
                       {opt.label}
                       {active && (
-                        <span className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-400" />
+                        <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
                       )}
                     </button>
                   );

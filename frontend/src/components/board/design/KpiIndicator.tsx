@@ -11,14 +11,14 @@ interface KpiIndicatorProps {
 }
 
 const variantBar: Record<string, string> = {
-  default: "bg-blue-500",
+  default: "bg-primary",
   success: "bg-emerald-500",
   warning: "bg-amber-500",
   danger: "bg-red-500",
 };
 
 const variantText: Record<string, string> = {
-  default: "text-blue-600 dark:text-blue-400",
+  default: "text-primary dark:text-primary",
   success: "text-emerald-600 dark:text-emerald-400",
   warning: "text-amber-600 dark:text-amber-400",
   danger: "text-red-600 dark:text-red-400",

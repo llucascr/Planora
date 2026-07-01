@@ -46,7 +46,7 @@ export function InviteMemberForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label className="block text-sm font-medium text-foreground mb-1.5">
           Login do GitHub
         </label>
         <input
@@ -54,7 +54,7 @@ export function InviteMemberForm({
           onChange={(e) => setLogin(e.target.value)}
           placeholder="Ex: planora"
           required
-          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#3d5aad] focus:ring-2 focus:ring-[#3d5aad]/10 transition"
+          className="w-full px-4 py-2.5 border border-border rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition"
         />
       </div>
 
@@ -62,7 +62,7 @@ export function InviteMemberForm({
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+          className="px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-xl transition-colors"
         >
           Cancelar
         </button>
@@ -70,7 +70,7 @@ export function InviteMemberForm({
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2.5 text-sm font-medium text-white bg-primary rounded-xl hover:bg-[#1a2f7a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          className="px-4 py-2.5 text-sm font-medium text-white bg-primary rounded-xl hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
           {loading ? "Enviando..." : "Convidar"}
         </button>

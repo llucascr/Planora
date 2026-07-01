@@ -211,7 +211,7 @@ export function CardModal({
                       className="prose prose-sm max-w-none
                       prose-headings:text-foreground prose-headings:font-semibold prose-headings:border-b prose-headings:border-border prose-headings:pb-1
                       prose-p:text-foreground/80 prose-p:my-3 prose-p:leading-relaxed
-                      prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
+                      prose-a:text-primary prose-a:no-underline hover:prose-a:underline
                       prose-code:bg-secondary prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-foreground prose-code:text-[85%] prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
                       prose-pre:bg-secondary prose-pre:border prose-pre:border-border prose-pre:rounded-md
                       prose-ul:my-3 prose-ol:my-3 prose-ul:pl-5 prose-ol:pl-5

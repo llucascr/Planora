@@ -59,7 +59,7 @@ export function CardGeneric({ card, onClick, onDelete, onEdit }: CardGenericProp
                   e.stopPropagation();
                   setConfirmDelete(false);
                 }}
-                className="text-xs text-gray-400 hover:text-gray-600 font-medium px-1 py-0.5 rounded transition-colors"
+                className="text-xs text-muted-foreground hover:text-foreground font-medium px-1 py-0.5 rounded transition-colors"
               >
                 Cancelar
               </button>

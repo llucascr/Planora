@@ -27,7 +27,7 @@ const STATUS_CONFIG: Record<
 > = {
   PROCESSING: {
     label: "Processando",
-    className: "text-blue-700 bg-blue-50 border-blue-200",
+    className: "text-primary bg-accent border-primary/20",
     Icon: SpinnerGap,
     spin: true,
   },
@@ -174,7 +174,7 @@ const CreateIssueForm = ({
                   prose prose-sm max-w-none
                   prose-headings:text-foreground prose-headings:font-bold prose-headings:border-b prose-headings:border-border prose-headings:pb-2 prose-headings:mb-3
                   prose-p:text-foreground/80 prose-p:my-2.5 prose-p:leading-relaxed
-                  prose-a:text-blue-600 hover:prose-a:underline prose-a:font-medium
+                  prose-a:text-primary hover:prose-a:underline prose-a:font-medium
                   prose-code:bg-secondary prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-foreground prose-code:text-[13px] prose-code:font-mono prose-code:before:content-none prose-code:after:content-none
                   prose-pre:bg-secondary prose-pre:text-foreground prose-pre:p-4 prose-pre:rounded-xl prose-pre:border prose-pre:border-border
                   prose-ul:my-3 prose-ol:my-3 prose-ul:pl-5 prose-ol:pl-5
@@ -292,7 +292,7 @@ export const AiJobsSidebar = ({ boardId }: { boardId: number }) => {
     <div className="flex flex-col h-full p-4 gap-4">
       <button
         onClick={openCreateModal}
-        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-[#1a2f7a] transition-colors"
+        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-hover transition-colors"
       >
         <PlusIcon size={15} weight="bold" />
         Nova backlog com IA

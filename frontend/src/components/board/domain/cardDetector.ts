@@ -65,5 +65,5 @@ export function getOrigemBadgeClass(origem: string): string {
         instagram: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400',
         site: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
     };
-    return map[origem?.toLowerCase()] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+    return map[origem?.toLowerCase()] ?? 'bg-muted text-muted-foreground dark:bg-gray-700 dark:text-gray-300';
 }
