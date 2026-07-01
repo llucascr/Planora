@@ -1,5 +1,6 @@
 import { config } from "config";
 import planoraIcon from "../../img/planora_icon.png";
+import planoraFace from "../../img/planora_face.png";
 
 const GitHubMark = () => (
   <svg
@@ -53,11 +54,9 @@ export const LoginPage = () => {
         </div>
 
         <div className="relative max-w-md">
-          <img
-            src={planoraIcon}
-            alt="Planora"
-            className="mb-10 h-20 w-20 rounded-2xl shadow-xl ring-1 ring-white/20"
-          />
+          <div className="mb-10 inline-flex items-center justify-center rounded-3xl bg-white p-5 shadow-xl">
+            <img src={planoraFace} alt="Planora" className="h-16 w-auto" />
+          </div>
           <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
             Transforme documentação em backlogs estruturados.
           </h2>
