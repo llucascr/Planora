@@ -15,8 +15,6 @@ interface KanbanViewProps {
   onCreateColumn?: () => void;
   refetch: () => void;
   members?: MemberBoard[];
-  boardId?: number;
-  repository?: string;
 }
 
 function KanbanColumn({
@@ -35,8 +33,6 @@ function KanbanColumn({
   onCardMove,
   refetch,
   members = [],
-  boardId,
-  repository,
 }: {
   columnId: string;
   columnIndex: number;
@@ -52,8 +48,6 @@ function KanbanColumn({
   onCardMove?: (from: string, to: string, cardId: string) => void;
   refetch: () => void;
   members?: MemberBoard[];
-  boardId?: number;
-  repository?: string;
 }) {
   const filteredCardIds = useFilteredColumnCards(columnId);
   const isDragging = draggingColIdx === columnIndex;
@@ -108,8 +102,6 @@ export function KanbanView({
   onCreateColumn,
   refetch,
   members = [],
-  boardId,
-  repository,
 }: KanbanViewProps) {
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -184,8 +176,6 @@ export function KanbanView({
           onCardMove={onCardMove}
           refetch={refetch}
           members={members}
-          boardId={boardId}
-          repository={repository}
         />
       ))}
 

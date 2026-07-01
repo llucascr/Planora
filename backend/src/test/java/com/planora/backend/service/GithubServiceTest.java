@@ -169,7 +169,7 @@ class GithubServiceTest {
             when(userService.findOptionalByLogin("alice")).thenReturn(Optional.of(assigneeAlice));
             when(userService.findOptionalByLogin("ghost")).thenReturn(Optional.empty());
 
-            IssueResponse response = githubService.createIssue(jwt, issueRequest, USER_ID, REPOSITORY, column);
+            IssueResponse response = githubService.createIssue(jwt, issueRequest, USER_ID, column);
 
             ArgumentCaptor<Issue> issueCaptor = ArgumentCaptor.forClass(Issue.class);
             verify(issueRepository).save(issueCaptor.capture());
@@ -194,7 +194,7 @@ class GithubServiceTest {
             IssueRequest issueRequest = new IssueRequest("t", "b", List.of(), List.of());
             when(userService.findById(USER_ID)).thenThrow(new EntityNotFoundException("User not found"));
 
-            assertThatThrownBy(() -> githubService.createIssue(jwt, issueRequest, USER_ID, REPOSITORY, column))
+            assertThatThrownBy(() -> githubService.createIssue(jwt, issueRequest, USER_ID, column))
                     .isInstanceOf(EntityNotFoundException.class);
 
             verifyNoInteractions(githubIssueClient, githubRepositoryClient, githubWebhookClient, issueRepository, labelService);
@@ -220,7 +220,7 @@ class GithubServiceTest {
             when(githubIssueClient.createIssue(eq(OWNER), eq(REPOSITORY), eq(BEARER_GITHUB_TOKEN), eq(GITHUB_API_VERSION), eq(r3)))
                     .thenReturn(buildOpenApiResponseWithTitle("t3"));
 
-            List<IssueResponse> responses = githubService.createBulkIssues(jwt, List.of(r1, r2, r3), USER_ID, REPOSITORY, column);
+            List<IssueResponse> responses = githubService.createBulkIssues(jwt, List.of(r1, r2, r3), USER_ID, column);
 
             assertThat(responses).hasSize(3);
             assertThat(responses).extracting(resp -> resp.issueApiResponse().title())
@@ -233,7 +233,7 @@ class GithubServiceTest {
         void deveRetornarListaVazia_quandoRequestsForVazio() {
             when(userService.findById(USER_ID)).thenReturn(user);
 
-            List<IssueResponse> responses = githubService.createBulkIssues(jwt, List.of(), USER_ID, REPOSITORY, column);
+            List<IssueResponse> responses = githubService.createBulkIssues(jwt, List.of(), USER_ID, column);
 
             assertThat(responses).isEmpty();
             verifyNoInteractions(githubIssueClient, githubRepositoryClient, githubWebhookClient, issueRepository, labelService);

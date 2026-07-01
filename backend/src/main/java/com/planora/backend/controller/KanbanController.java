@@ -5,6 +5,7 @@ import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
 import com.planora.backend.model.issue.dto.MoveIssueRequest;
 import com.planora.backend.model.issue.dto.IssueUpdateRequest;
+import com.planora.backend.model.issue.dto.LabelResponse;
 import com.planora.backend.model.kanban.dto.*;
 import com.planora.backend.service.IKanbanBoardService;
 import com.planora.backend.service.KanbanMemberService;
@@ -72,13 +73,12 @@ public class KanbanController {
             @RequestParam Long boardId,
             @RequestParam Long columnId,
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody IssueRequest issueRequest,
-            @RequestParam String repository
+            @RequestBody IssueRequest issueRequest
     ) {
         Long userId = tokenService.getUserId(jwt);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                kanbanBoardService.createIssueAndAddToColumn(boardId, columnId, jwt, issueRequest, userId, repository)
+                kanbanBoardService.createIssueAndAddToColumn(boardId, columnId, jwt, issueRequest, userId)
         );
     }
 
@@ -87,12 +87,22 @@ public class KanbanController {
             @RequestParam Long boardId,
             @RequestParam Long columnId,
             @AuthenticationPrincipal Jwt jwt,
-            @Valid @RequestBody BulkIssueRequest bulkRequest,
-            @RequestParam Long userId,
-            @RequestParam String repository
+            @Valid @RequestBody BulkIssueRequest bulkRequest
     ) {
+        Long userId = tokenService.getUserId(jwt);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                kanbanBoardService.createBulkIssuesAndAddToColumn(boardId, columnId, jwt, bulkRequest.issues(), userId, repository)
+                kanbanBoardService.createBulkIssuesAndAddToColumn(boardId, columnId, jwt, bulkRequest.issues(), userId)
+        );
+    }
+
+    @GetMapping("/board/{boardId}/labels")
+    public ResponseEntity<List<LabelResponse>> getBoardLabels(
+            @PathVariable Long boardId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        return ResponseEntity.ok(
+                kanbanBoardService.listBoardLabels(boardId, tokenService.getGithubToken(jwt))
         );
     }
 

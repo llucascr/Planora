@@ -11,7 +11,6 @@ interface GridViewProps {
   onCardMove?: (from: string, to: string, cardId: string) => void;
   members?: MemberBoard[];
   boardId?: number;
-  repository?: string;
   refetch?: () => void;
 }
 
@@ -21,7 +20,6 @@ export function GridView({
   onCardMove,
   members = [],
   boardId,
-  repository,
   refetch,
 }: GridViewProps) {
   const state = useBoardState();
@@ -52,7 +50,6 @@ export function GridView({
                 onCardMove={onCardMove}
                 members={members}
                 boardId={boardId}
-                repository={repository}
                 refetch={refetch}
               />
             </div>

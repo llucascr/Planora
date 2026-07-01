@@ -152,7 +152,7 @@ class ApiPythonServiceTest {
 
             verify(kanbanBoardService).createBulkIssuesAndAddToColumn(
                     eq(BOARD_ID), eq(COLUMN_ID), eq(jwt),
-                    eq(List.of(issue)), eq(USER_ID), eq(REPOSITORY));
+                    eq(List.of(issue)), eq(USER_ID));
         }
 
         @Test
@@ -179,7 +179,7 @@ class ApiPythonServiceTest {
                     .jwtToken(JWT_TOKEN_VALUE)
                     .build();
             when(jobRepository.findById(JOB_ID)).thenReturn(Optional.of(job));
-            when(kanbanBoardService.createBulkIssuesAndAddToColumn(any(), any(), any(), any(), any(), any()))
+            when(kanbanBoardService.createBulkIssuesAndAddToColumn(any(), any(), any(), any(), any()))
                     .thenThrow(new RuntimeException("board error"));
 
             assertThatThrownBy(() -> apiPythonService.saveBacklog(callback, jwt))

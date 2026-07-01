@@ -79,7 +79,7 @@ public class ApiPythonService {
 
         try {
             kanbanBoardService.createBulkIssuesAndAddToColumn(job.getBoardId(), job.getColumnId(), jwt,
-                    issues, job.getUserId(), job.getRepository());
+                    issues, job.getUserId());
             job.setStatus(JobStatus.COMPLETED);
         } catch (Exception e) {
             job.setStatus(JobStatus.ERROR);

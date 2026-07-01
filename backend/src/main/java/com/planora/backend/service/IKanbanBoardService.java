@@ -3,6 +3,7 @@ package com.planora.backend.service;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
 import com.planora.backend.model.issue.dto.IssueUpdateRequest;
+import com.planora.backend.model.issue.dto.LabelResponse;
 import com.planora.backend.model.kanban.KanbanBoard;
 import com.planora.backend.model.kanban.dto.KanbanBoardRequest;
 import com.planora.backend.model.kanban.dto.KanbanBoardResponse;
@@ -40,11 +41,12 @@ public interface IKanbanBoardService {
     List<KanbanColumnWithIssuesResponse> getColumnsWithIssues(Long boardId, Long userId);
 
     IssueResponse createIssueAndAddToColumn(Long boardId, Long columnId, Jwt token,
-                                            IssueRequest issueRequest, Long userId, String repository);
+                                            IssueRequest issueRequest, Long userId);
 
     List<IssueResponse> createBulkIssuesAndAddToColumn(Long boardId, Long columnId, Jwt token,
-                                                       List<IssueRequest> issueRequests, Long userId,
-                                                       String repository);
+                                                       List<IssueRequest> issueRequests, Long userId);
+
+    List<LabelResponse> listBoardLabels(Long boardId, String githubToken);
 
     IssueResponse openIssue(Jwt token, Long issueId);
 

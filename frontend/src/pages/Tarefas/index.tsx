@@ -97,8 +97,6 @@ export const TarefasPage = () => {
         onInviteMember={openInviteMemberModal}
         boardId={boardId}
         members={board?.members}
-        repository={board?.githubRepository}
-        githubOwnerName={board?.githubOwnerName}
       />
     </div>
   );

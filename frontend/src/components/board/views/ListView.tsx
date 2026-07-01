@@ -11,7 +11,6 @@ interface ListViewProps {
   onCardMove?: (from: string, to: string, cardId: string) => void;
   members?: MemberBoard[];
   boardId?: number;
-  repository?: string;
   refetch?: () => void;
 }
 
@@ -22,7 +21,6 @@ function ListColumnSection({
   onCardMove,
   members = [],
   boardId,
-  repository,
   refetch,
 }: {
   columnId: string;
@@ -31,7 +29,6 @@ function ListColumnSection({
   onCardMove?: (from: string, to: string, cardId: string) => void;
   members?: MemberBoard[];
   boardId?: number;
-  repository?: string;
   refetch?: () => void;
 }) {
   const state = useBoardState();
@@ -48,7 +45,7 @@ function ListColumnSection({
       >
         <div className="flex-1 h-px bg-border group-hover:bg-primary/30 transition-colors" />
         <span className="shrink-0 text-xs font-bold text-muted-foreground uppercase tracking-wider group-hover:text-foreground transition-colors">
-          {column?.nome}
+          {column?.name}
         </span>
         <span className="shrink-0 rounded-full bg-primary/10 px-1.5 text-[10px] font-bold text-primary">
           {filteredCardIds.length}
@@ -72,7 +69,6 @@ function ListColumnSection({
                 onCardMove={onCardMove}
                 members={members}
                 boardId={boardId}
-                repository={repository}
                 refetch={refetch}
               />
             );
@@ -94,7 +90,6 @@ export function ListView({
   onCardMove,
   members = [],
   boardId,
-  repository,
   refetch,
 }: ListViewProps) {
   const state = useBoardState();
@@ -109,7 +104,6 @@ export function ListView({
           onCardMove={onCardMove}
           members={members}
           boardId={boardId}
-          repository={repository}
           refetch={refetch}
         />
       ))}

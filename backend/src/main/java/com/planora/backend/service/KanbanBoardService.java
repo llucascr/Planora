@@ -4,6 +4,7 @@ import com.planora.backend.exception.DataNotFoundException;
 import com.planora.backend.model.issue.dto.IssueRequest;
 import com.planora.backend.model.issue.dto.IssueResponse;
 import com.planora.backend.model.issue.dto.IssueUpdateRequest;
+import com.planora.backend.model.issue.dto.LabelResponse;
 import com.planora.backend.model.kanban.KanbanBoard;
 import com.planora.backend.model.kanban.KanbanMember;
 import com.planora.backend.model.kanban.dto.InvitedStatus;
@@ -120,14 +121,22 @@ public class KanbanBoardService implements IKanbanBoardService {
     }
 
     public IssueResponse createIssueAndAddToColumn(Long boardId, Long columnId, Jwt token,
-                                                   IssueRequest issueRequest, Long userId, String repository) {
-        return kanbanIssueService.createIssueAndAddToColumn(boardId, columnId, token, issueRequest, userId, repository);
+                                                   IssueRequest issueRequest, Long userId) {
+        return kanbanIssueService.createIssueAndAddToColumn(boardId, columnId, token, issueRequest, userId);
     }
 
     public List<IssueResponse> createBulkIssuesAndAddToColumn(Long boardId, Long columnId, Jwt token,
-                                                              List<IssueRequest> issueRequests, Long userId,
-                                                              String repository) {
-        return kanbanIssueService.createBulkIssuesAndAddToColumn(boardId, columnId, token, issueRequests, userId, repository);
+                                                              List<IssueRequest> issueRequests, Long userId) {
+        return kanbanIssueService.createBulkIssuesAndAddToColumn(boardId, columnId, token, issueRequests, userId);
+    }
+
+    public List<LabelResponse> listBoardLabels(Long boardId, String githubToken) {
+        KanbanBoard board = findById(boardId);
+        return githubService.listRepositoryLabels(
+                githubToken,
+                board.getGithubOwnerName(),
+                board.getGithubRepository()
+        );
     }
 
     public IssueResponse openIssue(Jwt token, Long issueId) {

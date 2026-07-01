@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import {
   DotsSixVertical,
   Plus,
@@ -56,29 +56,10 @@ export function Column({
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(column.name);
   const [openMenu, setOpenMenu] = useState(false);
-  const [repository, setRepository] = useState("");
-  const [ownerName, setOwnerName] = useState("");
 
   const accentColor = COLUMN_COLORS[columnIndex % COLUMN_COLORS.length];
 
   if (!column) return null;
-
-  useEffect(() => {
-    async function loadBoard() {
-      try {
-        const response: any = await httpClient.get(
-          `/v1/kanban/board/${column.idBoard}`,
-        );
-
-        setRepository(response.name);
-        setOwnerName(response.githubOwnerName);
-      } catch (err) {
-        console.error("Erro ao buscar board:", err);
-      }
-    }
-
-    loadBoard();
-  }, [column.idBoard]);
 
   function handleToggle() {
     dispatch({ type: "TOGGLE_COLUMN", payload: columnId });
@@ -222,8 +203,6 @@ export function Column({
           action="create"
           boardId={column.idBoard}
           columnId={column.id}
-          repository={repository}
-          githubOwnerName={ownerName}
           refetch={refetch}
           members={members}
           onClose={() => ui.hide("modal", "issue-form-create")}
@@ -346,9 +325,7 @@ export function Column({
                   onCardClick={onCardClick}
                   refetch={refetch}
                   boardId={column.idBoard}
-                  repository={repository}
                   members={members}
-                  ownerName={ownerName}
                 />
               </React.Fragment>
             );

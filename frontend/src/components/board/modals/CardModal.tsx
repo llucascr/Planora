@@ -36,8 +36,6 @@ interface CardModalProps {
   onDelete?: () => void;
   boardId?: number;
   columnId?: number;
-  repository?: string;
-  githubOwnerName?: string;
   members?: MemberBoard[];
   refetch?: () => void;
 }
@@ -49,8 +47,6 @@ export function CardModal({
   onDelete,
   boardId,
   columnId,
-  repository,
-  githubOwnerName,
   members,
   refetch,
 }: CardModalProps) {
@@ -165,20 +161,13 @@ export function CardModal({
           )}
         </div>
 
-        {isEditing &&
-        boardId &&
-        columnId &&
-        repository &&
-        githubOwnerName &&
-        members ? (
+        {isEditing && boardId && columnId && members ? (
           <div className="flex-1 overflow-y-auto p-4 bg-card">
             <IssueForm
               action="update"
               issue={card}
               boardId={boardId}
               columnId={columnId}
-              repository={repository}
-              githubOwnerName={githubOwnerName}
               members={members}
               refetch={() => {
                 refetch?.();

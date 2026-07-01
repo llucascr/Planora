@@ -27,20 +27,19 @@ public class KanbanIssueService {
     private final GithubService githubService;
 
     public IssueResponse createIssueAndAddToColumn(Long boardId, Long columnId, Jwt token,
-                                                   IssueRequest issueRequest, Long userId, String repository) {
+                                                   IssueRequest issueRequest, Long userId) {
         validateBoardMember(boardId, userId);
 
         KanbanColumn column = findColumnInBoard(boardId, columnId);
-        return githubService.createIssue(token, issueRequest, userId, repository, column);
+        return githubService.createIssue(token, issueRequest, userId, column);
     }
 
     public List<IssueResponse> createBulkIssuesAndAddToColumn(Long boardId, Long columnId, Jwt token,
-                                                              List<IssueRequest> issueRequests, Long userId,
-                                                              String repository) {
+                                                              List<IssueRequest> issueRequests, Long userId) {
         validateBoardMember(boardId, userId);
 
         KanbanColumn column = findColumnInBoard(boardId, columnId);
-        return githubService.createBulkIssues(token, issueRequests, userId, repository, column);
+        return githubService.createBulkIssues(token, issueRequests, userId, column);
     }
 
     public IssueResponse openIssue(Jwt token, Long issueId) {

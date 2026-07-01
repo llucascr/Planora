@@ -413,11 +413,11 @@ class KanbanBoardServiceTest {
         void deveDelegarEPropagarRetorno() {
             IssueRequest request = new IssueRequest("t", "b", List.of(), List.of());
             IssueResponse expected = mockIssueResponse();
-            when(kanbanIssueService.createIssueAndAddToColumn(BOARD_ID, COLUMN_ID, jwt, request, USER_ID, REPO))
+            when(kanbanIssueService.createIssueAndAddToColumn(BOARD_ID, COLUMN_ID, jwt, request, USER_ID))
                     .thenReturn(expected);
 
             IssueResponse response = kanbanBoardService.createIssueAndAddToColumn(
-                    BOARD_ID, COLUMN_ID, jwt, request, USER_ID, REPO);
+                    BOARD_ID, COLUMN_ID, jwt, request, USER_ID);
 
             assertThat(response).isSameAs(expected);
         }
@@ -426,11 +426,11 @@ class KanbanBoardServiceTest {
         @DisplayName("deve propagar UnauthorizedException do KanbanIssueService")
         void devePropagar_quandoNaoEhMember() {
             IssueRequest request = new IssueRequest("t", "b", List.of(), List.of());
-            when(kanbanIssueService.createIssueAndAddToColumn(BOARD_ID, COLUMN_ID, jwt, request, USER_ID, REPO))
+            when(kanbanIssueService.createIssueAndAddToColumn(BOARD_ID, COLUMN_ID, jwt, request, USER_ID))
                     .thenThrow(new UnauthorizedException("Kanban member not found"));
 
             assertThatThrownBy(() -> kanbanBoardService.createIssueAndAddToColumn(
-                    BOARD_ID, COLUMN_ID, jwt, request, USER_ID, REPO))
+                    BOARD_ID, COLUMN_ID, jwt, request, USER_ID))
                     .isInstanceOf(UnauthorizedException.class);
         }
     }
@@ -444,11 +444,11 @@ class KanbanBoardServiceTest {
         void deveDelegarEPropagarRetorno() {
             List<IssueRequest> requests = List.of(new IssueRequest("t", "b", List.of(), List.of()));
             List<IssueResponse> expected = List.of(mockIssueResponse());
-            when(kanbanIssueService.createBulkIssuesAndAddToColumn(BOARD_ID, COLUMN_ID, jwt, requests, USER_ID, REPO))
+            when(kanbanIssueService.createBulkIssuesAndAddToColumn(BOARD_ID, COLUMN_ID, jwt, requests, USER_ID))
                     .thenReturn(expected);
 
             List<IssueResponse> response = kanbanBoardService.createBulkIssuesAndAddToColumn(
-                    BOARD_ID, COLUMN_ID, jwt, requests, USER_ID, REPO);
+                    BOARD_ID, COLUMN_ID, jwt, requests, USER_ID);
 
             assertThat(response).isSameAs(expected);
         }

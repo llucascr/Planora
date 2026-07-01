@@ -100,7 +100,6 @@ class GithubContractIntegrationTest extends AbstractIntegrationTest {
                         .with(jwtFor(owner))
                         .param("boardId", board.getKanbanBoardId().toString())
                         .param("columnId", todo.getKanbanColumnId().toString())
-                        .param("repository", REPO)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(request)))
                 .andExpect(status().isCreated());
@@ -206,7 +205,6 @@ class GithubContractIntegrationTest extends AbstractIntegrationTest {
                         .with(jwtFor(owner))
                         .param("boardId", board.getKanbanBoardId().toString())
                         .param("columnId", todo.getKanbanColumnId().toString())
-                        .param("repository", REPO)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(request)))
                 .andExpect(status().is4xxClientError());

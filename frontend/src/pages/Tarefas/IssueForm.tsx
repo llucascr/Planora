@@ -12,8 +12,6 @@ interface IssueFormProps {
 
   boardId: number;
   columnId: number;
-  repository: string;
-  githubOwnerName: string;
 
   members: MemberBoard[];
 
@@ -26,8 +24,6 @@ export function IssueForm({
   issue,
   boardId,
   columnId,
-  repository,
-  githubOwnerName,
   members,
   refetch,
   onClose,
@@ -58,7 +54,7 @@ export function IssueForm({
     async function loadLabels() {
       try {
         const response = await httpClient.get<GithubLabel[]>(
-          `/v1/github/repository/labels?ownerName=${githubOwnerName}&repository=${repository}`,
+          `/v1/kanban/board/${boardId}/labels`,
         );
 
         setAvailableLabels(response);
@@ -68,7 +64,7 @@ export function IssueForm({
     }
 
     loadLabels();
-  }, [repository]);
+  }, [boardId]);
 
   function toggleAssignee(login: string) {
     setAssignees((prev) =>
@@ -90,7 +86,7 @@ export function IssueForm({
     try {
       if (action === "create") {
         await httpClient.post(
-          `/v1/kanban/board/issue/create?boardId=${boardId}&columnId=${columnId}&repository=${repository}`,
+          `/v1/kanban/board/issue/create?boardId=${boardId}&columnId=${columnId}`,
           {
             title,
             body: description,

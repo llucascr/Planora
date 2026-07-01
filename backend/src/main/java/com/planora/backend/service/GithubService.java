@@ -51,16 +51,16 @@ public class GithubService {
     @Value("${github.webhook.secret:}")
     private String webhookSecret;
 
-    public IssueResponse createIssue(Jwt token, IssueRequest issueRequest, Long userId, String repository, KanbanColumn column) {
+    public IssueResponse createIssue(Jwt token, IssueRequest issueRequest, Long userId, KanbanColumn column) {
         User user = userService.findById(userId);
-        return buildAndPersistIssue(user, repository, token, column, issueRequest);
+        return buildAndPersistIssue(user, token, column, issueRequest);
     }
 
     @Transactional
-    public List<IssueResponse> createBulkIssues(Jwt token, List<IssueRequest> requests, Long userId, String repository, KanbanColumn column) {
+    public List<IssueResponse> createBulkIssues(Jwt token, List<IssueRequest> requests, Long userId, KanbanColumn column) {
         User user = userService.findById(userId);
         return requests.stream()
-                .map(request -> buildAndPersistIssue(user, repository, token, column, request))
+                .map(request -> buildAndPersistIssue(user, token, column, request))
                 .toList();
     }
 
@@ -160,11 +160,11 @@ public class GithubService {
         issueRepository.delete(issue);
     }
 
-    private IssueResponse buildAndPersistIssue(User user, String repository, Jwt token, KanbanColumn column, IssueRequest issueRequest) {
-        String ownerName = column.getKanbanBoard().getGithubOwnerName();
+    private IssueResponse buildAndPersistIssue(User user, Jwt token, KanbanColumn column, IssueRequest issueRequest) {
+        KanbanBoard board = column.getKanbanBoard();
         IssueApiResponse apiResponse = githubIssueClient.createIssue(
-                ownerName,
-                repository,
+                board.getGithubOwnerName(),
+                board.getGithubRepository(),
                 "Bearer " + tokenService.getGithubToken(token),
                 GITHUB_API_VERSION,
                 issueRequest
@@ -313,14 +313,14 @@ public class GithubService {
     }
 
     public List<LabelResponse> listRepositoryLabels(
-            Jwt token,
+            String githubToken,
             String ownerName,
             String repository
     ) {
         return githubLabelClient.getRepositoryLabels(
                         ownerName,
                         repository,
-                        "Bearer " + tokenService.getGithubToken(token),
+                        "Bearer " + githubToken,
                         GITHUB_API_VERSION
                 ).stream()
                 .map(labelService::resolveOrCreateLabel)

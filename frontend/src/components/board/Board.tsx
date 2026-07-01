@@ -55,8 +55,6 @@ function BoardInner({
   onCreateColumn,
   onInviteMember,
   members = [],
-  repository,
-  githubOwnerName,
 }: {
   boardId: number;
   onCardMove?: (from: string, to: string, cardId: string) => void;
@@ -64,8 +62,6 @@ function BoardInner({
   onCreateColumn?: () => void;
   onInviteMember?: () => void;
   members?: MemberBoard[];
-  repository?: string;
-  githubOwnerName?: string;
 }) {
   const state = useBoardState();
   const dispatch = useBoardDispatch();
@@ -159,8 +155,6 @@ function BoardInner({
             onColumnMove={onColumnMove}
             onCreateColumn={onCreateColumn}
             members={members}
-            boardId={boardId}
-            repository={repository}
             refetch={handleRefetch}
           />
         );
@@ -172,7 +166,6 @@ function BoardInner({
             onCardMove={onCardMove}
             members={members}
             boardId={boardId}
-            repository={repository}
             refetch={handleRefetch}
           />
         );
@@ -184,7 +177,6 @@ function BoardInner({
             onCardMove={onCardMove}
             members={members}
             boardId={boardId}
-            repository={repository}
             refetch={handleRefetch}
           />
         );
@@ -265,8 +257,6 @@ function BoardInner({
           onDelete={() => handleDeleteCard(selectedCard.id.toString())}
           boardId={boardId}
           columnId={Number(selectedColumn?.id)}
-          repository={repository}
-          githubOwnerName={githubOwnerName}
           members={members}
           refetch={() => {
             handleRefetch();
@@ -282,8 +272,6 @@ interface BoardProps {
   boardId: number;
   columns: BoardColumn[];
   members?: MemberBoard[];
-  repository?: string;
-  githubOwnerName?: string;
   onCardMove?: (
     fromColumnId: string,
     toColumnId: string,
@@ -301,8 +289,6 @@ export function Board({
   columns,
   onCardMove,
   members = [],
-  repository,
-  githubOwnerName,
   onColumnMove,
   className,
   onCreateColumn,
@@ -318,8 +304,6 @@ export function Board({
           onCreateColumn={onCreateColumn}
           onInviteMember={onInviteMember}
           members={members}
-          repository={repository}
-          githubOwnerName={githubOwnerName}
         />
       </div>
     </BoardProvider>
