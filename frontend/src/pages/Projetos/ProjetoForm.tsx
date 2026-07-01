@@ -128,7 +128,7 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+        <label className="block text-sm font-medium text-foreground mb-1.5">
           Nome do Projeto
         </label>
         <input
@@ -137,13 +137,13 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
           onChange={(e) => setName(e.target.value)}
           placeholder="Ex: Sistema de Gestão de Tarefas"
           required
-          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#3d5aad] focus:ring-2 focus:ring-[#3d5aad]/10 transition"
+          className="w-full px-4 py-2.5 border border-border rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition"
         />
       </div>
 
       {repositories && (
         <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-foreground">
             Repositório GitHub
           </label>
           <Dropdown
@@ -156,7 +156,7 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
             searchable={false}
             className="w-full"
             renderTrigger={(selectedOption, isOpen) => (
-              <div className="w-full flex items-center justify-between bg-white border border-gray-200 rounded-xl py-2.5 px-4 text-sm text-gray-700 focus:border-[#3d5aad] focus:ring-2 focus:ring-[#3d5aad]/10 transition-all font-normal cursor-pointer shadow-sm hover:border-gray-300">
+              <div className="w-full flex items-center justify-between bg-card border border-border rounded-xl py-2.5 px-4 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all font-normal cursor-pointer shadow-sm hover:border-input">
                 <div className="flex items-center gap-2 truncate">
                   {selectedOption?.icon || <GithubLogo size={16} />}
                   <span className="truncate">
@@ -169,14 +169,14 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
                 />
               </div>
             )}
-            menuClassName="!w-full h-64 overflow-y-auto !rounded-xl !border-gray-100 !shadow-2xl !bg-white"
+            menuClassName="!w-full h-64 overflow-y-auto !rounded-xl !border-border !shadow-2xl !bg-card"
           />
         </div>
       )}
 
       <div>
         <div className="flex items-center justify-between mb-1.5">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-foreground">
             Descrição
           </label>
           {isCreate && githubRepository?.description && !description && (
@@ -196,7 +196,7 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Descreva o objetivo do projeto..."
           rows={3}
-          className="w-full px-4 py-2.5 border border-gray-200 rounded-xl outline-none focus:border-[#3d5aad] focus:ring-2 focus:ring-[#3d5aad]/10 transition resize-none"
+          className="w-full px-4 py-2.5 border border-border rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition resize-none"
         />
       </div>
 
@@ -204,14 +204,14 @@ export function ProjetoForm({ action, board, refetch }: ProjetoFormProps) {
         <button
           type="button"
           onClick={() => ui.hide("modal", `projeto-form-${action}`)}
-          className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+          className="px-4 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted rounded-xl transition-colors"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2.5 text-sm font-medium text-white bg-primary rounded-xl hover:bg-[#1a2f7a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          className="px-4 py-2.5 text-sm font-medium text-white bg-primary rounded-xl hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
           {loading
             ? isCreate

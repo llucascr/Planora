@@ -11,7 +11,7 @@ export const SearchHeaderBtn = ({ item }: { item: SearchHeaderBtnType[] }) => {
             <button
               key={index}
               onClick={() => btn.onClick!()}
-              className="cursor-pointer flex items-center gap-2 bg-transparent hover:bg-blue-600 border hover:border-blue-600 border-blue-500 text-blue-600 hover:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 w-auto"
+              className="cursor-pointer flex items-center gap-2 bg-transparent hover:bg-primary border hover:border-primary border-primary text-primary hover:text-white text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5 w-auto"
             >
               {btn.title}
               {btn.icon}
